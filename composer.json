@@ -1,0 +1,22 @@
+{
+	"name": "arc/arc",
+	"type": "library",
+	"description": "Ariadne Component Library",
+	"keywords": ["component","components"],
+	"homepage": "http://www.ariadne-cms.org/arc/",
+	"license": "GPL",
+	"authors": [
+		{
+			"name": "Auke van Slooten",
+			"email": "auke@muze.nl"
+		}
+	],
+	"require": {
+		"php": ">=5.3"
+	},
+	"autoload": {
+		"psr-0": {
+			"arc": "src/",
+		}
+	}
+}
