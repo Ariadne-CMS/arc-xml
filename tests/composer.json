@@ -1,0 +1,5 @@
+{
+	"require": {
+		"lastcraft/simpletest": "1.*"
+	}
+}
