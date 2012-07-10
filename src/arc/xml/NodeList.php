@@ -521,6 +521,7 @@
 		}
 
 		public function parseName( $name, $attributes = array() ) {
+			//FIXME: copy of  \arc\xml::parseName, needs refactoring
 			$colonPos = strrpos( $name, ':' );
 			if ( $colonPos !== false ) {
 				$prefix = substr( $name, 0, $colonPos );
