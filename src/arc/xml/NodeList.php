@@ -532,10 +532,12 @@
 					$namespace = $this->lookupPrefix( $prefix );
 				}
 				$localName = substr( $name, $colonPos );
-				return array( 'prefix' => $prefix, 'namespace' => $namespace, 'localName' => $localName );
+				$result = array( 'prefix' => $prefix, 'namespace' => $namespace, 'localName' => $localName );
 			} else {
-				return array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
+				$result = array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
 			}
+			// make list( $a, $b, $c ) = parseName() work
+			return array_merge( array_values( $result ), $result ); 
 		}
 
 		public function find( $selector ) {
