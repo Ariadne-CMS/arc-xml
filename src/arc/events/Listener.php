@@ -34,4 +34,3 @@
 
 		/* FIXME: add a add() method, which re-adds the listener, potentially as last in the list */
 	}
-?>

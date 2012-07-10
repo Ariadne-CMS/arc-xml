@@ -12,4 +12,3 @@
 	namespace arc;
 
 	class ExceptionDefault extends Exception { }
-?>

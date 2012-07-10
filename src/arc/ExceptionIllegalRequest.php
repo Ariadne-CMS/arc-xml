@@ -13,4 +13,3 @@
 
 	class ExceptionIllegalRequest extends Exception { }
 
-?>

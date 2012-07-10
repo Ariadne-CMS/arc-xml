@@ -13,4 +13,3 @@
 
 	class ExceptionConfigError extends Exception { }
 
-?>

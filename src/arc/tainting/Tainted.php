@@ -22,4 +22,3 @@
 			return filter_var($this->value, FILTER_SANITIZE_SPECIAL_CHARS);
 		}
 	}
-?>

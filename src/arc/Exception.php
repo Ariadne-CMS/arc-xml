@@ -13,4 +13,3 @@
 
 	class Exception extends \Exception { }
 
-?>

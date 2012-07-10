@@ -9,4 +9,3 @@
 		public function show( $template, $arguments = null );
 
 	}
-?>

@@ -13,4 +13,3 @@
 
 	class ExceptionAuthenticationError extends Exception { }
 
-?>

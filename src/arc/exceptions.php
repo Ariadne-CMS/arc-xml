@@ -24,4 +24,3 @@
 		const CONFIGURATION_ERROR = 110;
 	}
 
-?>

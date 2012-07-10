@@ -48,4 +48,3 @@
 			return $this->stack->fire($eventName, $eventData, $objectType = null, $this->path);
 		}
 	}
-?>
