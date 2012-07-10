@@ -26,4 +26,3 @@
 		public function headers( $headers );
 
 	}
-	
