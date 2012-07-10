@@ -16,7 +16,7 @@
 	namespace arc;
 
 	if ( !defined('ARC_BASE_DIR') ) {
-		define('ARC_BASE_DIR', dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPERATOR );
+		define('ARC_BASE_DIR', dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPARATOR );
 	}
 	require_once( ARC_BASE_DIR . 'arc/Pluggable.php' );
 	require_once( ARC_BASE_DIR . 'arc/Loader.php' );

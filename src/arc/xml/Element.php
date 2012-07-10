@@ -96,7 +96,9 @@ class Element extends \ArrayObject implements NodeInterface {
 			}
 			if ( $el instanceof Element || $el instanceof Node ) {
 				if ( $this->document !== $el->document ) {
-					$el->parentNode->removeChild( $el ); // remove element from original document for consistency
+					if ( $el->parentNode ) {
+						$el->parentNode->removeChild( $el ); // remove element from original document for consistency
+					}
 					$this->document->importNode( $el );
 				}
 				$this->domNode->appendChild( $el->domNode );
