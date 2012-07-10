@@ -10,17 +10,17 @@
 	 */
 
 	namespace arc\url;
-	
+
 	/* ParsedUrl tries to parse the query part, so if it isn't compatible with PHP it won't survive */
 	class ParsedUrl extends SafeUrl implements \arc\KeyValueStoreInterface {
-	
+
 		private $components, $query, $skipQueryParsing;
-		
+
 		public function __construct( $url ) {
 			parent::__construct( $url );
 			$this->query = new UrlQuery( $this->components['query'] );
 		}
-		
+
 		public function __get( $var ) {
 			if ( $var == 'query' ) {
 				return $this->query;
@@ -28,7 +28,7 @@
 				return parent::__get($var);
 			}
 		}
-		
+
 		public function __set( $var, $value ) {
 			switch($var) {
 				case 'query' :
@@ -51,11 +51,11 @@
 			$result = parent::__toString();
 			return $url;
 		}
-		
+
 		public function getvar( $name ) {
 			return $this->query->$name;
 		}
-		
+
 		public function putvar( $name, $value ) {
 			$this->query->{$name} = $value;
 		}
@@ -63,6 +63,5 @@
 		public function import( $values ) {
 			$this->query->import( $values );
 		}
-		
+
 	}
-?>

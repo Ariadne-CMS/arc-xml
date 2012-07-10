@@ -1,13 +1,13 @@
 <?php
 
 	namespace arc\xml;
-	
+
 	class Query extends \ArrayObject implements NodeInterface {
 		protected $query = null;
 		public    $document = null;
 		protected $contextNode = null;
 		protected $list = null;
-		
+
 		public function __construct( $query, $document, $contextNode = null ) {
 			$this->contextNode = $contextNode;
 			$this->document = $document;
@@ -31,13 +31,13 @@
 		public function __set( $name, $value ) {
 			// FIXME: create new node, make sure required parent nodes are created as needed as well.
 		}
-				
+
 		protected function applySearch() {
 			if ( !$this->list ) {
 				$this->list = $this->document->xpath( $this->query, $this->contextNode );
 			}
 		}
-		
+
 		public function offsetGet( $offset ) {
 			$this->applySearch();
 			if ( $this->list ) {
@@ -46,7 +46,7 @@
 				return null;
 			}
 		}
-		
+
 		public function getArrayCopy() {
 			$this->applySearch();
 			$array = array();
@@ -55,16 +55,16 @@
 			}
 			return $array;
 		}
-		
+
 		public function toString() {
 			$this->applySearch();
 			return ( $this->list ? $this->list->__toString() : '' );
 		}
-		
+
 		public function __toString() {
 			return $this->toString();
 		}
-		
+
 		public function offsetSet( $offset, $value ) {
 			// change a child node or preamble
 			if ( !isset($offset) ) {
@@ -76,7 +76,7 @@
 				}
 			}
 		}
-		
+
 		public function offsetUnset( $offset ) {
 			// remove a child node or preamble...
 			$item = $this->document->proxy( $this->offsetGet( $offset ) );
@@ -85,7 +85,7 @@
 			}
 			unset( $this->list[ $offset ] );
 		}
-		
+
 		protected function getNearestParent() {
 			// get last matching node(s)
 			$query = $this->query;

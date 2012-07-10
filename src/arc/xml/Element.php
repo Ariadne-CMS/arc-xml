@@ -1,16 +1,16 @@
 <?php
 
 namespace arc\xml;
-	
+
 class Element extends \ArrayObject implements NodeInterface {
 	public $document = null;
 	public $domNode = null;
-		
+
 	public function __construct( $element, $document ) {
 		$this->document = $document;
 		$this->domNode = $element;
 	}
-	
+
 	public function proxy( $el ) {
 		return $this->document->proxy( $el );
 	}
@@ -38,7 +38,7 @@ class Element extends \ArrayObject implements NodeInterface {
 			default:
 				return new Query( $name, $this->document, $this );
 			break;
-		}	
+		}
 	}
 
 	public function __set( $name, $value ) {
@@ -62,7 +62,7 @@ class Element extends \ArrayObject implements NodeInterface {
 			case 'lastChild' :
 			case 'nextSibling' :
 			case 'previousSibling' :
-				// replaceChild 
+				// replaceChild
 			break;
 			case 'childNodes' :
 				// replaceChild on all children
@@ -77,14 +77,14 @@ class Element extends \ArrayObject implements NodeInterface {
 				}
 				if ( $value instanceof NodeInterface ) {
 					$newChild = $value;
-				} else { 
+				} else {
 					$newChild = $this->document->createElement( $name, array(), $value );
 				}
 				$this->appendChild( $newChild );
 			break;
 		}
 	}
-	
+
 	public function appendChild( $el ) {
 		if ( is_array( $el ) || $el instanceof NodeList ) {
 			foreach ( $el as $item ) {
@@ -110,14 +110,14 @@ class Element extends \ArrayObject implements NodeInterface {
 		}
 		return $el;
 	}
-	
+
 	public function removeChild( $el ) {
 		$this->domNode->removeChild( $el->domNode );
 		return $el;
 	}
-	
+
 	public function replaceChild( $el, $referenceEl ) {
-	
+
 	}
 
 	public function insertBefore( $el, $referenceEl = null ) {
@@ -143,21 +143,21 @@ class Element extends \ArrayObject implements NodeInterface {
 	public function removeAttribute( $name ) {
 
 	}
-	
+
 	public function hasClass( $className ) {
-	
+
 	}
-	
+
 	public function addClass( $className ) {
-	
+
 	}
-	
+
 	public function removeClass( $className ) {
-	
+
 	}
 
 	public function getChildrenByTagName( $tagName ) {
-		return new Query( '/'.$tagName, $this->document, $this->domNode );		
+		return new Query( '/'.$tagName, $this->document, $this->domNode );
 	}
 
 	public function getElementsByTagName( $tagName ) {
@@ -186,7 +186,7 @@ class Element extends \ArrayObject implements NodeInterface {
 			return '';
 		}
 	}
-	
+
 	public function offsetGet( $offset ) {
 		if ( is_string( $offset ) ) {
 			list( $prefix, $namespace, $localName) = $this->document->parseName( $offset );
@@ -198,7 +198,7 @@ class Element extends \ArrayObject implements NodeInterface {
 		}
 		return null;
 	}
-	
+
 	public function offsetSet( $offset, $value ) {
 		if ( is_string( $offset ) ) {
 			list( $prefix, $namespace, $localName) = $this->document->parseName( $offset );
@@ -209,7 +209,7 @@ class Element extends \ArrayObject implements NodeInterface {
 			}
 		}
 	}
-	
+
 	public function offsetExists( $offset ) {
 		return $this->offsetGet( $offset ) !== null;
 	}
@@ -217,12 +217,12 @@ class Element extends \ArrayObject implements NodeInterface {
 	public function xpath( $xpathQuery ) {
 		return $this->document->xpath( $xpathQuery, $this );
 	}
-	
+
 	public function find( $selector ) {
 		$xpathQuery = \arc\xml::css2XPath( $selector );
-		return $this->xpath( $xpathQuery );	
+		return $this->xpath( $xpathQuery );
 	}
-	
+
 	public function querySelectorAll( $selector ) {
 		return $this->find( $selector );
 	}

@@ -8,14 +8,14 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-	 
+
 	namespace arc\config;
-	
+
 	class Configuration {
 
 		protected $configuration = array();
 		protected $context = null;
-		
+
 		public function __construct( $context = null ) {
 			$this->context = $context;
 		}
@@ -57,7 +57,7 @@
 			}
 			return $config;
 		}
-		
+
 		public function acquire( $name, $path = null ) {
 			$path = $this->getPath( $path );
 			$parents = \arc\path::parents( $path );
@@ -77,7 +77,7 @@
 			}
 			return $result;
 		}
-		
+
 		public function configure( $name, $value, $path = null ) {
 			$path = $this->getPath( $path );
 			$config = &$this->configuration[$path];
@@ -93,9 +93,9 @@
 			}
 			$config = $value;
 		}
-		
+
 		public function get( $path ) {
 			return new ConfigurationPath( $this, $path );
 		}
-		
+
 	}

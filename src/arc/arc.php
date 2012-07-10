@@ -14,17 +14,17 @@
 	 */
 
 	namespace arc;
-	
+
 	if ( !defined('ARC_BASE_DIR') ) {
 		define('ARC_BASE_DIR', dirname( dirname( __FILE__ ) ) . DIRECTORY_SEPERATOR );
 	}
 	require_once( ARC_BASE_DIR . 'arc/Pluggable.php' );
 	require_once( ARC_BASE_DIR . 'arc/Loader.php' );
-	
+
 	class arc extends Loader {
-		
+
 		private static $plugins;
-		
+
 		public static function plugin( $filename, $methodSearcher ) {
 			if ( is_readable( $filename ) ) {
 				include_once( $filename );
@@ -56,9 +56,8 @@
 
 		public static function hasClass( $className ) {
 			$fileName = self::_parseClassName( $className );
-			return is_readable( ARC_BASE_DIR . $fileName );			
+			return is_readable( ARC_BASE_DIR . $fileName );
 		}
 
 	}
 
-?>

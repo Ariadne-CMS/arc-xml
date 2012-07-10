@@ -15,7 +15,7 @@
 
 		private $httpClient = null;
 		private $feed = null;
-		
+
 		public function __construct( $feed = null, $httpClient = null ) {
 			$this->feed = $feed;
 			$this->httpClient = $httpClient;
@@ -28,7 +28,7 @@
 			$xml = $this->httpClient->get( $url, $request, $options );
 			return $this->parse( $xml );
 		}
-		
+
 		public function parse( $xml ) {
 			$dom = \arc\xml::parse( $xml );
 			$feed = $dom->feed[0];
@@ -57,4 +57,3 @@
 		}
 
 	}
-?>

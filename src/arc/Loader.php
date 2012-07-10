@@ -24,12 +24,12 @@
 			$fileName = preg_replace( '/\.\.+/', '.', $fileName );
 			return $fileName . '.php';
 		}
-		
+
 		public function __invoke( $name ) {
 			$this->autoload( $name );
 			return new $name();
 		}
-		
+
 		abstract public static function hasClass( $className );
 
 		abstract public static function autoload( $className );

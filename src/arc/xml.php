@@ -1,6 +1,6 @@
 <?php
 	namespace arc;
-	
+
 	class xml extends Pluggable {
 		static $namespaces = array();
 
@@ -60,7 +60,7 @@
 			$nodes = new xml\NodeList( $result, $document );
 			return $nodes;
 		}
-		
+
 		static function preamble( $xmlEncoding = false, $xmlVersion = '1.0', $xmlStandalone = false )  {
 			$document = new xml\NodeList( new \DOMDocument );
 			return new xml\Preamble( $xmlEncoding, $xmlVersion, $xmlStandalone, $document );
@@ -95,7 +95,7 @@
 			}
 			throw new \arc\Exception( $message, exceptions::ILLEGAL_ARGUMENT );
 		}
-		
+
 		static public function parse( $xml, $encoding = null ) {
 			try {
 				return self::parseFull( $xml, $encoding );
@@ -123,13 +123,13 @@
 					$root .= '>';
 					$result = self::parse( $root.$xml.'</arxmlroot>' );
 					$result = $result->firstChild->childNodes;
-					return $result; 
+					return $result;
 				} catch( \arc\Exception $e ) {
 					return new xml\Node( $xml );
 				}
 			}
 		}
-	
+
 		static public function parseName( $name, $attributes = array() ) {
 			$colonPos = strrpos( $name, ':' );
 			if ( $colonPos !== false ) {
@@ -147,15 +147,15 @@
 				return array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
 			}
 		}
-		
+
 		static public function registerNameSpace( $prefix, $namespace ) {
 			self::$namespaces[$namespace] = $prefix;
 		}
-		
+
 		static public function lookupNameSpaceURI( $prefix ) {
 			return array_search( $prefix, self::namespaces );
 		}
-		
+
 		static public function lookupNameSpacePrefix( $namespace ) {
 			$prefix = self::$namespaces[$namespace];
 			if ( !$prefix ) {
@@ -163,7 +163,7 @@
 			}
 			return $prefix;
 		}
-		
+
 		static public function css2XPath( $cssSelector ) {
 
 			$cssSelectors = array(

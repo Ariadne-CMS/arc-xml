@@ -10,9 +10,9 @@
 	 */
 
 	namespace arc;
-		
+
 	class tainting extends Pluggable {
-	
+
 		public static function taint($value) {
 			if ( !is_numeric($value) ) {
 				if ( is_array($value) ) {
@@ -28,20 +28,18 @@
 			if ( $value instanceof tainting\Tainted ) {
 				$value = filter_var($value->value, $filter, $flags);
 			} else if ( is_array($value) ) {
-				array_walk_recursive( $value, 'self::untaintArrayItem', array( 
+				array_walk_recursive( $value, 'self::untaintArrayItem', array(
 					'filter' => $filter,
 					'flags' => $flags
 				) );
 			}
 			return $value;
 		}
-		
-		protected static function untaintArrayItem( &$value, $key, $options) { 
+
+		protected static function untaintArrayItem( &$value, $key, $options) {
 			//FIXME: doublecheck that this works with array_walk_recursive with $value as reference
 			$value = self::untaint( $value, $options['filter'], $options['flags'] );
 		}
 
 	}
 
-
-?>

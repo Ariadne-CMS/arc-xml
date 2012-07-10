@@ -19,7 +19,7 @@
 			}
 			return new atom\Client( $url, $httpClient );
 		}
-		
+
 		public static function parse( $xml ) {
 			$client = new atom\Client();
 			return $client->parse( $xml );
@@ -27,5 +27,3 @@
 
 	}
 
-	
-?>

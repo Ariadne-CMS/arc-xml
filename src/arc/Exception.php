@@ -10,7 +10,6 @@
 	 */
 
 	namespace arc;
-	
+
 	class Exception extends \Exception { }
-	
-?>
+

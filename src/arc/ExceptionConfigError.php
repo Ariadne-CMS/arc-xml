@@ -9,8 +9,7 @@
 	 * file that was distributed with this source code.
 	 */
 
-	namespace arc;	
-	
+	namespace arc;
+
 	class ExceptionConfigError extends Exception { }
-	
-?>
+

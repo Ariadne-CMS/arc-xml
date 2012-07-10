@@ -10,7 +10,7 @@
 	 */
 
 	namespace arc;
-	
+
 	class exceptions extends \arc\Pluggable {
 		const NO_PATH_INFO     = 101;
 		const UNKNOWN_ERROR    = 102;
@@ -24,4 +24,3 @@
 		const CONFIGURATION_ERROR = 110;
 	}
 
-?>
