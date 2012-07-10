@@ -22,6 +22,7 @@
 			} else if ( $this->domNode instanceof \DOMComment ) {
 				return "<!-- " . $this->nodeValue . " -->";
 			} else {
+				var_dump( $this->domNode );
 				return (string) $this->nodeValue;
 			}
 		}

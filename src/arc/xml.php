@@ -1,7 +1,18 @@
 <?php
+
+	/*
+	 * This file is part of the Ariadne Component Library.
+	 *
+	 * (c) Muze <info@muze.nl>
+	 *
+	 * For the full copyright and license information, please view the LICENSE
+	 * file that was distributed with this source code.
+	 */
+
 	namespace arc;
 
 	class xml extends Pluggable {
+	
 		static $namespaces = array();
 
 		static public function el() {
@@ -27,9 +38,37 @@
 			return $el;
 		}
 
-		static public function nodes() {
+		static public function element() {
+			return call_user_func_array( '\arc\xml::el', func_get_args() );
+		}
+		
+		static public function node( $content ) {
 			$document = new xml\NodeList( new \DOMDocument() );
+			if ( strpos( '<!--', $content ) === 0 ) {
+				$content = preg_replace('/^<!--\\s(.*)\\s-->/','$1', $content); 
+				$node = $document->createComment( $content );
+			} else if ( strpos( '<![CDATA[', $content ) === 0 ) {
+				$content = preg_replace('/^<!\[CDATA\[(.*)\]\]>/','$1', $content); 
+				$node = $document->createCDATASection( $content );
+			} else {
+				$node = $document->createTextNode( $content );
+			}
+			return $node;
+		}
+		
+		static public function comment( $content ) {
+			$document = new xml\NodeList( new \DOMDocument() );
+			return $document->createComment( $content );
+		}
+		
+		static public function cdata( $content ) {
+			$document = new xml\NodeList( new \DOMDocument() );
+			return $document->createCDATASection( $content );
+		}
+
+		static public function nodes() {
 			$args = func_get_args();
+			$document = new xml\NodeList( new \DOMDocument() );
 			$result = array();
 			foreach ( $args as $key => $arg ) {
 				if ( is_array( $arg ) ) {
@@ -43,6 +82,9 @@
 						$arg = self::parse( $arg );
 						if ( $arg instanceof \ArrayObject ) {
 							$result = array_merge( $result, $arg->getArrayCopy() );
+						} else if ( !$arg ) { // FIXME: parse returns null for comments
+							$arg = self::node( $arg );
+							$result[] = $arg;
 						} else {
 							$result[] = $arg;
 						}
@@ -65,7 +107,7 @@
 			$document = new xml\NodeList( new \DOMDocument );
 			return new xml\Preamble( $xmlEncoding, $xmlVersion, $xmlStandalone, $document );
 		}
-
+		
 		static public function parseFull( $xml, $encoding = null ) {
 			$dom = new \DomDocument();
 			if ( $encoding ) {
@@ -97,22 +139,25 @@
 		}
 
 		static public function parse( $xml, $encoding = null ) {
+			if ( !$xml ) {
+				return null;
+			}
+			$xml = ''.$xml;
+			if ( strpos( $xml, '<' ) === false ) {
+				return self::node( $xml );
+			}
 			try {
 				return self::parseFull( $xml, $encoding );
 			} catch( \arc\Exception $e ) {
 				if ( $xml instanceof xml\NodeInterface ) {
 					return $xml;
 				}
-				if ( !$xml || strpos( $xml, '<' ) === false ) {
-					return new xml\Node( $xml );
-				}
 				try {
 					// add a known (single) root element with all declared namespaces
 					// libxml will barf on multiple root elements
 					// and it will silently drop namespace prefixes not defined in the document
-					$namespaces = array_merge( self::$namespaces, $namespaces );
 					$root = '<arxmlroot';
-					foreach ( $namespaces as $name => $uri ) {
+					foreach ( self::$namespaces as $name => $uri ) {
 						if ( $name === 0 ) {
 							$root .= ' xmlns="';
 						} else {
@@ -121,11 +166,11 @@
 						$root .= htmlspecialchars( $uri ) . '"';
 					}
 					$root .= '>';
-					$result = self::parse( $root.$xml.'</arxmlroot>' );
+					$result = self::parseFull( $root.$xml.'</arxmlroot>' );
 					$result = $result->firstChild->childNodes;
 					return $result;
 				} catch( \arc\Exception $e ) {
-					return new xml\Node( $xml );
+					return self::node( $xml );
 				}
 			}
 		}

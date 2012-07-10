@@ -27,7 +27,7 @@
 			if ( $this->standalone ) {
 				$result .= ' standalone="'.$this->standalone.'"';
 			}
-			$result .= " ?>\n";
+			$result .= " ?>";
 			return $result;
 		}
 

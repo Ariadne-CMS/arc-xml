@@ -7,10 +7,6 @@
 	 *
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
-	 *
-	 * This file must be included for the Ariadne Component Library to work
-	 * If you want to keep this library fully PSR-0 compliant, move this file
-	 * one directory up.
 	 */
 
 	namespace arc;

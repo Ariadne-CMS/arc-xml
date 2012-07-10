@@ -1,5 +1,14 @@
 <?php
 
+	/*
+	 * This file is part of the Ariadne Component Library.
+	 *
+	 * (c) Muze <info@muze.nl>
+	 *
+	 * For the full copyright and license information, please view the LICENSE
+	 * file that was distributed with this source code.
+	 */
+
 	namespace arc\xml;
 
 	class NodeList extends \ArrayObject implements NodeInterface {
@@ -203,13 +212,26 @@
 			return $this->document->proxy( $result );
 		}
 
-		public function createTextNode( $value ) {
+		protected function getDocument() {
 			if ( $this->domReference instanceof \DOMDocument ) {
-				$domDocument = $this->domReference;
+				return $this->domReference;
 			} else {
-				$domDocument = $this->domReference->ownerDocument;
+				return $this->domReference->ownerDocument;
 			}
-			$domNode = $domDocument->createTextNode( ''.$value );
+		}
+		
+		public function createTextNode( $value ) {
+			$domNode = $this->getDocument()->createTextNode( ''.$value );
+			return $this->document->proxy( $domNode );
+		}
+		
+		public function createComment( $value ) {
+			$domNode = $this->getDocument()->createComment( ''.$value );
+			return $this->document->proxy( $domNode );
+		}
+		
+		public function createCDATASection( $value ) {
+			$domNode = $this->getDocument()->createCDATASection( ''.$value );
 			return $this->document->proxy( $domNode );
 		}
 
@@ -259,7 +281,9 @@
 				return $this->document->importNode( $el, $deep );
 			}
 			if ( $el->document !== $this ) {
-				if ( $el instanceof Element || $el instanceof Node ) {
+				if ( $el instanceof Preamble ) {
+					// nothing to do, preamble is not a node in DOMDocument
+				} else if ( $el instanceof Element || $el instanceof Node ) {
 					// import the node into the current domDocument
 					$oldNode = $el->domNode;
 					unset( $this->objectStore[ $oldNode ] );
@@ -493,13 +517,7 @@
 		}
 
 		public function getElementById( $id ) {
-			if ( $this->parentNode ) {
-				return $this->parentNode->getElementById( id );
-			} else if ( $this->document->domReference instanceof \DOMDocument ) {
-				return $this->document->proxy( $this->document->domReference->getElementById( $id ));
-			} else if ( $this->document->domReference instanceof \DOMNode ) {
-				return $this->document->proxy( $this->document->domReference->ownerDocument->getElementById( $id ));
-			}
+			return $this->proxy( $this->getDocument()->getElementById( $id ) );
 		}
 
 		public function parseName( $name, $attributes = array() ) {
@@ -527,5 +545,15 @@
 
 		public function querySelectorAll( $selector ) {
 			return $this->find( $selector );
+		}
+		
+		public function bind( $nodes, $name, $type = 'string' ) {
+			$b = new DataBinding( );
+			return $b->bind( $nodes, $name, $type );
+		}
+
+		public function bindAsArray( $nodes, $type = 'string' ) {
+			$b = new DataBinding( );
+			return $b->bindAsArray( $nodes, 'list', $type)->list;
 		}
 	}
