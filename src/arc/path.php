@@ -10,9 +10,9 @@
 	 */
 
 	namespace arc;
-	
+
 	class path extends Pluggable {
-		
+
 		public static function parents( $path, $cwd = '/' ) {
 			// returns all parents starting at the root, up to and including the path itself
 			$root = '/';
@@ -63,7 +63,7 @@
 			}
 			return $result;
 		}
-				
+
 		public static function clean( $path, $filter = FILTER_SANITIZE_ENCODED, $flags = null ) {
 			if ( !isset($flags) ) {
 				$flags =  FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
@@ -76,7 +76,7 @@
 			}
 			return $result;
 		}
-		
+
 		public static function parent( $path, $root = '/' ) {
 			if ( $path == '/' ) {
 				return null;
@@ -87,10 +87,10 @@
 			}
 			if ( $parent[ strlen( $parent ) - 1 ] !== '/' ) {
 				$parent .= '/';
-			} 
+			}
 			return $parent;
 		}
-		
+
 	}
 
 ?>

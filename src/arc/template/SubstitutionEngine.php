@@ -1,15 +1,15 @@
 <?php
 
 	namespace ar\template;
-		
+
 	class SubstitutionEngine implements TemplateEngineInterface {
-	
+
 		private var $defaults = array();
-		
+
 		function __construct( $defaultArguments = array() ) {
 			$this->defaults = $defaultArguments;
 		}
-	
+
 		protected function getSubstitution( $match, $arguments ) {
 			if ( $arguments instanceof \ar\KeyValueStoreInterface ) {
 				$result = $arguments->getvar( $match );
@@ -24,7 +24,7 @@
 			}
 			return $result;
 		}
-	
+
 		function render( $text, $arguments = null ) {
 			$variableRE = '/([^\\]|\b)\{(\$)?([^}]+)\}/m';
 			if ( !isset( $arguments ) ) {
@@ -35,7 +35,7 @@
 			}, (string) $text );
 			return new PartialSubstitution( $text );
 		}
-		
+
 		function decompile( $text, $arguments ) {
 			$text = (string) $text;
 			foreach( $arguments as $name => $value ) {
@@ -48,11 +48,11 @@
 			}
 			return $text;
 		}
-		
+
 		function show( $text, $arguments = null ) {
 			echo $this->compile( $text, $arguments = null );
 		}
-		
+
 	}
-	
+
 ?>

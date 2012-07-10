@@ -10,7 +10,7 @@
 	 */
 
 	namespace arc;
-	
+
 	class ExceptionIllegalRequest extends Exception { }
 
 ?>

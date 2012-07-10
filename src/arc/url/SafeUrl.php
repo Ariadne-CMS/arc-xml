@@ -12,12 +12,12 @@
 	namespace arc\url;
 
 	/* SafeUrl doesn't parse the query part, so it isn't destroyed by PHP's parse_str method */
-	class SafeUrl { 
-	
+	class SafeUrl {
+
 		public function __construct( $url ) {
 			$this->components = parse_url( $url );
 		}
-		
+
 		public function __get($var) {
 			if ( $var == 'password' ) {
 				$var = 'pass';
@@ -28,7 +28,7 @@
 				return null;
 			}
 		}
-		
+
 		public function __set($var, $value) {
 			switch($var) {
 				case 'path' :
@@ -83,7 +83,7 @@
 			}
 			return $url;
 		}
-	
+
 	}
-	
+
 ?>

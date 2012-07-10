@@ -19,7 +19,7 @@
 
 		public function offsetSet( $offset, $value ) {
 
-		} 
+		}
 
 		public function offsetExists( $offset ) {
 

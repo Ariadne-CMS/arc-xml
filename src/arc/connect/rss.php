@@ -19,7 +19,7 @@
 			}
 			return new rss\Client( $url, $httpClient );
 		}
-		
+
 		public static function parse( $xml ) {
 			$client = new rss\Client();
 			return $client->parse( $xml );
@@ -27,5 +27,5 @@
 
 	}
 
-	
+
 ?>

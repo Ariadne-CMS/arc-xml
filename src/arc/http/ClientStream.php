@@ -10,7 +10,7 @@ c<?php
 	 */
 
 	namespace arc\http;
-	
+
 	class ClientStream implements ClientInterface {
 
 		private $options = array();
@@ -43,7 +43,7 @@ c<?php
 			}
 			return $url;
 		}
-		
+
 		public function send( $type, $url, $request = null, $options = array() ) {
 			if ( $type == 'GET' && $request ) {
 				$url = $this->buildURL( $url, $request );
@@ -65,23 +65,23 @@ c<?php
 		}
 
 		public function get( $url, $request = null, $options = array() ) {
-			
+
 			if ( !isset($request) ) {
 				$request = $this->parseRequestURL($url);
 			}
-			return $this->send( 'GET', $url, $request, $options );		
+			return $this->send( 'GET', $url, $request, $options );
 		}
-		
+
 		public function post( $url, $request = null, $options = array() ) {
-			return $this->send( 'POST', $url, $request, $options );		
+			return $this->send( 'POST', $url, $request, $options );
 		}
 
 		public function put( $url, $request = null, $options = array() ) {
-			return $this->send( 'PUT', $url, $request, $options );		
+			return $this->send( 'PUT', $url, $request, $options );
 		}
 
 		public function delete( $url, $request = null, $options = array() ) {
-			return $this->send( 'DELETE', $url, $request, $options );		
+			return $this->send( 'DELETE', $url, $request, $options );
 		}
 
 		public function headers( $headers ) {
@@ -91,6 +91,6 @@ c<?php
 			$this->options['header'] = $this->options['headers'].$headers;
 			return $this;
 		}
-		
+
 	}
 ?>

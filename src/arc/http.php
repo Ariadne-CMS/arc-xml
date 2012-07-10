@@ -10,22 +10,22 @@
 	 */
 
 	namespace arc\connect;
-	
+
 	class http extends \arc\Pluggable {
-	
+
 		public static $tainting = true;
-				
+
 		public static function getvar( $name = null, $method = null) {
 			$result = null;
 			switch($method) {
-				case 'GET' : 
-				case 'POST' : 
+				case 'GET' :
+				case 'POST' :
 				case 'COOKIE' :
 				case 'SERVER' :
 					$result = isset($name) ? ${'_'.$method}[$name] : ${'_'.$method};
 				break;
-				default : 
-					$result = !isset($name) ? $_REQUEST : 
+				default :
+					$result = !isset($name) ? $_REQUEST :
 						( isset($_POST[$name]) ? $_POST[$name] : $_GET[$name] );
 				break;
 			}
@@ -43,7 +43,7 @@
 		public static function client( $options = array() ) {
 			return new http\ClientStream( $options );
 		}
-		
+
 		public static function configure( $option, $value ) {
 			switch ( $option ) {
 				case 'tainting' :
@@ -51,15 +51,15 @@
 				break;
 			}
 		}
-			
+
 		public static function get( $url, $request = null, $options = array() ) {
 			return self::request( 'GET', $url, $request, $options);
 		}
-		
+
 		public static function post( $url, $request = null, $options = array() ) {
 			return self::request( 'POST', $url, $request, $options);
 		}
-		
+
 	}
 
 ?>

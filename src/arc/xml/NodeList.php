@@ -1,7 +1,7 @@
 <?php
 
 	namespace arc\xml;
-		
+
 	class NodeList extends \ArrayObject implements NodeInterface {
 		public $domReference = null;
 		public $domNodeList = null;
@@ -85,7 +85,7 @@
 					foreach ( $this as $el ) {
 						$array[] = $el->{$name};
 					}
-					return $array;	
+					return $array;
 				break;
 				default:
 					$xpathQuery = '/' . $name;
@@ -93,7 +93,7 @@
 				break;
 			}
 		}
-		
+
 		public function __set( $name, $value ) {
 			switch ( $name ) {
 				case 'lastChild':
@@ -126,7 +126,7 @@
 					}
 					if ( $value instanceof NodeInterface ) {
 						$newChild = $value;
-					} else { 
+					} else {
 						$newChild = $this->document->createElement( $name, array(), $value );
 					}
 					$this->appendChild( $newChild );
@@ -138,7 +138,7 @@
 			$this->namespaces[$namespace] = $prefix;
 			$this->domXPath->registerNamespace( $prefix, $namespace );
 		}
-		
+
 		public function lookupNameSpaceURI( $prefix ) {
 			$uri = array_search( $prefix, $this->namespaces );
 			if ( !$uri ) {
@@ -146,7 +146,7 @@
 			}
 			return $uri;
 		}
-		
+
 		public function lookupPrefix( $namespace ) {
 			$prefix = $this->namespaces[$namespace];
 			if ( !isset($prefix) ) {
@@ -176,7 +176,7 @@
 				$wrapped = new Element( $node, $this );
 			} else if ( $node instanceof \DOMNode ) {
 				$wrapped = new Node( $node, $this );
-			} else if ( $node instanceof Preamble || $node instanceof Node 
+			} else if ( $node instanceof Preamble || $node instanceof Node
 					|| $node instanceof Element || $node instanceof NodeList ) {
 				$wrapped = $node;
 			} else if ( $node instanceof \DOMNodeList ) {
@@ -297,7 +297,7 @@
 			}
 			return isset( $item );
 		}
-		
+
 		public function offsetGet( $offset ) {
 			if ( $this->preamble ) {
 				if ( $offset == 0 ) {
@@ -342,7 +342,7 @@
 			}
 			$this->domNodeList[ $offset ] = $newItem;
 		}
-		
+
 		public function offsetUnset( $offset ) {
 			if ( $this->preamble ) {
 				if ( $offset == 0 ) {
@@ -366,7 +366,7 @@
 			}
 			return $this->iterator;
 		}
-		
+
 		public function __toString() {
 			$result = '';
 			foreach ( $this as $el ) {
@@ -415,7 +415,7 @@
 				$el->parentNode->removeChild( $el );
 			}
 		}
-		
+
 		public function insertBefore( $el ) {
 
 		}
@@ -519,7 +519,7 @@
 				return array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
 			}
 		}
-		
+
 		public function find( $selector ) {
 			$xpathQuery = \arc\xml::css2XPath( $selector );
 			return $this->xpath( $xpathQuery );

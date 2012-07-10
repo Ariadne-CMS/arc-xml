@@ -10,11 +10,11 @@
 	 */
 
 	namespace arc;
-	
+
 	interface KeyValueStoreInterface {
-	
+
 		function getVar( $name );
-		
+
 		function putVar( $name, $value );
-	
+
 	}

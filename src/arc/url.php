@@ -12,15 +12,15 @@
 	namespace arc;
 
 	class url {
-	
+
 		public static function url( $url ) {
 			return new url\ParsedUrl( $url );
 		}
-		
+
 		public static function safeUrl( $url ) {
 			return new url\SafeUrl( $url );
 		}
-		
+
 	}
-	
+
 ?>

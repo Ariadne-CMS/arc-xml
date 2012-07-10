@@ -10,12 +10,12 @@
 	 */
 
 	namespace arc\events;
-		
+
 	class Stack {
-	
+
 		protected $listeners = array();
 		protected $event = null;
-		
+
 		public static function listen( $eventName, $objectType = null, $capture = false ) {
 			if ( class_exists( '\arc\context' ) ) {
 				$path = \arc\context::getPath();
@@ -24,13 +24,13 @@
 			}
 			return new IncompleteListener( $path, $eventName, $objectType, $capture, $this );
 		}
-		
+
 		public static function capture( $eventName, $objectType = null ) {
 			return $this->listen( $eventName, $objectType, true );
 		}
-		
+
 		public static function fire( $eventName, $eventData = array(), $objectType = null, $path = '') {
-			if ( !$this->listeners['capture'][$eventName] 
+			if ( !$this->listeners['capture'][$eventName]
 				&& !$this->listeners['listen'][$eventName] ) {
 				return $eventData; // no listeners for this event, so dont bother searching
 			}
@@ -52,7 +52,7 @@
 			if ( self::walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true ) ) {
 				self::walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
 			}
-			
+
 			if ( $this->event->preventDefault ) {
 				$result = false;
 			} else if ( $this->event->data ) {
@@ -63,7 +63,7 @@
 			$this->event = $prevEvent;
 			return $result;
 		}
-		
+
 		protected static function walkListeners( $listeners, $path, $objectType, $capture ) {
 			$objectTypeStripped = $objectType;
 			$pos = strpos('.', $objectType);
@@ -82,7 +82,7 @@
 			}
 			$counter = count( $pathlist );
 			reset($pathlist);
-			
+
 			do {
 				$currentPath = current( $pathlist );
 				if ( is_array( $listeners[$currentPath] ) ) {
@@ -90,7 +90,7 @@
 						if ( !isset($listener['type']) ||
 							 ( $listener['type'] == $objectType ) ||
 							 ( $listener['type'] == $objectTypeStripped ) ||
-							 ( is_a( $objectType, $listener['type'] ) ) ) 
+							 ( is_a( $objectType, $listener['type'] ) ) )
 						{
 							$result = call_user_func_array( $listener['method'], $listener['args'] );
 							if ( $result === false ) {
@@ -102,15 +102,15 @@
 			} while( next( $pathlist ) );
 			return true;
 		}
-		
+
 		public function event() {
 			return $this->event;
 		}
-		
+
 		public static function get( $path ) {
 			return new IncompleteListener( $path, null, null, false, $this );
 		}
-		
+
 		public static function addListener( $path, $eventName, $objectType, $method, $args, $capture = false ) {
 			if ( !$path ) {
 				$path = '/';
@@ -123,7 +123,7 @@
 			);
 			return new Listener( $eventName, $path, $capture, count($this->listeners[$when][$eventName][$path])-1, $this );
 		}
-		
+
 		public static function removeListener( $name, $path, $capture, $id ) {
 			$when = ($listener['capture']) ? 'capture' : 'listen';
 			unset( $this->listeners[$when][$name][$path][$id] );

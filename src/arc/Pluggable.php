@@ -8,11 +8,11 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-	
-	namespace arc;	
-	
+
+	namespace arc;
+
 	class Pluggable {
-	
+
 		protected static $methods = array();
 
 		protected static function _callPlugin( $methodName, $arguments = array() ) {

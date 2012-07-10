@@ -10,7 +10,7 @@
 	 */
 
 	namespace arc\tainting;
-	
+
 	class Tainted {
 		public $value = null;
 
@@ -21,5 +21,5 @@
 		public function __toString() {
 			return filter_var($this->value, FILTER_SANITIZE_SPECIAL_CHARS);
 		}
-	}	
+	}
 ?>

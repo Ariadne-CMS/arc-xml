@@ -1,20 +1,20 @@
 <?php
 
 	namespace arc\xml;
-	
+
 	class Preamble implements NodeInterface {
 		public $encoding = 'utf-8';
 		public $version  = '1.0';
 		public $standalone = false;
 		public $document = null;
-		
+
 		public function __construct( $xmlEncoding = false, $xmlVersion = '1.0', $xmlStandalone = false, $document) {
 			$this->encoding = $xmlEncoding;
 			$this->version = $xmlVersion;
 			$this->standalone = $xmlStandalone;
 			$this->document = $document;
 		}
-		
+
 		public function __toString() {
 			return $this->toString();
 		}
@@ -42,4 +42,4 @@
 		}
 
 	}
-	
+

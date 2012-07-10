@@ -1,16 +1,16 @@
 <?php
 
 	namespace arc\xml;
-	
+
 	class Node implements NodeInterface {
 		public $domNode = null;
 		public $document = null;
-		
+
 		public function __construct( $DOMNode, $document ) {
 			$this->domNode = $DOMNode;
 			$this->document = $document;
 		}
-		
+
 		public function __toString() {
 			return $this->toString();
 		}
@@ -25,7 +25,7 @@
 				return (string) $this->nodeValue;
 			}
 		}
-		
+
 		public function __get( $name ) {
 			switch ( $name ) {
 				case 'nodeValue':
@@ -53,5 +53,5 @@
 			return clone $this;
 		}
 
-		
+
 	}

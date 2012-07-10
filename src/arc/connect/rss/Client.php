@@ -15,7 +15,7 @@
 
 		private $httpClient = null;
 		private $feed = null;
-		
+
 		public function __construct( $feed = null, $httpClient = null ) {
 			$this->feed = $feed;
 			$this->httpClient = $httpClient;
@@ -28,7 +28,7 @@
 			$xml = $this->httpClient->get( $url, $request, $options );
 			return $this->parse( $xml );
 		}
-		
+
 		public function parse( $xml ) {
 			$dom = \arc\xml::parse( $xml );
 			$channel = $dom->rss->channel[0];
@@ -62,7 +62,7 @@
 				->bind( $item->enclosure->attributes, 'enclosure', 'array' )
 				->bind( $item->source->nodeValue, 'source' )
 				->bind( $item->source->getAttribute('url'), 'source_url' )
-				->bind( $item->pubDate, 'pubDate')	
+				->bind( $item->pubDate, 'pubDate')
 				->bind( $item, 'rawXML', 'xml' );
 		}
 
