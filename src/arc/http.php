@@ -9,9 +9,9 @@
 	 * file that was distributed with this source code.
 	 */
 
-	namespace arc\connect;
+	namespace arc;
 	
-	class http extends \arc\Pluggable {
+	class http extends Pluggable {
 	
 		public static $tainting = true;
 				
