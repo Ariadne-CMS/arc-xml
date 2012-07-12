@@ -35,6 +35,7 @@
 					$s = simplexml_import_dom($this->domReference->documentElement);
 					$x = $s->asXML();
 					$p = preg_match_all('/<\?xml([[:space:]]+|version="([^"]+)"|encoding="([^"]+)"|standalone="([^"]+)")*\?>/', $x, $matches);
+					$version = $encoding = $standalone = null;
 					if ( $matches[2][0] ) {
 						$version = $matches[2][0];
 					}
@@ -315,11 +316,12 @@
 				}
 			}
 			if ( is_array( $this->domNodeList ) || $this->domNodeList instanceof \ArrayAccess ) {
-				$item = $this->domNodeList[ $offset ];
+				$result = isset($this->domNodeList[ $offset ]) ? true : false;
 			} else {
 				$item = $this->domNodeList->item( $offset );
+				$result = isset($item);
 			}
-			return isset( $item );
+			return $result;
 		}
 
 		public function offsetGet( $offset ) {
@@ -331,7 +333,7 @@
 				}
 			}
 			if ( is_array( $this->domNodeList ) || $this->domNodeList instanceof \ArrayAccess ) {
-				$item = $this->domNodeList[ $offset ];
+				$item = isset($this->domNodeList[ $offset ]) ? $this->domNodeList[ $offset ] : null;
 			} else {
 				$item = $this->domNodeList->item( $offset );
 			}

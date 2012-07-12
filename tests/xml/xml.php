@@ -74,6 +74,7 @@
 
 		function testXMLParsing() {
 			$xml = \arc\xml::parse( $this->RSSXML );
+			$error = null;
 
 			$channelTitle = $xml->rss->channel->title->nodeValue;
 
