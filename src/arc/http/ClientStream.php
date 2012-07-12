@@ -1,4 +1,4 @@
-c<?php
+<?php
 
 	/*
 	 * This file is part of the Ariadne Component Library.
@@ -19,7 +19,7 @@ c<?php
 
 		protected function parseRequestURL( $url ) {
 			$components = parse_url( $url );
-			return $components['query'];
+			return isset($components['query']) ? $components['query'] : false;
 		}
 
 		protected function mergeOptions( ) {
@@ -56,7 +56,7 @@ c<?php
 			$context = stream_context_create( array( 'http' => $options ) );
 			$result = @file_get_contents( (string) $url, false, $context );
 			$this->responseHeaders = $http_response_header; //magic php variable set by file_get_contents.
-			$this->requestHeaders = $options['header'];
+			$this->requestHeaders = isset($options['header']) ? $options['header'] : '';
 			return $result;
 		}
 
@@ -88,7 +88,10 @@ c<?php
 			if (is_array($headers)) {
 				$headers = join("\r\n", $headers);
 			}
-			$this->options['header'] = $this->options['headers'].$headers;
+			if (!isset($this->options['header'])) {
+				$this->options['header'] = '';
+			}
+			$this->options['header'] = $this->options['header'].$headers;
 			return $this;
 		}
 
