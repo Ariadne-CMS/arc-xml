@@ -1,4 +1,4 @@
-c<?php
+<?php
 
 	/*
 	 * This file is part of the Ariadne Component Library.
