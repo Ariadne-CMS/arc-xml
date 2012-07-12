@@ -15,7 +15,6 @@
 
 		public static function parents( $path, $cwd = '/', $root = '/' ) {
 			// returns all parents starting at the root, up to and including the path itself
-			$path = self::normalize( $path, $cwd );
 			$parents = array();
 			$pathticles = explode( '/', $path );
 			$prevpath = '/';
@@ -27,7 +26,7 @@
 					}
 				}
 			}
-			if ( !isset($parents[0]) && $parents[0] !== $root ) {
+			if ( !isset($parents[0]) || $parents[0] !== $root ) {
 				array_unshift( $parents, $root );
 			}
 			return $parents;
@@ -68,12 +67,12 @@
 				$flags =  FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
 			}
 			$splitpath = explode( '/', $path );
-			$result = '/';
+			$result = '';
 			foreach ( $splitpath as $pathticle ) {
 				$pathticle = filter_var( $pathticle, $filter, $flags );
 				$result .= $pathticle . '/';
 			}
-			return $result;
+			return substr( $result, 0, -1 );
 		}
 
 		public static function parent( $path, $root = '/' ) {
