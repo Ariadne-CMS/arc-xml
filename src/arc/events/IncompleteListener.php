@@ -11,23 +11,23 @@
 
 	namespace arc\events;
 
-	class IncompleteListener {
-		private $path = '/';
-		private $eventName = null;
+	class IncompleteListener implements StackInterface {
+		private $path       = '/';
+		private $eventName  = null;
 		private $objectType = null;
-		private $capture = false;
-		private $stack;
+		private $capture    = false;
+		private $eventStack = null;
 
-		public function __construct( $path, $eventName = null, $objectType = null, $capture = false, $stack = null ) {
-			$this->path = $path;
-			$this->eventName = $eventName;
+		public function __construct( $eventName = null, $path = '/', $objectType = null, $capture = false, $eventStack = null ) {
+			$this->path       = $path;
+			$this->eventName  = $eventName;
 			$this->objectType = $objectType;
-			$this->capture = $capture;
-			$this->stack = $stack;
+			$this->capture    = $capture;
+			$this->eventStack = $eventStack;
 		}
 
 		public function call( $method, $args = array() ) {
-			return $this->stack->addListener( $this->path, $this->eventName, $this->objectType, $method, $args, $this->capture);
+			return $this->eventStack->addListener( $this->eventName, $method, $args, $this->path, $this->objectType, $this->capture );
 		}
 
 		public function listen( $eventName, $objectType = null ) {
@@ -44,7 +44,17 @@
 			return $this;
 		}
 
-		public function fire($eventName, $eventData, $objectType = null) {
-			return $this->stack->fire($eventName, $eventData, $objectType = null, $this->path);
+		public function fire( $eventName, $eventData = array(), $objectType = null, $path = null ) {
+			if ( !isset( $path ) ) {
+				$path = $this->path;
+			} else if ( isset($this->path) ) {
+				$path = \arc\path::normalize( $path, $this->path );
+			}
+			return $this->eventStack->fire( $eventName, $eventData, $path, $objectType );
+		}
+
+		public function get( $path ) {
+			$path = \arc\path::normalize( $path, $this->path );
+			return new IncompleteListener( $path, null, null, false, $this );
 		}
 	}

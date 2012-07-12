@@ -11,85 +11,69 @@
 
 	namespace arc\events;
 
-	class Stack {
+	class Stack implements StackInterface {
 
+		protected $contextStack = null;
 		protected $listeners = array();
 		protected $event = null;
-		protected $contextStack = null;
 
 		public function __construct( $contextStack = null ) {
 			$this->contextStack = $contextStack;
 		}
 
 		public function listen( $eventName, $objectType = null, $capture = false ) {
-			if ( isset( $this->contextStack ) ) {
-				$path = $this->contextStack->getPath();
-			} else {
-				$path = '/';
-			}
-			return new IncompleteListener( $path, $eventName, $objectType, $capture, $this );
+			$path = isset( $this->contextStack ) ? $this->contextStack['path'] : '/';
+			return new IncompleteListener( $eventName, $path, $objectType, $capture, $this );
 		}
 
 		public function capture( $eventName, $objectType = null ) {
 			return $this->listen( $eventName, $objectType, true );
 		}
 
-		public function fire( $eventName, $eventData = array(), $objectType = null, $path = '/' ) {
+		public function fire( $eventName, $eventData = array(), $objectType = null, $path = null ) {
+			$path = \arc\path::normalize( $path, $this->contextStack? $this->contextStack['path'] : '/' );
 			if ( !$this->listeners['capture'][$eventName]
 				&& !$this->listeners['listen'][$eventName] ) {
 				return $eventData; // no listeners for this event, so dont bother searching
 			}
 			$prevEvent = null;
 			if ( $this->event ) {
-				$prevEvent = $this->event;
+				$prevEvent = $this->event; // remember current event, so you can fire events in an event handler
 			}
-			if ( isset( $this->contextStack ) ) {
-				$path = $this->contextStack->getPath( array( 'path' => $path ) );
-			}
-			/*
-			FIXME: make this generic
-			if ( !isset($objectType) ) {
-				$objectType = ar\context::getObjectType( array( 'path' => $path ) );
-			} else if ( !$objectType ) { // when set to false to prevent automatic filling of the objectType, reset it to null
-				$objectType = null;
-			}
-			*/
 			$this->event = new Event( $eventName, $eventData );
+			// first run the capture phase listeners
 			if ( $this->walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true ) ) {
+				// only if the event isn't cancelled continue with the listen phase
 				$this->walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
 			}
 
 			if ( $this->event->preventDefault ) {
 				$result = false;
-			} else if ( $this->event->data ) {
-				$result = $this->event->data;
 			} else {
-				$result = true;
+				$result = $this->event->data;
 			}
 			$this->event = $prevEvent;
 			return $result;
 		}
 
 		protected function walkListeners( $listeners, $path, $objectType, $capture ) {
-			$objectTypeStripped = $objectType;
-			$pos = strpos('.', $objectType);
-			if ( $pos !== false ) {
-				$objectTypeStripped = substr($objectType, 0, $pos);
-			}
 			$pathlist = \arc\path::parents( $path );
-			$counter = count( $pathlist );
+			if ( !$capture ) {
+				array_reverse( $pathlist ); // listen phase runs listeners from path to root, capture from root to path
+			}
 			reset($pathlist);
-
 			do {
 				$currentPath = current( $pathlist );
 				if ( is_array( $listeners[$currentPath] ) ) {
 					foreach ( $listeners[$currentPath] as $listener ) {
 						if ( !isset($listener['type']) ||
-							 ( $listener['type'] == $objectType ) ||
-							 ( $listener['type'] == $objectTypeStripped ) ||
-							 ( is_a( $objectType, $listener['type'] ) ) )
-						{
+							 ( $listener['type'] == $objectType ) || // allows use of non-php 'types', no inheritance though
+							 ( is_a( $objectType, $listener['type'] ) ) 
+						) {
+							// always add the event as the first argument to the method
+							array_unshift( $listener['args'],  $this->event );
 							$result = call_user_func_array( $listener['method'], $listener['args'] );
+							// only stop walking over the listeners if a listener returns false
 							if ( $result === false ) {
 								return false;
 							}
@@ -105,25 +89,26 @@
 		}
 
 		public function get( $path ) {
+			$path = \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
 			return new IncompleteListener( $path, null, null, false, $this );
 		}
 
-		public function addListener( $path, $eventName, $objectType, $method, $args, $capture = false ) {
-			if ( !$path ) {
-				$path = '/';
+		public function addListener( $eventName, $method, $args=null, $path='/', $objectType = null, $capture = false ) {
+			$when = $capture ? 'capture' : 'listen';
+			if ( ! is_callable($method) ) {
+				throw new \arc\ExceptionIlligalRequest('Method is not callable.',\arc\exceptions::ILLEGAL_ARGUMENT);
 			}
-			$when = ($capture) ? 'capture' : 'listen';
 			$this->listeners[$when][$eventName][$path][] = array(
 				'type' => $objectType,
 				'method' => $method,
 				'args' => $args
 			);
-			return new Listener( $eventName, $path, $capture, count($this->listeners[$when][$eventName][$path])-1, $this );
+			$id = count( $this->listeners[$when][$eventName][$path] ) - 1;
+			return new Listener( $eventName, $id, $path, $capture, $this );
 		}
 
-		public function removeListener( $name, $path, $capture, $id ) {
-			$when = ($listener['capture']) ? 'capture' : 'listen';
-			unset( $this->listeners[$when][$name][$path][$id] );
+		public function removeListener( $eventName, $id, $path = '/', $capture = false ) {
+			$when = ($capture) ? 'capture' : 'listen';
+			unset( $this->listeners[$when][$eventName][$path][$id] );
 		}
 	}
-

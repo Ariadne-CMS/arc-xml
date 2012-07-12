@@ -11,27 +11,35 @@
 
 	namespace arc;
 
-	class events extends \arc\Pluggable {
+	/**
+		@requires \arc\path
+		@optional \arc\context
+	*/
+	class events extends Pluggable {
 
 		protected static $stack;
 
-		public static function getStack() {
+		public static function getStack( $path = null ) {
 			if ( !self::$stack ) {
-				self::$stack = new events\Stack();
+				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
+				self::$stack = new events\Stack( $context );
+			}
+			if ( isset($path) ) { 
+					return self::$stack->get( $path );
 			}
 			return self::$stack;
 		}
 
 		public static function listen( $eventName, $objectType = null, $path = null ) {
-			return self::getStack()->get( $path )->listen( $eventName, $objectType );
+			return self::getStack( $path )->listen( $eventName, $objectType );
 		}
 
 		public static function capture( $eventName, $objectType = null, $path = null ) {
-			return self::getStack()->get( $path )->capture( $eventName, $objectType );
+			return self::getStack( $path )->capture( $eventName, $objectType );
 		}
 
 		public static function fire( $eventName, $eventData = array(), $objectType = null, $path = null ) {
-			return self::getStack()->get( $path )->fire( $eventName, $eventData, $objectType );
+			return self::getStack( $path )->fire( $eventName, $eventData, $objectType );
 		}
 
 		public static function event() {
@@ -39,7 +47,7 @@
 		}
 
 		public static function get( $path ) {
-			return new events\IncompleteListener( $path, null, null, false, self::getStack() );
+			return self::getStack( $path );
 		}
 
 	}

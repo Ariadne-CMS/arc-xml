@@ -12,23 +12,23 @@
 	namespace arc\events;
 
 	class Listener {
-		private $capture = false;
-		private $path = '';
-		private $name = '';
-		private $id = null;
-		private $stack = null;
+		private $capture    = false;
+		private $path       = '/';
+		private $eventName  = '';
+		private $id         = null;
+		private $eventStack = null;
 
-		public function __construct( $name, $path, $capture, $id, $stack = null ) {
-			$this->name = $name;
-			$this->path = $path;
-			$this->capture = $capture;
-			$this->id = $id;
-			$this->stack = $stack;
+		public function __construct( $eventName, $id, $path = '/', $capture = false, $eventStack = null ) {
+			$this->eventName  = $eventName;
+			$this->path       = $path;
+			$this->capture    = $capture;
+			$this->id         = $id;
+			$this->eventStack = $eventStack;
 		}
 
 		public function remove() {
 			if ( isset($this->id) ) {
-				$this->stack->removeListener( $this->name, $this->path, $this->capture, $this->id );
+				$this->eventStack->removeListener( $this->eventName, $this->path, $this->capture, $this->id );
 			}
 		}
 
