@@ -15,7 +15,7 @@
 
 		protected static $stack;
 
-		protected static function getStack() {
+		public static function getStack() {
 			if ( !self::$stack ) {
 				self::$stack = new events\Stack();
 			}

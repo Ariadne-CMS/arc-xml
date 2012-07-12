@@ -15,21 +15,26 @@
 
 		protected $listeners = array();
 		protected $event = null;
+		protected $contextStack = null;
 
-		public static function listen( $eventName, $objectType = null, $capture = false ) {
-			if ( class_exists( '\arc\context' ) ) {
-				$path = \arc\context::getPath();
+		public function __construct( $contextStack = null ) {
+			$this->contextStack = $contextStack;
+		}
+
+		public function listen( $eventName, $objectType = null, $capture = false ) {
+			if ( isset( $this->contextStack ) ) {
+				$path = $this->contextStack->getPath();
 			} else {
 				$path = '/';
 			}
 			return new IncompleteListener( $path, $eventName, $objectType, $capture, $this );
 		}
 
-		public static function capture( $eventName, $objectType = null ) {
+		public function capture( $eventName, $objectType = null ) {
 			return $this->listen( $eventName, $objectType, true );
 		}
 
-		public static function fire( $eventName, $eventData = array(), $objectType = null, $path = '') {
+		public function fire( $eventName, $eventData = array(), $objectType = null, $path = '/' ) {
 			if ( !$this->listeners['capture'][$eventName]
 				&& !$this->listeners['listen'][$eventName] ) {
 				return $eventData; // no listeners for this event, so dont bother searching
@@ -38,19 +43,20 @@
 			if ( $this->event ) {
 				$prevEvent = $this->event;
 			}
-			if ( class_exists( '\arc\context' ) ) {
-				$path = \arc\context::getPath( array( 'path' => $path ) );
-			} else {
-				$path = '/';
+			if ( isset( $this->contextStack ) ) {
+				$path = $this->contextStack->getPath( array( 'path' => $path ) );
 			}
+			/*
+			FIXME: make this generic
 			if ( !isset($objectType) ) {
 				$objectType = ar\context::getObjectType( array( 'path' => $path ) );
 			} else if ( !$objectType ) { // when set to false to prevent automatic filling of the objectType, reset it to null
 				$objectType = null;
 			}
+			*/
 			$this->event = new Event( $eventName, $eventData );
-			if ( self::walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true ) ) {
-				self::walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
+			if ( $this->walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true ) ) {
+				$this->walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
 			}
 
 			if ( $this->event->preventDefault ) {
@@ -64,22 +70,13 @@
 			return $result;
 		}
 
-		protected static function walkListeners( $listeners, $path, $objectType, $capture ) {
+		protected function walkListeners( $listeners, $path, $objectType, $capture ) {
 			$objectTypeStripped = $objectType;
 			$pos = strpos('.', $objectType);
 			if ( $pos !== false ) {
 				$objectTypeStripped = substr($objectType, 0, $pos);
 			}
-			if ( class_exists( '\arc\context' ) ) {
-				$path = \arc\context::getPath( array( 'path' => $path ) );
-				$pathlist = \arc\path::parents( $path );
-				if ( !$capture ) {
-					$pathlist = array_reverse( $pathlist );
-				}
-			} else {
-				$path = '/';
-				$pathlist = array( '/' );
-			}
+			$pathlist = \arc\path::parents( $path );
 			$counter = count( $pathlist );
 			reset($pathlist);
 
@@ -107,11 +104,11 @@
 			return $this->event;
 		}
 
-		public static function get( $path ) {
+		public function get( $path ) {
 			return new IncompleteListener( $path, null, null, false, $this );
 		}
 
-		public static function addListener( $path, $eventName, $objectType, $method, $args, $capture = false ) {
+		public function addListener( $path, $eventName, $objectType, $method, $args, $capture = false ) {
 			if ( !$path ) {
 				$path = '/';
 			}
@@ -124,7 +121,7 @@
 			return new Listener( $eventName, $path, $capture, count($this->listeners[$when][$eventName][$path])-1, $this );
 		}
 
-		public static function removeListener( $name, $path, $capture, $id ) {
+		public function removeListener( $name, $path, $capture, $id ) {
 			$when = ($listener['capture']) ? 'capture' : 'listen';
 			unset( $this->listeners[$when][$name][$path][$id] );
 		}
