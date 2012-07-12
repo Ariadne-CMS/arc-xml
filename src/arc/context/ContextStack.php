@@ -21,31 +21,26 @@
 		}
 
 		public function push( $values ) {
-			// merge values with last entry
+			// merge values with the values in the current top
 			$original = $this->top();
 			$values += $original;
 			parent::push( $values );
 		}
 
-		public function peek( $level = 0 ) {
+		public function peek( $level = 0 ) { // level counts down from the top
 			$size = parent::count();
-			$offset = $site - ( $level + 1 );
+			$offset = $size - ( $level + 1 );
 			return parent::offsetGet( $offset );
 		}
 
-		public function getPath() {
-			$context = $this->top();
-			return $context['path'];
-		}
-
+		// \arc\KeyValueStoreInterface
 		public function putVar( $name, $value ) {
-			$context = $this->pop();
+			$context = $this->top();
 			if ( isset( $value ) ) {
 				$context[$name] = $value;
 			} else {
 				unset( $context[$name] );
 			}
-			$this->push( $context );
 		}
 
 		public function getVar( $name ) {
