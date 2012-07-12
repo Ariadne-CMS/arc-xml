@@ -13,9 +13,8 @@
 
 	class path extends Pluggable {
 
-		public static function parents( $path, $cwd = '/' ) {
+		public static function parents( $path, $cwd = '/', $root = '/' ) {
 			// returns all parents starting at the root, up to and including the path itself
-			$root = '/';
 			$path = self::normalize( $path, $cwd );
 			$parents = array();
 			$pathticles = explode( '/', $path );
@@ -23,12 +22,12 @@
 			foreach ( $pathticles as $pathticle ) {
 				if ( $pathticle ) {
 					$prevpath  .= $pathticle . '/';
-					if ( strpos( $prevpath, $root ) === 0 ) { // skip parents above the root
+					if ( strpos( $prevpath, $root ) === 0 ) { // Add only parents below the root
 						$parents[] = $prevpath;
 					}
 				}
 			}
-			if ( $parents[0] !== $root ) {
+			if ( !isset($parents[0]) && $parents[0] !== $root ) {
 				array_unshift( $parents, $root );
 			}
 			return $parents;
@@ -82,11 +81,11 @@
 				return null;
 			}
 			$parent = dirname( $path );
+			if ( $parent[1] ) { // fast check to see if there is a dirname
+				$parent .= '/';
+			}
 			if ( strpos( $parent, $root ) !== 0 ) {
 				return null;
-			}
-			if ( $parent[ strlen( $parent ) - 1 ] !== '/' ) {
-				$parent .= '/';
 			}
 			return $parent;
 		}
