@@ -11,24 +11,17 @@
 
 	namespace arc\config;
 
-	class Configuration {
+	class Configuration implements \arc\KeyValueStoreInterface, ConfigurationInterface {
 
+		protected $contextStack = null;
 		protected $configuration = array();
-		protected $context = null;
 
-		public function __construct( $context = null ) {
-			$this->context = $context;
+		public function __construct( $contextStack = null ) {
+			$this->contextStack = $contextStack;
 		}
 
 		protected function getPath( $path ) {
-			if ( !isset( $path ) ) {
-				if ( isset( $this->context ) ) {
-					$path = $this->context->getPath();
-				} else {
-					$path = '/';
-				}
-			}
-			return $path;
+			return \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
 		}
 
 		protected function getFilledPath( $path, $name = '' ) {
@@ -58,6 +51,7 @@
 			return $config;
 		}
 
+		// ConfigurationInterface
 		public function acquire( $name, $path = null ) {
 			$path = $this->getPath( $path );
 			$parents = \arc\path::parents( $path );
@@ -98,4 +92,12 @@
 			return new ConfigurationPath( $this, $path );
 		}
 
+		// \arc\KeyValueStoreInterface
+		public function getVar( $name ) {
+			return $this->acquire( $name );
+		}
+
+		public function putVar( $name, $value ) {
+			return $this->configure( $name, $value );
+		}
 	}

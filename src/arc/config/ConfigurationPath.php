@@ -11,7 +11,7 @@
 
 	namespace arc\config;
 
-	class ConfigurationPath implements \arc\KeyValueStoreInterface {
+	class ConfigurationPath implements \arc\KeyValueStoreInterface, ConfigurationInterface {
 
 		protected $configuration = null;
 		protected $path = '/';
@@ -21,6 +21,7 @@
 			$this->path = $path;
 		}
 
+		// ConfigurationInterface
 		public function acquire( $name ) {
 			return $this->configuration->acquire( $name, $this->path );
 		}
@@ -29,6 +30,12 @@
 			return $this->configuration->configure( $name, $value, $this->path );
 		}
 
+		public function get( $path ) {
+			$path = \arc\path::normalize( $path, $this->path );
+			return new ConfigurationPath( $this->configuration, $path );
+		}
+
+		// \arc\KeyValueStoreInterface
 		public function getVar( $name ) {
 			return $this->acquire( $name );
 		}

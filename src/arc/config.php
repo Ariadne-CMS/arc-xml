@@ -11,11 +11,15 @@
 
 	namespace arc;
 
+	/**
+		@requires \arc\path
+		@optional \arc\context
+	*/
 	class config extends Pluggable {
 
 		protected static $configuration = null;
 
-		protected static function getConfiguration( $context = null ) {
+		public static function getConfiguration( $context = null ) {
 			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
 				$context = \arc\context::getContext();
 			}
