@@ -212,7 +212,7 @@
 		}
 
 		static public function css2XPath( $cssSelector ) {
-
+			/* (c) Tijs Verkoyen - http://blog.verkoyen.eu/blog/p/detail/css-selector-to-xpath-query/ */
 			$cssSelectors = array(
 				// E F: Matches any F element that is a descendant of an E element
 				'/(\w)\s+(\w)/',

@@ -13,7 +13,7 @@
 
 	/**
 		@requires \arc\path
-		@optional \arc\context
+		@suggest \arc\context
 	*/
 	class events extends Pluggable {
 
