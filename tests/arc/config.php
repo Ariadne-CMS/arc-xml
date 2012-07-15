@@ -38,8 +38,6 @@
 			$result = \arc\config::get('/test/child/')->acquire('a');
 			$this->assertFalse( $result['b'] );
 			$this->assertTrue( $result['c'] == 'test' );
-			//$c = \arc\config::getConfiguration();
-			//$c->debug();
 		}
 
 	}
