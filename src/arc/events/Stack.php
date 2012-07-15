@@ -59,7 +59,7 @@
 		protected function walkListeners( $listeners, $path, $objectType, $capture ) {
 			$pathlist = \arc\path::parents( $path );
 			if ( !$capture ) {
-				array_reverse( $pathlist ); // listen phase runs listeners from path to root, capture from root to path
+				$pathlist = array_reverse( $pathlist ); // listen phase runs listeners from path to root, capture from root to path
 			}
 			reset($pathlist);
 			do {
@@ -90,20 +90,33 @@
 
 		public function get( $path ) {
 			$path = \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
-			return new IncompleteListener( $path, null, null, false, $this );
+			return new IncompleteListener( null, $path, null, false, $this );
 		}
 
+		protected function createArray( $array ) { 
+			// create a nested array, prevents PHP notices
+			$args = func_get_args();
+			array_shift( $args ); // remove $array
+			foreach ( $args as $arg ) {
+				if ( !$array[ $arg ] ) {
+					$array[ $arg ] = array();
+				}
+				$array = &$array[ $arg ];
+			}
+		}
+		
 		public function addListener( $eventName, $method, $args=null, $path='/', $objectType = null, $capture = false ) {
 			$when = $capture ? 'capture' : 'listen';
 			if ( ! is_callable($method) ) {
 				throw new \arc\ExceptionIlligalRequest('Method is not callable.',\arc\exceptions::ILLEGAL_ARGUMENT);
 			}
-			$this->listeners[$when][$eventName][$path][] = array(
+			$this->createArray( $this->listeners, $when, $eventName, $path );
+			$id = count( $this->listeners[$when][$eventName][$path] );
+			$this->listeners[$when][$eventName][$path][$id] = array(
 				'type' => $objectType,
 				'method' => $method,
 				'args' => $args
 			);
-			$id = count( $this->listeners[$when][$eventName][$path] ) - 1;
 			return new Listener( $eventName, $id, $path, $capture, $this );
 		}
 

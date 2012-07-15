@@ -13,8 +13,6 @@
 
 	interface StackInterface {
 
-		public function call( $method, $args = array() );
-
 		public function listen( $eventName, $objectType = null, $capture = false );
 
 		public function capture( $eventName, $objectType = null );

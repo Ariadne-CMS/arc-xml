@@ -28,7 +28,7 @@
 
 		public function remove() {
 			if ( isset($this->id) ) {
-				$this->eventStack->removeListener( $this->eventName, $this->path, $this->capture, $this->id );
+				$this->eventStack->removeListener( $this->eventName, $this->id, $this->path, $this->capture );
 			}
 		}
 

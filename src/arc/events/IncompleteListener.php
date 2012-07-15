@@ -30,10 +30,10 @@
 			return $this->eventStack->addListener( $this->eventName, $method, $args, $this->path, $this->objectType, $this->capture );
 		}
 
-		public function listen( $eventName, $objectType = null ) {
+		public function listen( $eventName, $objectType = null, $capture = false ) {
 			$this->eventName = $eventName;
 			$this->objectType = $objectType;
-			$this->capture = false;
+			$this->capture = $capture;
 			return $this;
 		}
 
@@ -50,7 +50,7 @@
 			} else if ( isset($this->path) ) {
 				$path = \arc\path::normalize( $path, $this->path );
 			}
-			return $this->eventStack->fire( $eventName, $eventData, $path, $objectType );
+			return $this->eventStack->fire( $eventName, $eventData, $objectType, $path );
 		}
 
 		public function get( $path ) {
