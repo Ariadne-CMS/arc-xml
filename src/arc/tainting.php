@@ -13,7 +13,7 @@
 
 	class tainting extends Pluggable {
 
-		public static function taint($value) {
+		public static function taint( &$value ) {
 			if ( !is_numeric($value) ) {
 				if ( is_array($value) ) {
 					array_walk_recursive( $value, array( self, 'taint' ) );
@@ -24,7 +24,7 @@
 			return $value;
 		}
 
-		public static function untaint($value, $filter = FILTER_SANITIZE_SPECIAL_CHARS, $flags = null) {
+		public static function untaint( &$value, $filter = FILTER_SANITIZE_SPECIAL_CHARS, $flags = null ) {
 			if ( $value instanceof tainting\Tainted ) {
 				$value = filter_var($value->value, $filter, $flags);
 			} else if ( is_array($value) ) {
@@ -37,7 +37,6 @@
 		}
 
 		protected static function untaintArrayItem( &$value, $key, $options) {
-			//FIXME: doublecheck that this works with array_walk_recursive with $value as reference
 			$value = self::untaint( $value, $options['filter'], $options['flags'] );
 		}
 
