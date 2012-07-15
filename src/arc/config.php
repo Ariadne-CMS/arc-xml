@@ -13,7 +13,7 @@
 
 	/**
 		@requires \arc\path
-		@suggest \arc\context
+		@suggests \arc\context
 	*/
 	class config extends Pluggable {
 
@@ -21,7 +21,7 @@
 
 		public static function getConfiguration( $context = null ) {
 			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
-				$context = \arc\context::getContext();
+				$context = \arc\context::getStack();
 			}
 			if ( !self::$configuration ) {
 				self::$configuration = new config\Configuration( $context );

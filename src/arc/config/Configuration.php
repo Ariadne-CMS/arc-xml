@@ -19,7 +19,10 @@
 		public function __construct( $contextStack = null ) {
 			$this->contextStack = $contextStack;
 		}
-
+		public function debug() {
+			var_dump( $this->configuration );
+		}
+		
 		protected function getPath( $path ) {
 			return \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
 		}
