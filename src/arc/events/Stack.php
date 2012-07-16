@@ -32,8 +32,8 @@
 
 		public function fire( $eventName, $eventData = array(), $objectType = null, $path = null ) {
 			$path = \arc\path::normalize( $path, $this->contextStack? $this->contextStack['path'] : '/' );
-			if ( !$this->listeners['capture'][$eventName]
-				&& !$this->listeners['listen'][$eventName] ) {
+			if ( !isset($this->listeners['capture'][$eventName])
+				&& !isset($this->listeners['listen'][$eventName]) ) {
 				return $eventData; // no listeners for this event, so dont bother searching
 			}
 			$prevEvent = null;
@@ -42,9 +42,14 @@
 			}
 			$this->event = new Event( $eventName, $eventData );
 			// first run the capture phase listeners
-			if ( $this->walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true ) ) {
-				// only if the event isn't cancelled continue with the listen phase
-				$this->walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
+			if( 
+				!isset(  $this->listeners['capture'][$eventName] ) ||
+				$this->walkListeners( $this->listeners['capture'][$eventName], $path, $objectType, true )
+			) {
+				if ( isset( $this->listeners['listen'][$eventName] ) ) {
+					// only if the event isn't cancelled continue with the listen phase
+					$this->walkListeners( $this->listeners['listen'][$eventName], $path, $objectType, false );
+				}
 			}
 
 			if ( $this->event->preventDefault ) {
@@ -64,7 +69,7 @@
 			reset($pathlist);
 			do {
 				$currentPath = current( $pathlist );
-				if ( is_array( $listeners[$currentPath] ) ) {
+				if ( isset(  $listeners[$currentPath] ) && is_array( $listeners[$currentPath] ) ) {
 					foreach ( $listeners[$currentPath] as $listener ) {
 						if ( !isset($listener['type']) ||
 							 ( $listener['type'] == $objectType ) || // allows use of non-php 'types', no inheritance though
@@ -98,7 +103,7 @@
 			$args = func_get_args();
 			array_shift( $args ); // remove $array
 			foreach ( $args as $arg ) {
-				if ( !$array[ $arg ] ) {
+				if ( !isset($array[ $arg ]) ) {
 					$array[ $arg ] = array();
 				}
 				$array = &$array[ $arg ];
@@ -111,7 +116,8 @@
 				throw new \arc\ExceptionIlligalRequest('Method is not callable.',\arc\exceptions::ILLEGAL_ARGUMENT);
 			}
 			$this->createArray( $this->listeners, $when, $eventName, $path );
-			$id = count( $this->listeners[$when][$eventName][$path] );
+			$id = isset($this->listeners[$when][$eventName][$path]) ?
+				count( $this->listeners[$when][$eventName][$path] ) : 0 ;
 			$this->listeners[$when][$eventName][$path][$id] = array(
 				'type' => $objectType,
 				'method' => $method,

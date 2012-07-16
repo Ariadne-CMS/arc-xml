@@ -16,7 +16,7 @@
 		protected static $methods = array();
 
 		protected static function _callPlugin( $methodName, $arguments = array() ) {
-			$method = self::$methods[ $methodName ];
+			$method = isset(self::$methods[ $methodName ]) ? self::$methods[ $methodName ] : false ;
 			if ( !$method ) {
 				$method = \arc\arc::getPluginMethod( get_called_class(), $methodName );
 			}

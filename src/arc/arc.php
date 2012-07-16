@@ -36,7 +36,7 @@
 			$l = count(self::$plugins);
 			for ( $i = $l-1; $i>=0; $i-- ) {
 				$plugin = self::$plugins[$i];
-				if ( $method = call_user_func( array( $plugin, getPluginMethod), $namespace, $methodName ) ) {
+				if ( $method = call_user_func( array( $plugin, 'getPluginMethod'), $namespace, $methodName ) ) {
 					return $method;
 				}
 			}

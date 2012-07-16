@@ -36,7 +36,7 @@
 			// removes '.', changes '//' to '/', changes '\\' to '/', calculates '..' up to '/'
 			$path = str_replace('\\', '/', $path);
 			$result = '/';
-			if ( $path[0] !== '/' ) {
+			if ( isset($path[0]) && $path[0] !== '/' ) {
 				$path = $cwd . '/' . $path;
 			}
 			if ( $path ) {
@@ -45,7 +45,7 @@
 					switch( $pathticle ) {
 						case '..' :
 							$result = dirname( $result );
-							if ( $result[1] ) { // fast check to see if there is a dirname
+							if ( isset($result[1]) ) { // fast check to see if there is a dirname
 								$result .= '/';
 							}
 							// php has a bug in dirname( '/' ) -> returns a '\\' in windows
@@ -80,7 +80,7 @@
 				return null;
 			}
 			$parent = dirname( $path );
-			if ( $parent[1] ) { // fast check to see if there is a dirname
+			if ( isset($parent[1]) ) { // fast check to see if there is a dirname
 				$parent .= '/';
 			}
 			if ( strpos( $parent, $root ) !== 0 ) {
