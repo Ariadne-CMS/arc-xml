@@ -27,7 +27,7 @@
 			// do request, any will do, just that requestHeaders will get set
 			$res = $client->get('http://www.ariadne-cms.org/');
 
-			$this->assertTrue(strstr($client->requestHeaders,'X-Test-Header: frop') !== false);
+			$this->assertTrue(strstr($client->requestHeaders,"X-Test-Header: frop\r\n") !== false);
 
 
 		}

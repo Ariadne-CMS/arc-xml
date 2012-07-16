@@ -13,9 +13,10 @@
 
 	class ClientStream implements ClientInterface {
 
-		private $options = array();
+		private $options = array('headers' => array());
 
 		public $responseHeaders = null;
+		public $requestHeaders = null;
 
 		protected function parseRequestURL( $url ) {
 			$components = parse_url( $url );
@@ -49,10 +50,21 @@
 				$url = $this->buildURL( $url, $request );
 				$request = '';
 			}
+
 			$options = $this->mergeOptions( array(
 				'method' => $type,
 				'content' => $request
 			), $options );
+
+			if( isset($options['header']) )  {
+				$options['header'] .=  "\r\n";
+			} else {
+				$options['header'] = '';
+			}
+
+			$options['header'] .= isset($options['headers']) ? implode( "\r\n", $options['headers'] ) ."\r\n": '' ;
+			unset($options['headers']);
+
 			$context = stream_context_create( array( 'http' => $options ) );
 			$result = @file_get_contents( (string) $url, false, $context );
 			$this->responseHeaders = $http_response_header; //magic php variable set by file_get_contents.
@@ -85,13 +97,15 @@
 		}
 
 		public function headers( $headers ) {
-			if (is_array($headers)) {
-				$headers = join("\r\n", $headers);
+			if (!isset($this->options['headers'])) {
+				$this->options['headers'] = array();
 			}
-			if (!isset($this->options['header'])) {
-				$this->options['header'] = '';
+			if( !is_array($headers) ) {
+				$this->headers = explode("\r\n",$headers);
 			}
-			$this->options['header'] = $this->options['header'].$headers;
+
+			$this->options['headers'] = array_merge($this->options['headers'], $headers);
+				
 			return $this;
 		}
 
