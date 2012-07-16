@@ -12,17 +12,17 @@
 	namespace arc\config;
 
 	interface ConfigurationInterface {
-	
+
 	/*
 		// commented out on purpose, since Configuration adds a path argument (for internal use)
 		// with default value null - which is just silly for ConfigurationPath.
 		// If you implement this interface, implement the methods below, with only these
 		// arguments made obligatory.
-		
+
 		public function acquire( $name );
-		
+
 		public function configure( $name, $value );
 	*/
-		
+
 	}
 

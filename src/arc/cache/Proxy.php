@@ -8,9 +8,9 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-	 
+
 	namespace arc\cache;
-	
+
 	class Proxy extends \arc\Wrapper {
 		// TODO: allow more control on retrieval:
 		// - get contents from cache even though cache may be stale
@@ -38,7 +38,7 @@
 				'result' => $result
 			);
 		}
-		
+
 		protected function __callCached( $method, $args, $path ) {
 			if ( !$cacheData = $this->cacheStore->getIfFresh( $path ) ) {
 				if ( $this->cacheStore->lock( $path ) ) {
@@ -52,10 +52,10 @@
 			}
 			return $cacheData;
 		}
-		
+
 		public function __call( $method, $args ) {
 			$path = $method . '(' . md5( serialize($args) ) . ')';
-			$cacheData = $this->__callCached( $method, $args, $path );			
+			$cacheData = $this->__callCached( $method, $args, $path );
 			echo $cacheData['output'];
 			$result = $cacheData['result'];
 			if ( is_object( $result ) ) {
@@ -63,7 +63,7 @@
 			}
 			return $result;
 		}
-		
+
 		public function __get( $name ) {
 			$result = parent::__get( $name );
 			if ( is_object( $result ) ) {
@@ -71,5 +71,5 @@
 			}
 			return $result;
 		}
-		
+
 	}

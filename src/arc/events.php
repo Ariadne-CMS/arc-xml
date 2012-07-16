@@ -24,7 +24,7 @@
 				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
 				self::$stack = new events\Stack( $context );
 			}
-			if ( isset($path) ) { 
+			if ( isset($path) ) {
 					return self::$stack->get( $path );
 			}
 			return self::$stack;

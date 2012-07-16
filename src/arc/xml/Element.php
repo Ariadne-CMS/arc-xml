@@ -19,7 +19,7 @@
 			$this->document = $document;
 			$this->domNode = $element;
 		}
-		
+
 		public function proxy( $el ) {
 			return $this->document->proxy( $el );
 		}

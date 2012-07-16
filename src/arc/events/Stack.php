@@ -68,7 +68,7 @@
 					foreach ( $listeners[$currentPath] as $listener ) {
 						if ( !isset($listener['type']) ||
 							 ( $listener['type'] == $objectType ) || // allows use of non-php 'types', no inheritance though
-							 ( is_a( $objectType, $listener['type'] ) ) 
+							 ( is_a( $objectType, $listener['type'] ) )
 						) {
 							// always add the event as the first argument to the method
 							array_unshift( $listener['args'],  $this->event );
@@ -93,7 +93,7 @@
 			return new IncompleteListener( null, $path, null, false, $this );
 		}
 
-		protected function createArray( $array ) { 
+		protected function createArray( $array ) {
 			// create a nested array, prevents PHP notices
 			$args = func_get_args();
 			array_shift( $args ); // remove $array
@@ -104,7 +104,7 @@
 				$array = &$array[ $arg ];
 			}
 		}
-		
+
 		public function addListener( $eventName, $method, $args=null, $path='/', $objectType = null, $capture = false ) {
 			$when = $capture ? 'capture' : 'listen';
 			if ( ! is_callable($method) ) {

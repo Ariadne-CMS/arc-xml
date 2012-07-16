@@ -12,7 +12,7 @@
 	namespace arc;
 
 	class xml extends Pluggable {
-	
+
 		static $namespaces = array();
 
 		static public function el() {
@@ -41,26 +41,26 @@
 		static public function element() {
 			return call_user_func_array( '\arc\xml::el', func_get_args() );
 		}
-		
+
 		static public function node( $content ) {
 			$document = new xml\NodeList( new \DOMDocument() );
 			if ( strpos( '<!--', $content ) === 0 ) {
-				$content = preg_replace('/^<!--\\s(.*)\\s-->/','$1', $content); 
+				$content = preg_replace('/^<!--\\s(.*)\\s-->/','$1', $content);
 				$node = $document->createComment( $content );
 			} else if ( strpos( '<![CDATA[', $content ) === 0 ) {
-				$content = preg_replace('/^<!\[CDATA\[(.*)\]\]>/','$1', $content); 
+				$content = preg_replace('/^<!\[CDATA\[(.*)\]\]>/','$1', $content);
 				$node = $document->createCDATASection( $content );
 			} else {
 				$node = $document->createTextNode( $content );
 			}
 			return $node;
 		}
-		
+
 		static public function comment( $content ) {
 			$document = new xml\NodeList( new \DOMDocument() );
 			return $document->createComment( $content );
 		}
-		
+
 		static public function cdata( $content ) {
 			$document = new xml\NodeList( new \DOMDocument() );
 			return $document->createCDATASection( $content );
@@ -107,7 +107,7 @@
 			$document = new xml\NodeList( new \DOMDocument );
 			return new xml\Preamble( $xmlEncoding, $xmlVersion, $xmlStandalone, $document );
 		}
-		
+
 		static public function parseFull( $xml, $encoding = null ) {
 			$dom = new \DomDocument();
 			if ( $encoding ) {
@@ -192,7 +192,7 @@
 				$result = array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
 			}
 			// make list( $a, $b, $c ) = parseName() work
-			return array_merge( array_values( $result ), $result ); 
+			return array_merge( array_values( $result ), $result );
 		}
 
 		static public function registerNameSpace( $prefix, $namespace ) {

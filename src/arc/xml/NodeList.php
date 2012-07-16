@@ -220,17 +220,17 @@
 				return $this->domReference->ownerDocument;
 			}
 		}
-		
+
 		public function createTextNode( $value ) {
 			$domNode = $this->getDocument()->createTextNode( ''.$value );
 			return $this->document->proxy( $domNode );
 		}
-		
+
 		public function createComment( $value ) {
 			$domNode = $this->getDocument()->createComment( ''.$value );
 			return $this->document->proxy( $domNode );
 		}
-		
+
 		public function createCDATASection( $value ) {
 			$domNode = $this->getDocument()->createCDATASection( ''.$value );
 			return $this->document->proxy( $domNode );
@@ -540,7 +540,7 @@
 				$result = array( 'prefix' => '', 'namespace' => '', 'localName' => $name );
 			}
 			// make list( $a, $b, $c ) = parseName() work
-			return array_merge( array_values( $result ), $result ); 
+			return array_merge( array_values( $result ), $result );
 		}
 
 		public function find( $selector ) {
@@ -551,7 +551,7 @@
 		public function querySelectorAll( $selector ) {
 			return $this->find( $selector );
 		}
-		
+
 		public function bind( $nodes, $name, $type = 'string' ) {
 			$b = new DataBinding( );
 			return $b->bind( $nodes, $name, $type );

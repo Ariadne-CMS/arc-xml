@@ -8,11 +8,11 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-	 
+
 	namespace arc\cache;
-	
+
 	class Store implements StoreInterface, \arc\KeyValueStoreInterface {
-	
+
 		protected $basePath = '';
 		protected $timeout = 7200;
 		protected $mode = 0777;
@@ -42,17 +42,17 @@
 				throw new \arc\ExceptionConfigError("Cache Directory is not writable ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
 			}
 		}
-		
+
 		protected function cachePath( $path ) {
 			// last '=' is added to prevent conflicts between subdirectories and cache images
 			// images always end in a '=', directories never end in a '='
-			return ARC_CACHE_DIR . $this->basePath . preg_replace('/(\.\.|\=)/', '', $path) . '='; 
+			return ARC_CACHE_DIR . $this->basePath . preg_replace('/(\.\.|\=)/', '', $path) . '=';
 		}
-		
+
 		public function subStore( $path ) {
 			return new Store( $this->basePath . preg_replace('/(\.\.|\=)/', '', $path) );
 		}
-		
+
 		public function get( $path ) {
 			$cachePath = $this->cachePath( $path );
 			if ( file_exists( $cachePath ) ) {
@@ -65,7 +65,7 @@
 		public function getvar( $name ) {
 			return $this->get( $name );
 		}
-		
+
 		public function isFresh( $path ) {
 			$cachePath = $this->cachePath( $path );
 			if ( file_exists( $cachePath ) ) {
@@ -74,7 +74,7 @@
 				return false;
 			}
 		}
-		
+
 		public function getIfFresh( $path, $freshness = 0 ) {
 			$info = $this->info( $path );
 			if ( $info && $info['timeout'] >= $freshness ) {
@@ -131,7 +131,7 @@
 				return false;
 			}
 		}
-		
+
 		public function info( $path ) {
 			$cachePath = $this->cachePath( $path );
 			if ( file_exists( $cachePath ) && is_readable( $cachePath ) ) {
@@ -154,7 +154,7 @@
 				return true;
 			}
 		}
-		
+
 		public function purge( $path = null ) {
 			$this->clear( $path );
 			$cachePath = substr( $this->cachePath( $path ), 0, -1 ); // remove last '='
@@ -163,7 +163,7 @@
 					$cacheDir = dir( $cachePath );
 					while (false !== ($entry = $cacheDir->read())) {
 						if ( $entry != '.' && $entry != '..' ) {
-							$this->purge( $path . '/' . $entry ); 
+							$this->purge( $path . '/' . $entry );
 						}
 					}
 					return rmdir( $cachePath );
@@ -174,5 +174,5 @@
 				return true;
 			}
 		}
-	
+
 	}

@@ -12,7 +12,7 @@
 	namespace arc\context;
 
 	class ContextStack extends \SplStack implements \arc\KeyValueStoreInterface {
-		
+
 		protected $position = 0;
 
 		public function __construct() {

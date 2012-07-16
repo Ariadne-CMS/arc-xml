@@ -10,7 +10,7 @@
 	 */
 
 	namespace arc\xml;
-	
+
 	class DataBinding {
 
 		public function bindAsArray( $nodes, $name, $type = 'string' ) {
@@ -29,11 +29,11 @@
 			$this->{$name} = $this->bindValue( $node, $type );
 			return $this;
 		}
-		
+
 		public function __toString() {
 			return $this->source->toString();
 		}
-		
+
 		protected function bindValue( $source, $type ) {
 			if ( $source instanceof NodeInterface ) {
 				$nodeValue = $source->nodeValue;
@@ -83,4 +83,3 @@
 		}
 
 	}
-?>

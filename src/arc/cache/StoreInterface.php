@@ -8,9 +8,9 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-	 
+
 	namespace arc\cache;
-	
+
 	interface StoreInterface {
 		public function get( $path );
 		public function set( $path, $value, $timeout = 7200 );
