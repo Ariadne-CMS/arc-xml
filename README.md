@@ -61,9 +61,8 @@ These are already in Ariadne, they just need to be refactored.
 TODO
 ----
 - tests and more tests
-- documentation - for now read 
-  http://www.ariadne-cms.org/docs/reference/ar/
-  Keep in mind that it uses a template specific syntax.
+- documentation - see [https://github.com/Ariadne-CMS/arc/wiki](the Wiki pages)
+  which are far from complete, but you can edit them yourself!
 - Refactor some static variables away - e.g. \arc\http::$tainting
 
 What makes ARC useful/interesting/unique?
