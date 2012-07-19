@@ -27,9 +27,9 @@
 		function testParents() {
 			$parents = \arc\path::parents('/test/');
 			$this->assertTrue( $parents == array('/','/test/'));
-			$parents = \arc\path::parents('/test/foo/','/','/test/');
+			$parents = \arc\path::parents('/test/foo/','/test/');
 			$this->assertTrue( $parents == array( '/test/', '/test/foo/'));
-			$parents = \arc\path::parents('/test/','/','/tost/');
+			$parents = \arc\path::parents('/test/','/tost/');
 			$this->assertTrue( $parents == array( '/tost/') );
 		}
 
@@ -46,5 +46,8 @@
 			$this->assertTrue( \arc\path::clean('/a/b/') == '/a/b/' );
 			$this->assertTrue( \arc\path::clean(' ') == '%20' );
 			$this->assertTrue( \arc\path::clean('/#/') == '/%23/');
+			$this->assertTrue( \arc\path::clean('/an a/', function( $filename ) {
+				return str_replace( 'a','', $filename );
+			}) == '/n /');
 		}
 	}

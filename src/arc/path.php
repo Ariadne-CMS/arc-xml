@@ -13,7 +13,7 @@
 
 	class path extends Pluggable {
 
-		public static function parents( $path, $cwd = '/', $root = '/' ) {
+		public static function parents( $path, $root = '/' ) {
 			// returns all parents starting at the root, up to and including the path itself
 			$parents = array();
 			$pathticles = explode( '/', $path );
@@ -64,13 +64,20 @@
 
 		public static function clean( $path, $filter = FILTER_SANITIZE_ENCODED, $flags = null ) {
 			if ( !isset($flags) ) {
-				$flags =  FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
+				$flags = FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
 			}
 			$splitpath = explode( '/', $path );
 			$result = '';
-			foreach ( $splitpath as $pathticle ) {
-				$pathticle = filter_var( $pathticle, $filter, $flags );
-				$result .= $pathticle . '/';
+			if ( is_callable( $filter ) ) {
+				foreach ( $splitpath as $pathticle ) {
+					$pathticle = call_user_func( $filter, $pathticle );
+					$result .= $pathticle . '/';
+				}
+			} else {
+				foreach ( $splitpath as $pathticle ) {
+					$pathticle = filter_var( $pathticle, $filter, $flags );
+					$result .= $pathticle . '/';
+				}
 			}
 			return substr( $result, 0, -1 );
 		}
@@ -87,6 +94,14 @@
 				return null;
 			}
 			return $parent;
+		}
+
+		public static function collapseTree( $tree ) {
+			// collapse a tree structured array to a realized path / collapsed path array
+		}
+
+		public static function expandTree( $array ) {
+			// inverse of collapseTree
 		}
 
 	}
