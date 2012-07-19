@@ -62,7 +62,7 @@
 					$value = $this->getValue( $this->configuration[$parent], $name );
 					if ( isset( $value ) ) {
 						if ( is_array( $value ) ) {
-							$result = $result + $value; // FIXME: smart recursive merge needed
+							$result = array_replace_recursive( $value, $result );
 						} else {
 							return $value;
 						}

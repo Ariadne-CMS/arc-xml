@@ -19,11 +19,9 @@
 
 		protected static $configuration = null;
 
-		public static function getConfiguration( $context = null ) {
-			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
-				$context = \arc\context::getStack();
-			}
+		public static function getConfiguration() {
 			if ( !self::$configuration ) {
+				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
 				self::$configuration = new config\Configuration( $context );
 			}
 			return self::$configuration;
