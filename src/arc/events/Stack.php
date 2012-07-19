@@ -23,7 +23,7 @@
 
 		public function listen( $eventName, $objectType = null, $capture = false ) {
 			$path = isset( $this->contextStack ) ? $this->contextStack['path'] : '/';
-			return new IncompleteListener( $eventName, $path, $objectType, $capture, $this );
+			return new IncompleteListener( $this, $eventName, $path, $objectType, $capture );
 		}
 
 		public function capture( $eventName, $objectType = null ) {
@@ -95,7 +95,7 @@
 
 		public function get( $path ) {
 			$path = \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
-			return new IncompleteListener( null, $path, null, false, $this );
+			return new IncompleteListener( $this, null, $path, null, false );
 		}
 
 		protected function createArray( $array ) {

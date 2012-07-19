@@ -18,7 +18,7 @@
 		private $capture    = false;
 		private $eventStack = null;
 
-		public function __construct( $eventName = null, $path = '/', $objectType = null, $capture = false, $eventStack = null ) {
+		public function __construct( $eventStack, $eventName = null, $path = '/', $objectType = null, $capture = false ) {
 			$this->path       = $path;
 			$this->eventName  = $eventName;
 			$this->objectType = $objectType;
@@ -55,6 +55,6 @@
 
 		public function get( $path ) {
 			$path = \arc\path::normalize( $path, $this->path );
-			return new IncompleteListener( $path, null, null, false, $this );
+			return new IncompleteListener( $this->eventStack, $path, null, null, false );
 		}
 	}
