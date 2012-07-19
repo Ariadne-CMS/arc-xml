@@ -3,7 +3,7 @@
 	"type": "library",
 	"description": "Ariadne Component Library",
 	"keywords": ["component","components"],
-	"homepage": "http://www.ariadne-cms.org/arc/",
+	"homepage": "https://github.com/Ariadne-CMS/arc/wiki",
 	"license": "GPL",
 	"authors": [
 		{
