@@ -15,11 +15,11 @@
 
 		function testTaint() {
 			$string = 'A String';
-			\arc\tainting::taint( $string );
+			$string = \arc\tainting::taint( $string );
 			$this->assertTrue( $string instanceof \arc\tainting\Tainted );
 			$result = (string) $string;
 			$this->assertTrue( $result == 'A String' );
-			\arc\tainting::untaint( $string );
+			$string = \arc\tainting::untaint( $string );
 			$this->assertTrue( $string === 'A String' );
 		}
 
