@@ -61,7 +61,7 @@ These are already in Ariadne, they just need to be refactored.
 TODO
 ----
 - tests and more tests
-- documentation - see [https://github.com/Ariadne-CMS/arc/wiki](the Wiki pages)
+- documentation - see [the Wiki pages](https://github.com/Ariadne-CMS/arc/wiki)
   which are far from complete, but you can edit them yourself!
 - Refactor some static variables away - e.g. \arc\http::$tainting
 
