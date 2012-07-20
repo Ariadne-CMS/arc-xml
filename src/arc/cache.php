@@ -8,72 +8,67 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
-
 	namespace arc;
+
+	/**
+		@requires \arc\path
+		@suggests \arc\context
+	*/
 
 	class cache extends Pluggable {
 
 		static $cacheStore = null;
-
-		public static function create( $prefix = null, $timeout = 7200 ) {
+		
+		public static function create( $prefix = null, $timeout = 7200, $context = null ) {
+			if ( !defined("ARC_CACHE_DIR") ) {
+				define( "ARC_CACHE_DIR", sys_get_temp_dir().'/arc/cache' );
+			}
+			if ( !file_exists( ARC_CACHE_DIR ) ) {
+				@mkdir( ARC_CACHE_DIR, 0770, true );
+			}
+			if ( !file_exists( ARC_CACHE_DIR ) ) {
+				throw new \arc\ExceptionConfigError("Cache Directory does not exist ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
+			}
+			if ( !is_dir( ARC_CACHE_DIR ) ) {
+				throw new \arc\ExceptionConfigError("Cache Directory is not a directory ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
+			}
+			if ( !is_writable( ARC_CACHE_DIR ) ) {
+				throw new \arc\ExceptionConfigError("Cache Directory is not writable ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
+			}
 			if ( !$prefix ) { // make sure you have a default prefix, so you won't clear other prefixes unintended
 				$prefix = 'default';
 			}
-			if ( class_exists( '\arc\context' ) ) {
-				$prefix = $prefix . context::getPath(); // make sure the cache store is limited to the current path in the context stack
+			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
+				$context = context::getStack();
+				$path = $context['path'];
+			} else {
+				$path = '/';
 			}
-			return new cache\Store( $prefix, $timeout );
+			$fileStore = new cache\FileStore( ARC_CACHE_DIR . '/' . $prefix, $path );
+			return new cache\Store( $fileStore, $context, $timeout );
 		}
 
-		protected static function initStore() {
+		public static function getStore() {
 			if ( !self::$cacheStore ) {
 				self::$cacheStore = self::create();
 			}
+			return self::$cacheStore;
 		}
 
-		public static function get( $name ) {
-			self::initStore();
-			return self::$cacheStore->get( $name );
+		public static function __callStatic( $name, $args ) {
+			$methods = array( 
+				'cd', 'ls', 'get', 'set', 'getVar', 'putVar', 'cache', 'info', 'timeout'
+				, 'isFresh', 'getIfFresh', 'lock', 'wait', 'unlock', 'clear', 'purge'
+			);
+			if ( in_array( $methods, $name ) ) {
+				return call_user_func_array( array( self::getStore(), $name), $args);
+			} else {
+				return parent::__callStatic( $name, $args );
+			}
 		}
-
-		public static function getIfFresh( $name, $freshness=0 ) {
-			self::initStore();
-			return self::$cacheStore->getIfFresh( $name, $freshness );
-		}
-
-		public static function lock( $name ) {
-			self::initStore();
-			return self::$cacheStore->lock( $name );
-		}
-
-		public static function wait( $name ) {
-			self::initStore();
-			return self::$cacheStore->wait( $name );
-		}
-
-		public static function set( $name, $value, $timeout = 7200 ) {
-			self::initStore();
-			return self::$cacheStore->set( $name, $value, $timeout );
-		}
-
-		public static function info( $name ) {
-			self::initStore();
-			return self::$cacheStore->info( $name );
-		}
-
-		public static function clear( $name = null ) {
-			self::initStore();
-			return self::$cacheStore->clear( $name );
-		}
-
-		public static function purge( $name = null ) {
-			self::initStore();
-			return self::$cacheStore->purge( $name );
-		}
-
-		public static function proxy( $object, $timeout = null ) {
-			self::initStore();
-			return new cache\Proxy( $object, self::$cacheStore, $timeout );
+		
+		public static function proxy( $object, $timeout = 7200 ) {
+			return new cache\Proxy( $object, self::getStore(), $timeout );
 		}
 
 	}
