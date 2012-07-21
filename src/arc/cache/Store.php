@@ -11,168 +11,131 @@
 
 	namespace arc\cache;
 
-	class Store implements StoreInterface, \arc\KeyValueStoreInterface {
+	class Store implements StoreInterface, \arc\KeyValueStoreInterface, \arc\PathTreeInterface {
 
-		protected $basePath = '';
 		protected $timeout = 7200;
-		protected $mode = 0777;
+		protected $contextStack = null;
+		protected $storage = null;
 
-		public function __construct( $basePath, $timeout = 7200, $mode = 0777 ) {
-			$this->basePath = preg_replace('/\.\./', '', $basePath);
+		public function __construct( $storage, $context = null, $timeout = 7200, $currentPath = null ) {
+			$this->contextStack = $context;
+			$this->timeout = $this->getTimeout( $timeout );
+			if ( !isset( $currentPath ) ) {
+				$currentPath = ( isset($context) ? $context['path'] : '/' );
+			}
+			$this->currentPath = $currentPath;
+			$this->storage = $storage->cd( $this->currentPath );
+		}
 
-			if ( is_string($timeout) ) {
-				$timeout = strtotime( $timeout, 0);
-			}
-			$this->timeout = $timeout;
-			$this->mode = $mode;
+		/* \arc\KeyValueStoreInterface */
+		public function getVar( $name ) {
+			return $this->getIfFresh( $name );
+		}
 
-			if ( !defined("ARC_CACHE_DIR") ) {
-				define( "ARC_CACHE_DIR", sys_get_temp_dir().'/arc/cache/' );
-			}
-			if ( !file_exists( ARC_CACHE_DIR ) ) {
-				mkdir( ARC_CACHE_DIR, $this->mode, true );
-			}
-			if ( !file_exists( ARC_CACHE_DIR ) ) {
-				throw new \arc\ExceptionConfigError("Cache Directory does not exist ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
-			}
-			if ( !is_dir( ARC_CACHE_DIR ) ) {
-				throw new \arc\ExceptionConfigError("Cache Directory is not a directory ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
-			}
-			if ( !is_writable( ARC_CACHE_DIR ) ) {
-				throw new \arc\ExceptionConfigError("Cache Directory is not writable ( ".ARC_CACHE_DIR." )", \arc\exceptions::CONFIGURATION_ERROR);
+		public function putVar( $name, $value ) {
+			$this->set( $name, $value, $this->timeout );
+		}
+
+		/* PathTreeInterface */
+		public function cd( $path ) {
+			$path = \arc\path::normalize( $path, $this->currentPath );
+			return new Store( $this->storage, $this->contextStack, $this->timeout, $path);
+		}
+		
+		public function ls() {
+			return $this->storage->ls();
+		}
+
+		/* StoreInterface */
+		public function cache( $name, $calculateCallback, $path = null ) {
+			if ( $this->isFresh( $name ) ) {
+				return $this->getVar( $name );
+			} else {
+				$result = call_user_func( $calculateCallback );
+				$this->putVar( $name, $result );
+				return $result;
 			}
 		}
 
-		protected function cachePath( $path ) {
-			// last '=' is added to prevent conflicts between subdirectories and cache images
-			// images always end in a '=', directories never end in a '='
-			return ARC_CACHE_DIR . $this->basePath . preg_replace('/(\.\.|\=)/', '', $path) . '=';
+		public function timeout( $timeout ) {
+			return new Store( $this->storage, $this->contextStack, $timeout, $this->currentPath );
 		}
-
-		public function subStore( $path ) {
-			return new Store( $this->basePath . preg_replace('/(\.\.|\=)/', '', $path) );
-		}
-
-		public function get( $path ) {
-			$cachePath = $this->cachePath( $path );
-			if ( file_exists( $cachePath ) ) {
-				return unserialize( file_get_contents( $cachePath ) );
+		
+		public function get( $name ) {
+			$content = $this->storage->getVar( $name );
+			if ( $content ) {
+				return unserialize( $content );
 			} else {
 				return null;
 			}
 		}
 
-		public function getvar( $name ) {
-			return $this->get( $name );
-		}
-
-		public function isFresh( $path ) {
-			$cachePath = $this->cachePath( $path );
-			if ( file_exists( $cachePath ) ) {
-				return ( filemtime( $cachePath ) > time() );
+		public function set( $name, $value, $timeout = null ) {
+			$timeout = $this->getTimeout( $timeout );
+			$value = serialize( $value );
+			if ( $this->storage->putVar( $name, $value ) ) {
+				$result = $this->storage->setInfo( $name, array( 'mtime' => $timeout ) );
 			} else {
-				return false;
+				$result = false;
 			}
-		}
-
-		public function getIfFresh( $path, $freshness = 0 ) {
-			$info = $this->info( $path );
-			if ( $info && $info['timeout'] >= $freshness ) {
-				return $this->get( $path );
-			} else {
-				return false;
-			}
-		}
-
-		public function lock( $path, $blocking = false ) {
-			// locks the file against writing by other processes, so generation of time or resource expensive images
-			// will not happen by multiple processes simultaneously
-			$cachePath = $this->cachePath( $path );
-			$dir = dirname( $cachePath );
-			if ( !file_exists( $dir ) ) {
-				mkdir( $dir, $this->mode, true ); //recursive
-			}
-			$lockFile = fopen( $cachePath, 'c' );
-			$lockMode = LOCK_EX;
-			if ( !$blocking ) {
-				$lockMode = $lockMode|LOCK_NB;
-			}
-			return flock( $lockFile, $lockMode );
-		}
-
-		public function wait( $path ) {
-			$cachePath = $this->cachePath( $path );
-			$lockFile = fopen( $cachePath, 'c' );
-			$result = flock( $lockFile, LOCK_EX );
-			fclose( $lockFile );
+			$this->unlock( $name );
 			return $result;
 		}
 
-		public function putvar( $name, $value ) {
-			return $this->set( $name, $value );
+		public function getInfo( $name ) {
+			return $this->storage->getInfo( $name );
 		}
 
-		public function set( $path, $value, $timeout = null ) {
-			$cachePath = $this->cachePath( $path );
+		public function isFresh( $name, $freshness = 0 ) {
+			$freshness = $this->getTimeout( $freshness );
+			$info = $this->getInfo( $name );
+			if ( $info && $info['mtime'] >= $freshness ) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		
+		public function getIfFresh( $name, $freshness = 0 ) {
+			$freshness = $this->getTimeout( $freshness );
+			$info = $this->getInfo( $name );
+			if ( $info && $info['mtime'] >= $freshness ) {
+				return $this->get( $path );
+			} else {
+				return null;
+			}
+		}
+
+		public function lock( $name, $blocking = false ) {
+			return $this->storage->lock( $name, $blocking );
+		}
+
+		public function wait( $name ) {
+			$this->lock( $name, true);
+			$this->unlock( $name );
+		}
+
+		public function unlock( $path ) {
+			return $this->storage->unlock( $path );
+		}
+
+		public function remove( $name ) {
+			return $this->storage->remove( $name );
+		}
+
+		public function purge( $name = null ) {
+			return $this->storage->purge( $name );
+		}
+
+		protected function getTimeout( $timeout ) {
 			if ( !isset( $timeout ) ) {
-				$timeout = $this->timeout;
-			}
-			if ( is_string( $timeout ) ) {
-				$timeout = strtotime( $timeout, 0);
-			}
-			$dir = dirname( $cachePath );
-			if ( !file_exists( $dir ) ) {
-				mkdir( $dir, $this->mode, true ); //recursive
-			}
-			if ( false !== file_put_contents( $cachePath, serialize( $value ), LOCK_EX ) ) {
-				// FIXME: make sure the lock file made with lock() is gone after file_put_contents
-				touch( $cachePath, time() + $timeout );
+				$timeout = time();
+			} else if ( is_string( $timeout ) ) {
+				$timeout = strtotime( $timeout );
 			} else {
-				return false;
+				$timeout = time() + $timeout;
 			}
+			return $timeout;
 		}
-
-		public function info( $path ) {
-			$cachePath = $this->cachePath( $path );
-			if ( file_exists( $cachePath ) && is_readable( $cachePath ) ) {
-				return array(
-					'size' => filesize($cachePath),
-					'fresh' => $this->isFresh( $path ),
-					'ctime' => filectime( $cachePath ),
-					'timeout' => filemtime( $cachePath ) - time()
-				);
-			} else {
-				return false;
-			}
-		}
-
-		public function clear( $path = null ) {
-			$cachePath = $this->cachePath( $path );
-			if ( file_exists( $cachePath ) ) {
-				return unlink( $cachePath );
-			} else {
-				return true;
-			}
-		}
-
-		public function purge( $path = null ) {
-			$this->clear( $path );
-			$cachePath = substr( $this->cachePath( $path ), 0, -1 ); // remove last '='
-			if ( file_exists( $cachePath ) ) {
-				if ( is_dir( $cachePath ) ){
-					$cacheDir = dir( $cachePath );
-					while (false !== ($entry = $cacheDir->read())) {
-						if ( $entry != '.' && $entry != '..' ) {
-							$this->purge( $path . '/' . $entry );
-						}
-					}
-					return rmdir( $cachePath );
-				} else {
-					return unlink( $cachePath );
-				}
-			} else {
-				return true;
-			}
-		}
-
+		
 	}

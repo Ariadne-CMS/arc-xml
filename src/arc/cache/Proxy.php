@@ -19,7 +19,7 @@
 		var $cacheController = null;
 		var $cacheTimeout = '2 hours';
 
-		public function __construct( $object, $cacheStore, $cacheTimeout = null, $cacheController = null ) {
+		public function __construct( $object, $cacheStore, $cacheTimeout = 7200, $cacheController = null ) {
 			parent::__construct( $object );
 			$this->cacheStore = $cacheStore;
 			$this->cacheController = $cacheController;
@@ -59,7 +59,7 @@
 			echo $cacheData['output'];
 			$result = $cacheData['result'];
 			if ( is_object( $result ) ) {
-				$result = new Proxy( $result, $this->cacheStore->subStore( $path ) );
+				$result = new Proxy( $result, $this->cacheStore->cd( $path ) );
 			}
 			return $result;
 		}
@@ -67,7 +67,7 @@
 		public function __get( $name ) {
 			$result = parent::__get( $name );
 			if ( is_object( $result ) ) {
-				$result = new Proxy( $result, $this->cacheStore->subStore( $name ) );
+				$result = new Proxy( $result, $this->cacheStore->cd( $name ) );
 			}
 			return $result;
 		}
