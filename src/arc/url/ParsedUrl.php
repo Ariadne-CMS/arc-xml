@@ -14,7 +14,7 @@
 	/* ParsedUrl tries to parse the query part, so if it isn't compatible with PHP it won't survive */
 	class ParsedUrl extends SafeUrl implements \arc\KeyValueStoreInterface {
 
-		private $components, $query, $skipQueryParsing;
+		private $query;
 
 		public function __construct( $url ) {
 			parent::__construct( $url );
@@ -49,7 +49,7 @@
 		public function __toString() {
 			$this->components['query'] = ''.$this->query;
 			$result = parent::__toString();
-			return $url;
+			return $result;
 		}
 
 		public function getvar( $name ) {

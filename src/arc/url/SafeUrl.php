@@ -13,6 +13,7 @@
 
 	/* SafeUrl doesn't parse the query part, so it isn't destroyed by PHP's parse_str method */
 	class SafeUrl {
+		protected $components;
 
 		public function __construct( $url ) {
 			$this->components = parse_url( $url );
@@ -52,22 +53,22 @@
 
 		public function __toString() {
 			$url = '';
-			if ( $this->components['host'] ) {
-				if ( $this->components['scheme'] ) {
+			if ( isset($this->components['host']) ) {
+				if ( isset($this->components['scheme']) ) {
 					$url .= $this->components['scheme'] . '://';
 				}
-				if ( $this->components['user'] ) {
+				if ( isset($this->components['user']) ) {
 					$url .= $this->components['user'];
-					if ( $this->components['pass'] ) {
+					if ( isset($this->components['pass']) ) {
 						$url .= ':' . $this->components['pass'];
 					}
 					$url .= '@';
 				}
 				$url .= $this->components['host'];
-				if ( $this->components['port'] ) {
+				if ( isset($this->components['port']) ) {
 					$url .= ':' . $this->components['port'];
 				}
-				if ( $this->components['path'] ) {
+				if ( isset($this->components['path']) ) {
 					if ( substr( $this->components['path'], 0, 1 ) !== '/' ) {
 						$url .= '/';
 					}
@@ -78,7 +79,7 @@
 			if ($query) {
 				$url .= '?' . $query ;
 			}
-			if ( $this->components['fragment'] ) {
+			if ( isset($this->components['fragment']) ) {
 				$url .= '#' . $this->components['fragment'];
 			}
 			return $url;
