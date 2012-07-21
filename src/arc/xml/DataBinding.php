@@ -61,7 +61,7 @@
 					break;
 					case 'url':
 						if ( class_exists('\arc\url') ) {
-							$nodeValue = new \arc\url::url( $nodeValue );
+							$nodeValue = \arc\url::url( $nodeValue );
 						} else {
 							$nodeValue = (string) $nodeValue;
 						}
