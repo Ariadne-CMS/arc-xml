@@ -100,7 +100,7 @@
 			$freshness = $this->getTimeout( $freshness );
 			$info = $this->getInfo( $name );
 			if ( $info && $info['mtime'] >= $freshness ) {
-				return $this->get( $path );
+				return $this->get( $name );
 			} else {
 				return null;
 			}

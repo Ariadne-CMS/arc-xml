@@ -56,12 +56,9 @@
 		}
 
 		public static function __callStatic( $name, $args ) {
-			$methods = array( 
-				'cd', 'ls', 'get', 'set', 'getVar', 'putVar', 'cache', 'info', 'timeout'
-				, 'isFresh', 'getIfFresh', 'lock', 'wait', 'unlock', 'clear', 'purge'
-			);
-			if ( in_array( $methods, $name ) ) {
-				return call_user_func_array( array( self::getStore(), $name), $args);
+			$store = self::getStore();
+			if ( method_exists( $store, $name ) ) {
+				return call_user_func_array( array( $store, $name), $args);
 			} else {
 				return parent::__callStatic( $name, $args );
 			}
