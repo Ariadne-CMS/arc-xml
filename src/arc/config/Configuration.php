@@ -88,7 +88,7 @@
 			$config = $value;
 		}
 
-		public function get( $path ) {
+		public function cd( $path ) {
 			return new ConfigurationPath( $this, $path );
 		}
 

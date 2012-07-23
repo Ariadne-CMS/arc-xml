@@ -30,7 +30,7 @@
 			return $this->configuration->configure( $name, $value, $this->path );
 		}
 
-		public function get( $path ) {
+		public function cd( $path ) {
 			$path = \arc\path::normalize( $path, $this->path );
 			return new ConfigurationPath( $this->configuration, $path );
 		}

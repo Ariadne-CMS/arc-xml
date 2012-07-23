@@ -19,6 +19,6 @@
 
 		public function fire( $eventName, $eventData = array(), $path = null, $objectType = null );
 
-		public function get( $path );
+		public function cd( $path );
 
 	}

@@ -35,8 +35,8 @@
 			return self::getConfiguration()->configure( $name, $value );
 		}
 
-		public static function get( $path ) {
-			return self::getConfiguration()->get( $path );
+		public static function cd( $path ) {
+			return self::getConfiguration()->cd( $path );
 		}
 
 	}

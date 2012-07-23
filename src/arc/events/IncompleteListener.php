@@ -53,7 +53,7 @@
 			return $this->eventStack->fire( $eventName, $eventData, $objectType, $path );
 		}
 
-		public function get( $path ) {
+		public function cd( $path ) {
 			$path = \arc\path::normalize( $path, $this->path );
 			return new IncompleteListener( $this->eventStack, $path, null, null, false );
 		}

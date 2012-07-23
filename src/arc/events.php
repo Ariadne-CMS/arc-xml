@@ -25,7 +25,7 @@
 				self::$stack = new events\Stack( $context );
 			}
 			if ( isset($path) ) {
-					return self::$stack->get( $path );
+					return self::$stack->cd( $path );
 			}
 			return self::$stack;
 		}
@@ -46,7 +46,7 @@
 			return self::getStack()->event();
 		}
 
-		public static function get( $path ) {
+		public static function cd( $path ) {
 			return self::getStack( $path );
 		}
 

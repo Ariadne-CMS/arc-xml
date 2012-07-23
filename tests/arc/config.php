@@ -24,18 +24,18 @@
 			\arc\config::configure('a.b', true);
 			$result = \arc\config::acquire('a.b');
 			$this->assertTrue( $result );
-			$result = \arc\config::get('/test/')->acquire('a.b');
+			$result = \arc\config::cd('/test/')->acquire('a.b');
 			$this->assertTrue( $result );
-			\arc\config::get('/test/')->configure('a.b', false );
-			$result = \arc\config::get('/test/')->acquire('a.b');
+			\arc\config::cd('/test/')->configure('a.b', false );
+			$result = \arc\config::cd('/test/')->acquire('a.b');
 			$this->assertFalse( $result );
-			$result = \arc\config::get('/test/child/')->acquire('a.b');
+			$result = \arc\config::cd('/test/child/')->acquire('a.b');
 			$this->assertFalse( $result );	
 		}
 
 		function testConfigurationMerge() {
-			\arc\config::get('/test/child/')->configure('a.c', 'test');
-			$result = \arc\config::get('/test/child/')->acquire('a');
+			\arc\config::cd('/test/child/')->configure('a.c', 'test');
+			$result = \arc\config::cd('/test/child/')->acquire('a');
 			$this->assertFalse( $result['b'] );
 			$this->assertTrue( $result['c'] == 'test' );
 		}

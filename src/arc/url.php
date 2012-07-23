@@ -11,7 +11,7 @@
 
 	namespace arc;
 
-	class url {
+	class url extends Pluggable {
 
 		public static function url( $url ) {
 			return new url\ParsedUrl( $url );

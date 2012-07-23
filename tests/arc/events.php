@@ -93,7 +93,7 @@
 		}
 
 		function testPathVisibility() {
-			$listener = \arc\events::get( '/test/' )->listen( 'testEvent' )->call( function($event) {
+			$listener = \arc\events::cd( '/test/' )->listen( 'testEvent' )->call( function($event) {
 				$event->data[] = '/test/listener';
 			} );
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
@@ -103,14 +103,14 @@
 				$this->assertTrue( false );
 			}
 
-			$result = \arc\events::get( '/test/' )->fire( 'testEvent', array( 'seen' => false ) );
+			$result = \arc\events::cd( '/test/' )->fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
 				$this->assertTrue( $result[0] == '/test/listener' );	
 			} else {
 				$this->assertTrue( false );
 			}
 
-			$result = \arc\events::get( '/test/child/' )->fire( 'testEvent', array( 'seen' => false ) );
+			$result = \arc\events::cd( '/test/child/' )->fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
 				$this->assertTrue( $result[0] == '/test/listener' );	
 			} else {
@@ -127,13 +127,13 @@
 			$capturer1 = \arc\events::capture( 'testEvent' )->call( function( $event ) {
 				$event->data[] = 'capturer1';
 			} );
-			$listener2 = \arc\events::get('/test/')->listen( 'testEvent')->call( function( $event ) {
+			$listener2 = \arc\events::cd('/test/')->listen( 'testEvent')->call( function( $event ) {
 				$event->data[] = 'listener2';
 			} );
-			$capturer2 = \arc\events::get('/test/')->capture( 'testEvent' )->call( function( $event ) {
+			$capturer2 = \arc\events::cd('/test/')->capture( 'testEvent' )->call( function( $event ) {
 				$event->data[] = 'capturer2';
 			} );
-			$result = \arc\events::get('/test/')->fire( 'testEvent', array( 'seen' => false ) );
+			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
 				$this->assertFalse( $result['seen'] ); // make sure no spurious old listeners are left
 				$this->assertTrue( $result[0] == 'capturer1' );
@@ -156,7 +156,7 @@
 			$listener2 = \arc\events::listen( 'testEvent' )->call( function( $event ) {
 				$event->data['seen'] = true;
 			} );
-			$result = \arc\events::get('/test/')->fire( 'testEvent', array( 'seen' => false ) );
+			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
 			$this->assertFalse( $result['seen'] );
 			$listener1->remove();
 			$listener2->remove();
@@ -166,7 +166,7 @@
 			$listener = \arc\events::listen( 'testEvent' )->call( function( $event ) {
 				$event->preventDefault();
 			} );
-			$result = \arc\events::get('/test/')->fire( 'testEvent', array( 'seen' => false ) );
+			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
 			$this->assertFalse( $result );
 			$listener->remove();
 		}

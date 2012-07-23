@@ -93,7 +93,7 @@
 			return $this->event;
 		}
 
-		public function get( $path ) {
+		public function cd( $path ) {
 			$path = \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
 			return new IncompleteListener( $this, null, $path, null, false );
 		}
