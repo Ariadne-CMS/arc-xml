@@ -52,17 +52,17 @@
 		}
 
 		// ConfigurationInterface
-		public function acquire( $name, $path = null ) {
+		public function acquire( $name, $path = null, $root = '/' ) {
 			$path = $this->getPath( $path );
-			$parents = \arc\path::parents( $path );
+			$parents = \arc\path::parents( $path, $root );
 			$parents = array_reverse( $parents );
-			$result = array();
+			$result = null;
 			foreach ( $parents as $parent ) {
 				if ( isset( $this->configuration[$parent] ) ) {
 					$value = $this->getValue( $this->configuration[$parent], $name );
 					if ( isset( $value ) ) {
 						if ( is_array( $value ) ) {
-							$result = array_replace_recursive( $value, $result );
+							$result = array_replace_recursive( $value, (array) $result );
 						} else {
 							return $value;
 						}
@@ -90,6 +90,55 @@
 
 		public function cd( $path ) {
 			return new ConfigurationPath( $this, $path );
+		}
+
+		public function root( $root ) {
+			$root = \arc\path::normalize( $root );
+			return new ConfigurationPath( $this, $path, $root );	
+		}
+
+		public function ls( $path = null ) {
+			$path = $this->getPath( $path );
+			$parents = \arc\path::parents( $path, $root );
+			$parents = array_reverse( $parents );
+			$result = array();
+			foreach ( $parents as $parent ) {
+				if ( isset( $this->configuration[$parent] ) ) {
+					$result = array_replace_recursive( $this->configuration[$parent], $result );
+				}
+			}
+			return $result;
+			/*$path = $this->getPath( $path );
+			return $this->configuration[$path];*/
+		}
+
+		public function getConfiguredValue( $name, $path = null ) {
+			$path = $this->getPath( $path );
+			$value = null;
+			if ( isset( $this->configuration[$path] ) ) {
+				$value = $this->getValue( $this->configuration[$path], $name );
+			}
+			return $value; 
+		}
+
+		public function getConfiguredValues( $path = null ) {
+			$path = $this->getPath( $path );
+			return $this->configuration[$path];
+		}
+
+		public function getConfiguredPath( $name, $path = null, $root = '/' ) {
+			$path = $this->getPath( $path );
+			$parents = \arc\path::parents( $path, $root );
+			$parents = array_reverse( $parents );
+			$result = array();
+			foreach ( $parents as $parent ) {
+				if ( isset( $this->configuration[$parent] ) ) {
+					$value = $this->getValue( $this->configuration[$parent], $name );
+					if ( isset( $value ) ) {
+						return $parent;
+					}
+				}
+			}
 		}
 
 		// \arc\KeyValueStoreInterface

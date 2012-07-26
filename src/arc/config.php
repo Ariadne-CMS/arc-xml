@@ -27,8 +27,8 @@
 			return self::$configuration;
 		}
 
-		public static function acquire( $name ) {
-			return self::getConfiguration()->acquire( $name );
+		public static function acquire( $name, $path = null, $root = '/' ) {
+			return self::getConfiguration()->acquire( $name, $path, $root );
 		}
 
 		public static function configure( $name, $value ) {
@@ -39,5 +39,8 @@
 			return self::getConfiguration()->cd( $path );
 		}
 
+		public static function root( $root ) {
+			return self::getConfiguration()->root( $root );
+		}
 	}
 

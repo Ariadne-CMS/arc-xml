@@ -14,16 +14,20 @@
 	class ConfigurationPath implements \arc\KeyValueStoreInterface, ConfigurationInterface {
 
 		protected $configuration = null;
-		protected $path = '/';
+		protected $path = null;
+		protected $root = null;
 
-		public function __construct( $configuration, $path ) {
+		public function __construct( $configuration, $path, $root = '/' ) {
 			$this->configuration = $configuration;
 			$this->path = $path;
+			$this->root = $root;
 		}
 
 		// ConfigurationInterface
-		public function acquire( $name ) {
-			return $this->configuration->acquire( $name, $this->path );
+		public function acquire( $name, $path = null, $root = null ) {
+			$path = \arc\path::normalize( $path, $this->path );
+			$root = \arc\path::normalize( $root, $this->root );
+			return $this->configuration->acquire( $name, $path, $root );
 		}
 
 		public function configure( $name, $value ) {
@@ -33,6 +37,25 @@
 		public function cd( $path ) {
 			$path = \arc\path::normalize( $path, $this->path );
 			return new ConfigurationPath( $this->configuration, $path );
+		}
+
+		public function ls() {
+			return $this->configuration->ls( $this->path );
+		}
+
+		public function root( $root ) {
+			$root = \arc\path::normalize( $root, $this->path );
+			return new ConfigurationPath( $this->configuration, $this->path, $root );
+		}
+
+		public function getConfiguredValue( $name, $path = null ) {
+			$path = \arc\path::normalize( $path, $this->path );
+			return $this->configuration->getConfiguredValue( $name, $path );
+		}
+
+		public function getConfiguredPath( $name, $path = null, $root = '/' ) {
+			$path = \arc\path::normalize( $path, $this->path );
+			return $this->configuration->getConfiguredPath( $name, $path, $root );
 		}
 
 		// \arc\KeyValueStoreInterface
