@@ -13,6 +13,29 @@
 	 
 	class TestPath extends UnitTestCase {
 
+		function testMapReduce() {
+			$path = '/a/b/c/';
+			$result = \arc\path::map( $path, function( $entry ) {
+				return strtoupper($entry);
+			});
+			$this->assertTrue( $result === '/A/B/C/' );
+
+			$result = \arc\path::reduce( $path, function( &$result, $entry ) {
+				return $result.$entry;
+			});
+			$this->assertTrue( $result === 'abc' );
+
+			$result = \arc\path::map( '/', function( $entry ) {
+				return 'a';
+			});
+			$this->assertTrue( $result === '/' );
+			
+			$result = \arc\path::map( 'frop', function($entry) {
+				return 'a';
+			});
+			$this->assertTrue( $result === '/a/' );
+		}
+
 		function testNormalize() {
 			$this->assertTrue( \arc\path::normalize('/') === '/' );
 			$this->assertTrue( \arc\path::normalize('/test/') === '/test/' );
@@ -22,6 +45,9 @@
 			$this->assertTrue( \arc\path::normalize( '../', '/test/') === '/' );
 			$this->assertTrue( \arc\path::normalize( '..', '/test/foo/') === '/test/' );
 			$this->assertTrue( \arc\path::normalize( '/..//../', '/test/') === '/' );
+			$this->assertTrue( \arc\path::normalize( null, '/test/') === '/test/' );
+			$this->assertTrue( \arc\path::normalize( false, '/test/') === '/test/' );
+			$this->assertTrue( \arc\path::normalize( array( 'something' ), '/test/') === '/test/' );
 		}
 
 		function testParents() {
@@ -44,7 +70,7 @@
 
 		function testClean() {
 			$this->assertTrue( \arc\path::clean('/a/b/') == '/a/b/' );
-			$this->assertTrue( \arc\path::clean(' ') == '%20' );
+			$this->assertTrue( \arc\path::clean(' ') == '/%20/' );
 			$this->assertTrue( \arc\path::clean('/#/') == '/%23/');
 			$this->assertTrue( \arc\path::clean('/an a/', function( $filename ) {
 				return str_replace( 'a','', $filename );

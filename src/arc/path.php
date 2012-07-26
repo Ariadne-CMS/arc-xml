@@ -15,71 +15,70 @@
 
 		public static function parents( $path, $root = '/' ) {
 			// returns all parents starting at the root, up to and including the path itself
-			$parents = array();
-			$pathticles = explode( '/', $path );
 			$prevpath = '/';
-			foreach ( $pathticles as $pathticle ) {
-				if ( $pathticle ) {
-					$prevpath  .= $pathticle . '/';
-					if ( strpos( $prevpath, $root ) === 0 ) { // Add only parents below the root
-						$parents[] = $prevpath;
-					}
+			$parents = self::reduce( $path, function( $result, $entry ) use ( $root, &$prevpath ) {
+				$prevpath .= $entry . '/';
+				if ( strpos( $prevpath , $root ) === 0 && $prevpath !== $root ) { // Add only parents below the root
+					$result[] = $prevpath;
 				}
-			}
-			if ( !isset($parents[0]) || $parents[0] !== $root ) {
-				array_unshift( $parents, $root );
-			}
+				return $result;
+			}, array( $root ) );
 			return $parents;
 		}
 
 		public static function normalize( $path, $cwd = '/' ) {
 			// removes '.', changes '//' to '/', changes '\\' to '/', calculates '..' up to '/'
 			$path = str_replace('\\', '/', $path);
-			$result = '/';
-			if ( isset($path[0]) && $path[0] !== '/' ) {
-				$path = $cwd . '/' . $path;
+			if ( is_object( $path ) && method_exists( $path, '__toString' ) ) {
+				$path = (string) $path;
 			}
-			if ( $path ) {
-				$splitpath = explode( '/', $path );
-				foreach ( $splitpath as $pathticle ) {
-					switch( $pathticle ) {
+			if ( !is_string( $path ) ) {
+				return $cwd;
+			}
+			if ( isset($path[0]) ) {
+				if ( $path[0] !== '/' ) {
+					$path = $cwd . '/' . $path;
+				}
+			}
+			if ( !$path ) {
+				return $cwd;
+			} else {
+				return '/' . self::reduce( $path, function( $result, $entry ) {
+					switch ( $entry ) {
 						case '..' :
 							$result = dirname( $result );
 							if ( isset($result[1]) ) { // fast check to see if there is a dirname
 								$result .= '/';
+							} else if ( $result === '.' ) { // dirname('foo') returns '.' so clear it
+								$result = '';
 							}
-							// php has a bug in dirname( '/' ) -> returns a '\\' in windows
-							$result[0] = '/';
 						break;
-						case '.' : break;
-						case ''	 : break;
+						case '.':
+						case '':
+						break;
 						default:
-							$result .= $pathticle . '/';
+							$result .= $entry .'/';
 						break;
 					}
-				}
+					return $result;
+				});
 			}
-			return $result;
 		}
 
-		public static function clean( $path, $filter = FILTER_SANITIZE_ENCODED, $flags = null ) {
-			if ( !isset($flags) ) {
-				$flags = FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
-			}
-			$splitpath = explode( '/', $path );
-			$result = '';
-			if ( is_callable( $filter ) ) {
-				foreach ( $splitpath as $pathticle ) {
-					$pathticle = call_user_func( $filter, $pathticle );
-					$result .= $pathticle . '/';
+		public static function clean( $path, $callback = null, $flags = null ) {
+			if ( !is_callable( $callback ) ) {
+				$filter = $callback;
+				if ( !isset( $filter ) ) {
+					 $filter = FILTER_SANITIZE_ENCODED;
 				}
-			} else {
-				foreach ( $splitpath as $pathticle ) {
-					$pathticle = filter_var( $pathticle, $filter, $flags );
-					$result .= $pathticle . '/';
+				if ( !isset($flags) ) {
+					$flags = FILTER_FLAG_ENCODE_LOW|FILTER_FLAG_ENCODE_HIGH;
 				}
+				$callback = function( $entry ) use ( $filter, $flags ) {
+					return filter_var( $entry, $filter, $flags);
+				};
 			}
-			return substr( $result, 0, -1 );
+			return self::map( $path, $callback );
 		}
 
 		public static function parent( $path, $root = '/' ) {
@@ -96,12 +95,31 @@
 			return $parent;
 		}
 
+		public static function map( $path, $callback ) {
+			$splitpath = array_filter( explode( '/', $path ), function( $entry ) {
+				return ( isset( $entry ) && $entry !== '' );
+			});
+			if ( count($splitpath) ) {
+				$result = array_map( $callback, $splitpath );
+				return '/' . join( $result, '/' ) .'/';
+			} else {
+				return '/';
+			}
+		}
+
+		public static function reduce( $path, $callback, $initial = null ) {
+			$splitpath = array_filter( explode( '/', $path ), function( $entry ) {
+				return ( isset( $entry ) && $entry !== '' );
+			});
+			return array_reduce( $splitpath, $callback, $initial );
+		}
+
 		public static function collapseTree( $tree ) {
-			// collapse a tree structured array to a realized path / collapsed path array
+			// TODO: collapse a tree structured array to a realized path / collapsed path array
 		}
 
 		public static function expandTree( $array ) {
-			// inverse of collapseTree
+			// TODO: inverse of collapseTree
 		}
 
 	}
