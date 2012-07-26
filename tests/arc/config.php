@@ -40,4 +40,10 @@
 			$this->assertTrue( $result['c'] == 'test' );
 		}
 
+		function testAcquireRoot() {
+			\arc\config::cd('/')->configure('a.d', 'missing');
+			$result = \arc\config::cd('/test/child/')->root('/test/')->acquire('a');
+			$this->assertFalse( isset($result['d']) );
+		}
+
 	}
