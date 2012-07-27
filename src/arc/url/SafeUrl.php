@@ -24,8 +24,7 @@
 			$url->query = 'a=1&a=2';
 			echo $url; // => 'http://www.ariadne-cms.org/docs/search/?a=1&a=2'
 	*/
-    class SafeUrl {
-		protected $components;
+	class SafeUrl {
 
 		/**
 			All parts of the URL format, as returned by parse_url.
