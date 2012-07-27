@@ -11,76 +11,77 @@
 
 	namespace arc\url;
 
-	/* SafeUrl doesn't parse the query part, so it isn't destroyed by PHP's parse_str method */
-	class SafeUrl {
+	/**
+		SafeUrl parses a URL string and returns an object with the seperate parts. You can change
+		these and when cast to a string SafeUrl will regenerate the URL string and make sure it
+		is valid.
+		SafeUrl doesn't parse the query string, so it isn't destroyed by PHP's parse_str method.
+		See ParsedUrl for a class that does parse the query string.
+
+		Usage:
+			$url = new \arc\url\SafeUrl( 'http://www.ariadne-cms.org/' );
+			$url->path = '/docs/search/';
+			$url->query = 'a=1&a=2';
+			echo $url; // => 'http://www.ariadne-cms.org/docs/search/?a=1&a=2'
+	*/
+    class SafeUrl {
 		protected $components;
 
+		/**
+			All parts of the URL format, as returned by parse_url.
+			scheme://user:pass@host:port/path?query#fragment
+		*/
+		public $scheme, $user, $pass, $host, $port, $path, $query, $fragment;
+
+		/**
+			Reference to $this->pass, since its the only property that is shortened by parse_url.
+		*/
+		public $password;
+
+		/**
+			@param string $url The URL to parse, the query part will remain a string.
+		*/
 		public function __construct( $url ) {
-			$this->components = parse_url( $url );
-		}
-
-		public function __get($var) {
-			if ( $var == 'password' ) {
-				$var = 'pass';
+			$componentList = array( 
+				'scheme', 'host', 'port', 'user', 'pass', 'path', 'query', 'fragment'
+			);
+			$components = parse_url( $url );
+			foreach( $componentList as $component ) {
+				$this->{$component} = $components[$component];
 			}
-			if ( isset( $this->components[$var] ) ) {
-				return $this->components[$var];
-			} else {
-				return null;
-			}
-		}
-
-		public function __set($var, $value) {
-			switch($var) {
-				case 'path' :
-					$this->components[$var] = $value;
-				break;
-				case 'password' :
-					$var = 'pass';
-					$this->components[$var] = $value;
-				break;
-				case 'query' :
-				case 'scheme':
-				case 'host' :
-				case 'port' :
-				case 'user' :
-				case 'pass' :
-				case 'fragment' :
-					$this->components[$var] = $value;
-				break;
-			}
+			$this->password = &$this->pass;
 		}
 
 		public function __toString() {
 			$url = '';
-			if ( isset($this->components['host']) ) {
-				if ( isset($this->components['scheme']) ) {
-					$url .= $this->components['scheme'] . '://';
+			if ( isset($this->host) ) {
+				if ( isset($this->scheme) ) {
+					$url .= $this->scheme . '://';
 				}
-				if ( isset($this->components['user']) ) {
-					$url .= $this->components['user'];
-					if ( isset($this->components['pass']) ) {
-						$url .= ':' . $this->components['pass'];
+				if ( isset($this->user) ) {
+					$url .= $this->user;
+					if ( isset($this->pass) ) {
+						$url .= ':' . $this->pass;
 					}
 					$url .= '@';
 				}
-				$url .= $this->components['host'];
-				if ( isset($this->components['port']) ) {
-					$url .= ':' . $this->components['port'];
+				$url .= $this->host;
+				if ( isset($this->port) ) {
+					$url .= ':' . $this->port;
 				}
-				if ( isset($this->components['path']) ) {
-					if ( substr( $this->components['path'], 0, 1 ) !== '/' ) {
+				if ( isset($this->path) ) {
+					if ( substr( $this->path, 0, 1 ) !== '/' ) {
 						$url .= '/';
 					}
 				}
 			}
-			$url .= $this->components['path'];
-			$query = '' . $this->components['query'];
-			if ($query) {
+			$url .= $this->path;
+			$query = (string) $this->query; // ParsedUrl has a query object with a __toString
+			if ( $query ) {
 				$url .= '?' . $query ;
 			}
-			if ( isset($this->components['fragment']) ) {
-				$url .= '#' . $this->components['fragment'];
+			if ( isset($this->fragment) ) {
+				$url .= '#' . $this->fragment;
 			}
 			return $url;
 		}
