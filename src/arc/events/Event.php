@@ -26,7 +26,8 @@
 		protected $name = '';
 
 		/**
-			If set to true will make fire() return false. Cannot be changed once set to true but can be read through __get().
+			If set to true will make fire() return false. Cannot be changed once set to true 
+			but can be read through __get().
 		*/
 		protected $preventDefault = false;
 

@@ -21,7 +21,8 @@
 		protected $event = null;
 
 		/**
-			@param \arc\context\ContextStack $contextStack Optional. Used to get the current path: $contextStack['arc.path']
+			@param \arc\context\ContextStack $contextStack Optional. Used to get the current path: 
+				$contextStack['arc.path']
 		*/
 		public function __construct( $contextStack = null ) {
 			$this->contextStack = $contextStack;
@@ -150,7 +151,7 @@
 		public function addListener( $eventName, $callback, $path='/', $capture = false ) {
 			$when = $capture ? 'capture' : 'listen';
 			if ( ! is_callable($callback) ) {
-				throw new \arc\ExceptionIlligalRequest('Method is not callable.',\arc\exceptions::ILLEGAL_ARGUMENT);
+				throw new \arc\ExceptionIlligalRequest('Method is not callable.', \arc\exceptions::ILLEGAL_ARGUMENT);
 			}
 			$this->createArray( $this->listeners, $when, $eventName, $path );
 			$id = isset($this->listeners[$when][$eventName][$path]) ?
@@ -166,7 +167,8 @@
 			@param string $eventName The name of the event the listener is registered for.
 			@param int $id The id of the listener.
 			@param string $path Optional. The path the listener is registered on. Default is '/'.
-			@param bool $capture Optional. If true the listener is triggered in the capture phase. Default is false.
+			@param bool $capture Optional. If true the listener is triggered in the capture phase. 
+				Default is false.
 		*/
 		public function removeListener( $eventName, $id, $path = '/', $capture = false ) {
 			$when = ($capture) ? 'capture' : 'listen';

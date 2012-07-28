@@ -34,7 +34,7 @@
 		}
 
 		/**
-			Will call the given callback method for each event that matches the earlier given eventName and objectType (if set).
+			Will call the given callback method for each event that matches the earlier given eventName.
 			@param Callable $method The callback method. The first argument is always the event object.
 			@param array $args Optional. List of extra arguments to pass to the callback method.
 			@returns Listener
@@ -69,7 +69,8 @@
 			Will fire the given event on the earlier - with cd() - set path.
 			@param string $eventName The name of the event to fire
 			@param mixed $eventData Optional. Extra information for the event listeners.
-			@returns bool|mixed false if $event->preventDefault() is called in a listener, $eventData otherwise.
+			@returns bool|mixed false if $event->preventDefault() is called in a listener, 
+				$eventData otherwise.
 		*/
 		public function fire( $eventName, $eventData = array() ) {
 			return $this->eventStack->fire( $eventName, $eventData, $this->path );
