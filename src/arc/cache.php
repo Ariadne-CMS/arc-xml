@@ -40,7 +40,7 @@
 			}
 			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
 				$context = context::getStack();
-				$path = $context['path'];
+				$path = $context['arc.path'];
 			} else {
 				$path = '/';
 			}

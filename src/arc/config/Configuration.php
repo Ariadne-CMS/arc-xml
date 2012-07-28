@@ -21,7 +21,7 @@
 		}
 
 		protected function getPath( $path ) {
-			return \arc\path::normalize( $path, $this->contextStack ? $this->contextStack['path'] : '/' );
+			return \arc\path::collapse( $path, $this->contextStack ? $this->contextStack['arc.path'] : '/' );
 		}
 
 		protected function getFilledPath( $path, $name = '' ) {
@@ -93,7 +93,7 @@
 		}
 
 		public function root( $root ) {
-			$root = \arc\path::normalize( $root );
+			$root = \arc\path::collapse( $root );
 			return new ConfigurationPath( $this, $path, $root );	
 		}
 

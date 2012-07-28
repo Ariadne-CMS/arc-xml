@@ -25,8 +25,8 @@
 
 		// ConfigurationInterface
 		public function acquire( $name, $path = null, $root = null ) {
-			$path = \arc\path::normalize( $path, $this->path );
-			$root = \arc\path::normalize( $root, $this->root );
+			$path = \arc\path::collapse( $path, $this->path );
+			$root = \arc\path::collapse( $root, $this->root );
 			return $this->configuration->acquire( $name, $path, $root );
 		}
 
@@ -35,7 +35,7 @@
 		}
 
 		public function cd( $path ) {
-			$path = \arc\path::normalize( $path, $this->path );
+			$path = \arc\path::collapse( $path, $this->path );
 			return new ConfigurationPath( $this->configuration, $path );
 		}
 
@@ -44,17 +44,17 @@
 		}
 
 		public function root( $root ) {
-			$root = \arc\path::normalize( $root, $this->path );
+			$root = \arc\path::collapse( $root, $this->path );
 			return new ConfigurationPath( $this->configuration, $this->path, $root );
 		}
 
 		public function getConfiguredValue( $name, $path = null ) {
-			$path = \arc\path::normalize( $path, $this->path );
+			$path = \arc\path::collapse( $path, $this->path );
 			return $this->configuration->getConfiguredValue( $name, $path );
 		}
 
 		public function getConfiguredPath( $name, $path = null, $root = '/' ) {
-			$path = \arc\path::normalize( $path, $this->path );
+			$path = \arc\path::collapse( $path, $this->path );
 			return $this->configuration->getConfiguredPath( $name, $path, $root );
 		}
 

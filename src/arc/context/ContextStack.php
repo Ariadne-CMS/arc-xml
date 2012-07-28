@@ -17,7 +17,8 @@
 
 		public function __construct() {
 			parent::push( array(
-				'path' => '/'
+				'arc.path' => '/',
+				'arc.user' => 'public'
 			) );
 		}
 

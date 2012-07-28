@@ -21,7 +21,7 @@
 		public function __construct( $root, $currentPath = '/', $mode = 0770 ) {
 			$this->root = $root;
 			$this->currentPath = $currentPath;
-			$this->basePath = $root . \arc\path::normalize( $currentPath );
+			$this->basePath = $root . \arc\path::collapse( $currentPath );
 			$this->mode = $mode;
 		}
 
@@ -79,11 +79,11 @@
 		}
 
 		public function cd( $path ) {
-			return new FileStore( $this->root, \arc\path::normalize( $path, $this->currentPath ), $this->mode );
+			return new FileStore( $this->root, \arc\path::collapse( $path, $this->currentPath ), $this->mode );
 		}
 
 		public function ls() {
-			$filePath = $this->root . \arc\path::normalize( $path, $this->currentPath );
+			$filePath = $this->root . \arc\path::collapse( $path, $this->currentPath );
 			$dir = dir( $filePath );
 			$result = array();
 			if ( $dir ) {
@@ -125,7 +125,7 @@
 			if ( $name ) {
 				$this->clear( $name );
 			}
-			$dirPath = $this->basePath . \arc\path::normalize( \arc\path::clean( $name ) );
+			$dirPath = $this->basePath . \arc\path::collapse( \arc\path::clean( $name ) );
 			if ( file_exists( $dirPath ) && is_dir( $dirPath ) ) {
 				$this->rmdir( $dirPath );
 			}

@@ -38,7 +38,7 @@
 
 		/* PathTreeInterface */
 		public function cd( $path ) {
-			$path = \arc\path::normalize( $path, $this->currentPath );
+			$path = \arc\path::collapse( $path, $this->currentPath );
 			return new Store( $this->storage, $this->contextStack, $this->timeout, $path);
 		}
 		
