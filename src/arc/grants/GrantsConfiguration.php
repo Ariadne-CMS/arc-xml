@@ -27,7 +27,7 @@
 		}
 
 		public function root( $path ) {
-			return new GrantsConfiguration( $this->config, $this->id, \arc\path::normalize( $path ) );
+			return new GrantsConfiguration( $this->config, $this->id, \arc\path::collapse( $path ) );
 		}
 
 		public function ls() {
