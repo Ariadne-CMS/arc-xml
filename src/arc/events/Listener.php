@@ -11,13 +11,23 @@
 
 	namespace arc\events;
 
+	/**
+		This object is returned for each event you listen for. It allows you to specifically remove that event listener.
+	*/
 	class Listener {
-		private $capture    = false;
-		private $path       = '/';
-		private $eventName  = '';
-		private $id         = null;
-		private $eventStack = null;
+		protected $capture    = false;
+		protected $path       = '/';
+		protected $eventName  = '';
+		protected $id         = null;
+		protected $eventStack = null;
 
+		/**
+			@param string $eventName The name of the event
+			@param int $id The id of this listener. This is unique for this eventStack.
+			@param string $path Optional. The path listened on, defaults to '/'
+			@param bool $capture Optional. True for capture phase listeners, default is false.
+			@param Stack $eventStack Optional. The eventStack the listener is registered on. Must be set for remove() to work.
+		*/
 		public function __construct( $eventName, $id, $path = '/', $capture = false, $eventStack = null ) {
 			$this->eventName  = $eventName;
 			$this->path       = $path;
@@ -26,11 +36,15 @@
 			$this->eventStack = $eventStack;
 		}
 
+		/**
+			This method removes this listener from the eventStack. If a matching event is fired later, the corresponding 
+			listener callback will no longer be called.
+		*/
 		public function remove() {
 			if ( isset($this->id) ) {
 				$this->eventStack->removeListener( $this->eventName, $this->id, $this->path, $this->capture );
 			}
 		}
 
-		/* FIXME: add a add() method, which re-adds the listener, potentially as last in the list */
+		/* FIXME: add an add() method, which re-adds the listener, potentially as last in the list */
 	}

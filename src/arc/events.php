@@ -12,42 +12,90 @@
 	namespace arc;
 
 	/**
+		This component implements an event system very similar to events in modern browsers. Events have 
+		a seperate capture and listen phase. Events are fired and listened to on a 'path' - like a 
+		filesystem path - instead of an object in the DOM. In the capture phase listeners are called in
+		order starting with listeners on the root path '/'. Then - if the event has not been cancelled -
+		in the listen phase listeners are called in the reverse order - with the root path being called 
+		last.
+		If the context stack is available you can change the default path events are fired on and listened 
+		to by changing the 'path' entry in the context stack.
+
 		@requires \arc\path
-		@suggest \arc\context
+		@suggests \arc\context
 	*/
 	class events extends Pluggable {
 
 		protected static $stack;
 
-		public static function getStack( $path = null ) {
+		/**
+			Factory method for the static stack. Returns the shared stack only. Use new \arc\events\Stack 
+			or your own factory method to create a seperate Stack instance.
+		*/
+		public static function getStack() {
 			if ( !self::$stack ) {
 				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
-				self::$stack = new events\Stack( $context );
-			}
-			if ( isset($path) ) {
-					return self::$stack->cd( $path );
+				self::$stack = new events\EventStack( $context );
 			}
 			return self::$stack;
 		}
 
-		public static function listen( $eventName, $objectType = null, $path = null ) {
-			return self::getStack( $path )->listen( $eventName, $objectType );
+		/**
+			Returns an IncompleteListener for the given event, objectType and path.
+
+			Usage:
+				\arc\events::listen( 'onsave' )->call( function( $event ) { 
+					$path = $event->data['path'];
+					if ( $path == '/foo/bar/' ) {
+						$event->preventDefault();
+						return false; // cancel all other listeners
+					}
+				});
+
+			@param string $eventName The name of the event to listen for.
+			@returns IncompleteListener 
+		*/
+		public static function listen( $eventName ) {
+			return self::getStack()->listen( $eventName );
 		}
 
-		public static function capture( $eventName, $objectType = null, $path = null ) {
-			return self::getStack( $path )->capture( $eventName, $objectType );
+		/**
+			Returns an IncompleteListener for the given event, objectType and path. The listener
+			will trigger in the capture phase - before any listeners in the listen phase.
+
+			@param string $eventName The name of the event to listen for.
+			@returns IncompleteListener 
+		*/
+		public static function capture( $eventName ) {
+			return self::getStack()->capture( $eventName );
 		}
 
-		public static function fire( $eventName, $eventData = array(), $objectType = null, $path = null ) {
-			return self::getStack( $path )->fire( $eventName, $eventData, $objectType );
+		/**
+			Fires an event. If the event objects preventDefault() method has been called it
+			will return false, otherwise the - potentially changed - eventData will be returned.
+
+			Usage:
+				$eventData = \arc\events::fire( 'onbeforesave', array( 'path' => '/foo/bar/' ) );
+				if ( $eventData ) {
+					$path = $eventData['path'];
+					// now save it
+				}
+
+			@param string $eventName The name of the event to fire.
+			@param mixed $eventData Optional. Data passed to each handler through the event object.
+			@returns false or $eventData - which may have been modified
+		*/
+		public static function fire( $eventName, $eventData = array() ) {
+			return self::getStack()->fire( $eventName, $eventData );
 		}
 
-		public static function event() {
-			return self::getStack()->event();
-		}
-
+		/**
+			Returns a new IncompleteListener with the given path.
+			@param string $path The path to change to, may be a relative path.
+			@returns IncompleteListener
+		*/
 		public static function cd( $path ) {
-			return self::getStack( $path );
+			return self::getStack()->cd( $path );
 		}
 
 	}
