@@ -36,18 +36,39 @@
 			$this->assertTrue( $result === '/a/' );
 		}
 
-		function testNormalize() {
-			$this->assertTrue( \arc\path::normalize('/') === '/' );
-			$this->assertTrue( \arc\path::normalize('/test/') === '/test/' );
-			$this->assertTrue( \arc\path::normalize('/test//') === '/test/' );
-			$this->assertTrue( \arc\path::normalize('/test/../') === '/' );
-			$this->assertTrue( \arc\path::normalize('test') === '/test/' );
-			$this->assertTrue( \arc\path::normalize( '../', '/test/') === '/' );
-			$this->assertTrue( \arc\path::normalize( '..', '/test/foo/') === '/test/' );
-			$this->assertTrue( \arc\path::normalize( '/..//../', '/test/') === '/' );
-			$this->assertTrue( \arc\path::normalize( null, '/test/') === '/test/' );
-			$this->assertTrue( \arc\path::normalize( false, '/test/') === '/test/' );
-			$this->assertTrue( \arc\path::normalize( array( 'something' ), '/test/') === '/test/' );
+		function testWalk() {
+			$path = '/a/b/c/';
+			$count = 0;
+			$result = \arc\path::walk( $path, function( $parent ) use ( &$count ) {
+				$count++;
+				if ( $parent == '/a/' ) {
+					return true;
+				}
+			});
+			$this->assertTrue( $result );
+			$this->assertTrue( $count == 2 );
+
+			$count = 0;
+			$result = \arc\path::walk( $path, function( $parent ) use ( &$count ) {
+				$count++;
+				if ( $parent == '/a/' ) {
+					return true;
+				}
+			}, false ); // reverse order
+			$this->assertTrue( $result );
+			$this->assertTrue( $count == 3 );
+		}
+
+		function testCollapse() {
+			$this->assertTrue( \arc\path::collapse('/') === '/' );
+			$this->assertTrue( \arc\path::collapse('/test/') === '/test/' );
+			$this->assertTrue( \arc\path::collapse('/test//') === '/test/' );
+			$this->assertTrue( \arc\path::collapse('/test/../') === '/' );
+			$this->assertTrue( \arc\path::collapse('test') === '/test/' );
+			$this->assertTrue( \arc\path::collapse( '../', '/test/') === '/' );
+			$this->assertTrue( \arc\path::collapse( '..', '/test/foo/') === '/test/' );
+			$this->assertTrue( \arc\path::collapse( '/..//../', '/test/') === '/' );
+			$this->assertTrue( \arc\path::collapse( '', '/test/') === '/test/' );
 		}
 
 		function testParents() {

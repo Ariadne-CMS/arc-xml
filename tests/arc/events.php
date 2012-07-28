@@ -15,7 +15,7 @@
 
 		function testContextLess() {
 			// create stack without \arc\context dependency injected
-			$stack = new \arc\events\Stack();
+			$stack = new \arc\events\EventStack();
 			$listener = $stack->listen( 'testEvent' )->call( function($event) {
 				$event->data['seen'] = true;
 			} );
@@ -94,25 +94,25 @@
 
 		function testPathVisibility() {
 			$listener = \arc\events::cd( '/test/' )->listen( 'testEvent' )->call( function($event) {
-				$event->data[] = '/test/listener';
+				$event->data['test'] = '/test/listener';
 			} );
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
-				$this->assertTrue( count( $result )==1 ); // means the event listener didn't fire, which is correct
+				$this->assertFalse( $result['test'] == '/test/listener/' ); // means the event listener didn't fire, which is correct
 			} else {
 				$this->assertTrue( false );
 			}
 
 			$result = \arc\events::cd( '/test/' )->fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
-				$this->assertTrue( $result[0] == '/test/listener' );	
+				$this->assertTrue( $result['test'] == '/test/listener' );	
 			} else {
 				$this->assertTrue( false );
 			}
 
 			$result = \arc\events::cd( '/test/child/' )->fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
-				$this->assertTrue( $result[0] == '/test/listener' );	
+				$this->assertTrue( $result['test'] == '/test/listener' );	
 			} else {
 				$this->assertTrue( false );
 			}
@@ -168,17 +168,6 @@
 			} );
 			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
 			$this->assertFalse( $result );
-			$listener->remove();
-		}
-
-		function testObjectTypes() {
-			$listener = \arc\events::listen( 'testEvent', 'stringType' )->call( function( $event ) {
-				$event->data['stringType'] = true;
-			});
-			$result = \arc\events::fire( 'testEvent', array( ), 'otherType' );
-			$this->assertTrue( $result == array() );
-			$result = \arc\events::fire( 'testEvent', array( ), 'stringType' );
-			$this->assertTrue( $result['stringType'] );
 			$listener->remove();
 		}
 
