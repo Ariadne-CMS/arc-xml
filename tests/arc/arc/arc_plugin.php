@@ -2,7 +2,7 @@
 
 	class arc_plugin {
 
-		function arc_plugin_test() {
+		public static function arc_plugin_test() {
 			return true;
 		}
 	}

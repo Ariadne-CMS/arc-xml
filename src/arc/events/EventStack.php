@@ -106,10 +106,12 @@
 		*/
 		protected function walkListeners( $event, $listeners, $path, $capture ) {
 			$result = \arc\path::walk( $path, function( $parent ) use ( $listeners, $event ) {
-				foreach ( (array) $listeners[$parent] as $listener ) {
-					$result = call_user_func( $listener['method'], $event );
-					if ( $result === false ) {
-						return false;
+				if (isset( $listeners[$parent] ) ) {
+					foreach ( (array) $listeners[$parent] as $listener ) {
+						$result = call_user_func( $listener['method'], $event );
+						if ( $result === false ) {
+							return false; // this will stop \arc\path::walk, so other event handlers won't be called
+						}
 					}
 				}
 			}, $capture );

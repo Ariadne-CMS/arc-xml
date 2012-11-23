@@ -11,9 +11,9 @@
 	namespace arc;
 
 	/**
-		@requires \arc\path
-		@suggests \arc\context
-	*/
+	 *	@requires \arc\path
+	 *	@suggests \arc\context
+	 */
 
 	class cache extends Pluggable {
 

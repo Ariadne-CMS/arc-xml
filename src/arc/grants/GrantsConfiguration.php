@@ -59,11 +59,11 @@
 				return true;
 			}
 			if ( strpos( $grants, ' >'.$grant.' ') !== false ) { // less usual case, grants set only for children
-				$grantsLocal = $this->config->getConfiguredValue( 'grants.'.$id, $this->path );
+				$grantsLocal = $this->config->getConfiguredValue( 'grants.'.$id );
 				return !isset($grantsLocal);
 			}
 			if ( strpos( $grants, ' ='.$grant.' ') !== false ) { // least usual case, grants set only for the configured path
-				$grantsLocal = $this->config->getConfiguredValue( 'grants.'.$id, $this->path );
+				$grantsLocal = $this->config->getConfiguredValue( 'grants.'.$id );
 				return isset($grantsLocal);
 			}
 			return false;

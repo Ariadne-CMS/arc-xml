@@ -12,10 +12,10 @@
 	namespace arc;
 
 	/**
-		@requires \arc\path;
-		@requires \arc\config;
-		@suggests \arc\context;
-	*/
+	 *	@requires \arc\path;
+	 * 	@requires \arc\config;
+	 *	@suggests \arc\context;
+	 */
 
 	class grants extends Pluggable {
 

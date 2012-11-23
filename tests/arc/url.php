@@ -16,7 +16,7 @@
 		function testSaveUrl() {
 				$starturl = 'http://www.ariadne-cms.org/?frop=1';
 				$url = \arc\url::safeUrl($starturl);
-				$this->assertIsA($url, '\arc\url\SafeUrl');
+				$this->assertIsA($url, '\arc\url\Url');
 				$this->assertEqual($url.'', $starturl);
 
 				$starturl = 'http://www.ariadne-cms.org/?frop=1&frop=2';
@@ -28,14 +28,13 @@
 		function testparseUrl() {
 				$starturl = 'http://www.ariadne-cms.org/?frop=1';
 				$url = \arc\url::Url($starturl);
-				$this->assertIsA($url, '\arc\url\ParsedUrl');
+				$this->assertIsA($url, '\arc\url\Url');
 				$this->assertEqual($url.'', $starturl);
 
 				$starturl = 'http://www.ariadne-cms.org/?frop=1&frml=2';
 				$url = \arc\url::Url($starturl);
 				$url->fragment = 'test123';
 				$this->assertEqual($url.'', $starturl .'#test123');
-				var_dump($url);
 		} 
 
 
