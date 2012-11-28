@@ -25,7 +25,7 @@
 			$recollapsedTree = \arc\tree::collapse( $expandedTree );
 			//var_dump($recollapsedTree);
 			$this->assertTrue( $collapsedTree == $recollapsedTree );
-			$this->assertFalse( $collapsedTree === $recollapsedTree );
+			//not a requirement: $this->assertFalse( $collapsedTree === $recollapsedTree );
 		}
 
 		function testRecurse() {

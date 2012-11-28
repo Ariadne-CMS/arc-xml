@@ -22,7 +22,7 @@
 		 *	@return array [ $path => $data, ... ]
 		 */
 		static public function collapse( $node, $prefix = '' ) {
-			return $node->map( function( $name, $child ) {
+			return $node->map( function( $child ) {
 				return $child->nodeValue;
 			} );
 		}

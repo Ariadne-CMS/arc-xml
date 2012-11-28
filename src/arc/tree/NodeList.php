@@ -1,0 +1,45 @@
+<?php
+
+	/*
+	 * This file is part of the Ariadne Component Library.
+	 *
+	 * (c) Muze <info@muze.nl>
+	 *
+	 * For the full copyright and license information, please view the LICENSE
+	 * file that was distributed with this source code.
+	 */
+	 
+	 /*
+		TODO: 
+		- parents() method, callback or just return an array of nodes?
+		- getPath() method, how to make this fast?
+		- cd() must accept absolute paths
+		- map / reduce should start with the current node, not the child nodes
+	 */
+
+	namespace arc\tree;
+
+	class Nodelist extends \ArrayObject {
+
+		private $parentNode = null;
+
+		public function __construct( $list = null, $parentNode = null ) {
+			parent::__construct( $list );
+			$this->parentNode = $parentNode;
+		}
+
+		public function offsetSet( $name, $value ) {
+			if ( ! ( $value instanceof \arc\tree\NamedNode ) ) {
+				$value = new \arc\tree\NamedNode( $name, $this->parentNode, null, $value );
+			}
+			$value->parentNode = $this->parentNode;
+			if ( $this->offsetExists( $name ) ) {
+				$old = $this->offsetGet( $name );
+				if ( $old !== $value ) {
+					$old->parentNode = null;
+				}
+			}
+			parent::offsetSet($name, $value);
+		}
+
+	}

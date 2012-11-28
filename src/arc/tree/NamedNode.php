@@ -21,16 +21,54 @@
 
 	class NamedNode {
 
-		public $parentNode = null;
-		public $childNodes = array();
+		private $parentNode = null;
+		private $childNodes = null;
 		public $nodeValue = null;
+		private $name = '';
 
-		public function __construct( $parentNode = null, $childNodes = null, $nodeValue = null ) {
+		public function __construct( $name='', $parentNode = null, $childNodes = null, $nodeValue = null ) {
+			$this->name = $name;
 			$this->parentNode = $parentNode;
-			if ( isset( $childNodes ) ) {
-				$this->childNodes = $childNodes;
-			}
+			$this->childNodes = new NodeList( (array) $childNodes, $this );
 			$this->nodeValue = $nodeValue;
+		}
+
+		public function __get( $name ) {
+			switch ( $name ) {
+				case 'name' :
+					return $this->name;
+				break;
+				case 'childNodes' :
+					return $this->childNodes;
+				break;
+				case 'parentNode' :
+					return $this->parentNode;
+				break;
+			}
+		}
+
+		public function __set( $name, $value ) {
+			switch ( $name ) {
+				case 'name' :
+					if ( $this->parentNode ) {
+						if ( $this->parentNode->childNodes[$value] !== $this ) {
+							$this->parentNode->childNodes[$value] = $this;
+						}
+					}
+					$this->name = $value;
+				break;
+				case 'childNodes' :
+					// make sure nodelists aren't shared between namednodes.
+					$this->childNodes = new NodeList( (array) $value, $this );
+				break;
+				case 'parentNode' :
+					if ( $value instanceof NamedNode ) {
+						$value->appendChild( $this->name, $this );
+					} else {
+						throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
+					}
+				break;
+			}
 		}
 
 		/**
@@ -43,16 +81,18 @@
 		 */
 		public function appendChild( $name, $child=null ) {
 			if ( !( $child instanceof \arc\tree\NamedNode ) ) {
-				$child = new \arc\tree\NamedNode( $this, null, $child );
+				$child = new \arc\tree\NamedNode( $name, $this, null, $child );
 			}
-			if ( isset($child->parentNode) ) {
-				$child->parentNode->removeChild( $child->getName() );
+			if ( $child->parentNode !== $this ) {
+				if ( isset($child->parentNode) ) {
+					$child->parentNode->removeChild( $child->name );
+				}
+				if ( isset( $this->childNodes[ $name ] ) ) {
+					$oldChild = $this->childNodes[ $name ];
+					$oldChild->parentNode = null;
+				}
+				$child->parentNode = $this;
 			}
-			if ( isset( $this->childNodes[ $name ] ) ) {
-				$oldChild = $this->childNodes[ $name ];
-				$oldChild->parentNode = null;
-			}
-			$child->parentNode = $this;
 			$this->childNodes[$name] = $child;
 			return $child;
 		}
@@ -70,16 +110,6 @@
 				return $child;
 			} else {
 				return null; 
-			}
-		}
-
-		/**
-		 */
-		public function getName() {
-			if ( $this->parentNode ) {
-				return array_search( $this, $this->parentNode->childNodes );
-			} else {
-				return '';
 			}
 		}
 
@@ -149,8 +179,8 @@
 		 */
 		public function ls( $callback ) {
 			$result = array();
-			foreach( $this->childNodes as $name => $child ) {
-				$result[$name] = call_user_func( $callback, $name, $child );
+			foreach( $this->childNodes as $child ) {
+				$result[$child->name] = call_user_func( $callback, $child );
 			}
 			return $result;
 		}
@@ -165,16 +195,15 @@
 		 * @return mixed
 		 */
 		public function dive( $diveCallback = null, $riseCallback = null ) {
-			$name = $this->getName();
 			$result = null;
 			if ( is_callable( $diveCallback ) ) {
-				$result = call_user_func( $diveCallback, $name, $this );
+				$result = call_user_func( $diveCallback, $this );
 			}
 			if ( !isset( $result ) && $this->parentNode ) {
 				$result = $this->parentNode->dive( $diveCallback, $riseCallback );
 			}
 			if ( is_callable( $riseCallback ) ) {
-				return call_user_func( $riseCallback, $name, $this, $result );
+				return call_user_func( $riseCallback, $this, $result );
 			} else {
 				return $result;
 			}
@@ -190,11 +219,12 @@
 		 * depth first search in the tree structure.
 		 */
 		public function walk( $callback ) {
-			foreach( $this->childNodes as $name => $child ) {
-				$result = call_user_func( $callback, $name, $child );
-				if ( !isset( $result ) ) {
-					$result = $child->walk( $callback );
-				}
+			$result = call_user_func( $callback, $this );
+			if ( isset( $result ) ) {
+				return $result;
+			}
+			foreach( $this->childNodes as $child ) {
+				$result = $child->walk( $callback );
 				if ( isset( $result ) ) {
 					return $result;
 				}
@@ -204,25 +234,25 @@
 
 		/**
 		 */
-		public function map( $callback, $root = '', $name = '' ) {
+		public function map( $callback, $root = '' ) {
 			$result = array();
-			$path = $root . $name . '/';
-			$callbackResult = call_user_func( $callback, $name, $this );
+			$path = $root . $this->name . '/';
+			$callbackResult = call_user_func( $callback, $this );
 			if ( isset($callbackResult) ) {
 				$result[ $path ] = $callbackResult;
 			}
-			foreach ( $this->childNodes as $name => $child ) {
-				$result += $child->map( $callback, $path, $name );
+			foreach ( $this->childNodes as $child ) {
+				$result += $child->map( $callback, $path );
 			}
 			return $result;
 		}
 
 		/**
 		 */
-		public function reduce( $callback, $initial = null, $name = '' ) {
-			$result = call_user_func( $callback, $name, $child, $initial );
-			foreach ( $this->childNodes as $name => $child ) {
-				$result = $child->reduce( $callback, $result, $name );
+		public function reduce( $callback, $initial = null ) {
+			$result = call_user_func( $callback, $initial, $child );
+			foreach ( $this->childNodes as $child ) {
+				$result = $child->reduce( $callback, $result );
 			}
 			return $result;
 		}
