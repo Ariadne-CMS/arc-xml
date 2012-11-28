@@ -28,6 +28,25 @@
 			$this->parentNode = $parentNode;
 		}
 
+		public function __set( $name, $value ) {
+			switch( $name ) {
+				case 'parentNode':
+					$this->parentNode = $value;
+					foreach( $this as $child ) {
+						$child->parentNode = $this->parentNode;
+					}
+				break;
+			}
+		}
+
+		public function __get( $name ) {
+			switch( $name ) {
+				case 'parentNode':
+					return $this->parentNode;
+				break;
+			}
+		}
+
 		public function offsetSet( $name, $value ) {
 			if ( ! ( $value instanceof \arc\tree\NamedNode ) ) {
 				$value = new \arc\tree\NamedNode( $name, $this->parentNode, null, $value );
@@ -40,6 +59,15 @@
 				}
 			}
 			parent::offsetSet($name, $value);
+		}
+		
+		public function __clone() {
+			$this->parentNode = null;
+			foreach( (array) $this as $name => $child ) {
+				$clone = clone $child;
+				$clone->parentNode = $this->parentNode;
+				parent::offsetSet( $name, $clone );
+			}
 		}
 
 	}

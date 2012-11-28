@@ -36,6 +36,31 @@
 			}
 			$arr = \arc\tree::collapse( $root );
 		}
-		
+
+
+		function testAppend() {
+			$tree = \arc\tree::expand();
+			$tree->childNodes['foo'] = 'bar';
+			$tree->cd('/foo/')->appendChild('test', 'a test');
+			$collapsed = \arc\tree::collapse( $tree );
+			$this->assertTrue( $collapsed == array(
+				'/foo/' => 'bar',
+				'/foo/test/' => 'a test'
+			));
+		}
+
+		function testClone() {
+			$tree = \arc\tree::expand();
+			$tree->childNodes['foo'] = 'bar';
+			$clone = clone $tree;
+			$clone->childNodes['foo'] = 'foo';
+			$this->assertTrue( $tree !== $clone );
+			$this->assertTrue( $tree->childNodes !== $clone->childNodes );
+			$foo1 = $tree->cd('/foo/');
+			$foo2 = $clone->cd('/foo/');
+			$this->assertTrue( $foo1 !== $foo2 );
+			$this->assertTrue( $tree->childNodes['foo'] == 'bar' );
+			$this->assertTrue( $clone->childNodes['foo'] == 'foo' );
+		}
 	}
 

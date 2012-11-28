@@ -64,11 +64,23 @@
 				case 'parentNode' :
 					if ( $value instanceof NamedNode ) {
 						$value->appendChild( $this->name, $this );
-					} else {
+					} else if ( isset($value) ) {
 						throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
 					}
 				break;
 			}
+		}
+
+		public function __clone() {
+			$this->parentNode = null;
+			$this->childNodes = clone $this->childNodes;
+			foreach( $this->childNodes as $child ) {
+				$child->parentNode = $this;
+			}
+		}
+
+		public function __toString() {
+			return (string) $this->nodeValue;
 		}
 
 		/**
