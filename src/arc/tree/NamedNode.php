@@ -9,25 +9,17 @@
 	 * file that was distributed with this source code.
 	 */
 	 
-	 /*
-		TODO: 
-		- parents() method, callback or just return an array of nodes?
-		- getPath() method, how to make this fast?
-		- cd() must accept absolute paths
-		- map / reduce should start with the current node, not the child nodes
-	 */
-
 	namespace arc\tree;
 
 	class NamedNode {
 
+		public $nodeValue = null;
 		private $parentNode = null;
 		private $childNodes = null;
-		public $nodeValue = null;
-		private $name = '';
+		private $nodeName = '';
 
-		public function __construct( $name='', $parentNode = null, $childNodes = null, $nodeValue = null ) {
-			$this->name = $name;
+		public function __construct( $nodeName='', $parentNode = null, $childNodes = null, $nodeValue = null ) {
+			$this->nodeName = $nodeName;
 			$this->parentNode = $parentNode;
 			$this->childNodes = new NodeList( (array) $childNodes, $this );
 			$this->nodeValue = $nodeValue;
@@ -35,8 +27,8 @@
 
 		public function __get( $name ) {
 			switch ( $name ) {
-				case 'name' :
-					return $this->name;
+				case 'nodeName' :
+					return $this->nodeName;
 				break;
 				case 'childNodes' :
 					return $this->childNodes;
@@ -44,18 +36,21 @@
 				case 'parentNode' :
 					return $this->parentNode;
 				break;
+				default:
+					return $this->cd( $name );
+				break;
 			}
 		}
 
 		public function __set( $name, $value ) {
 			switch ( $name ) {
-				case 'name' :
+				case 'nodeName' :
 					if ( $this->parentNode ) {
 						if ( $this->parentNode->childNodes[$value] !== $this ) {
 							$this->parentNode->childNodes[$value] = $this;
 						}
 					}
-					$this->name = $value;
+					$this->nodeName = $value;
 				break;
 				case 'childNodes' :
 					// make sure nodelists aren't shared between namednodes.
@@ -63,20 +58,39 @@
 				break;
 				case 'parentNode' :
 					if ( $value instanceof NamedNode ) {
-						$value->appendChild( $this->name, $this );
+						$value->appendChild( $this->nodeName, $this );
 					} else if ( isset($value) ) {
 						throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
 					}
 				break;
+				default:
+					$this->childNodes[ $name ] = $value;
+				break;
 			}
 		}
 
+		public function __isset( $name ) {
+			switch( $name ) {
+				case 'nodeName' :
+				case 'childNodes':
+					return true; // these are always _set_, but may be empty
+				break;
+				case 'parentNode':
+					return isset( $this->parentNode );
+				break;
+				default:
+					return isset( $this->childNodes[ $name ] );
+				break;
+			}
+		}
+
+		/* The tree itself must always be deep cloned, a single node cannot have two parentNodes.
+		 * The nodeValue may be whatever - so if it is an object, that object will not be cloned.
+		 */
 		public function __clone() {
 			$this->parentNode = null;
 			$this->childNodes = clone $this->childNodes;
-			foreach( $this->childNodes as $child ) {
-				$child->parentNode = $this;
-			}
+			$this->childNodes->parentNode = $this;
 		}
 
 		public function __toString() {
@@ -91,21 +105,21 @@
 		 *		a new instance will be constructed with $data as its nodeValue.
 		 *	@return \arc\tree\NamedNode The new child node.
 		 */
-		public function appendChild( $name, $child=null ) {
+		public function appendChild( $nodeName, $child=null ) {
 			if ( !( $child instanceof \arc\tree\NamedNode ) ) {
-				$child = new \arc\tree\NamedNode( $name, $this, null, $child );
+				$child = new \arc\tree\NamedNode( $nodeName, $this, null, $child );
 			}
 			if ( $child->parentNode !== $this ) {
 				if ( isset($child->parentNode) ) {
-					$child->parentNode->removeChild( $child->name );
+					$child->parentNode->removeChild( $child->nodeName );
 				}
-				if ( isset( $this->childNodes[ $name ] ) ) {
-					$oldChild = $this->childNodes[ $name ];
+				if ( isset( $this->childNodes[ $nodeName ] ) ) {
+					$oldChild = $this->childNodes[ $nodeName ];
 					$oldChild->parentNode = null;
 				}
 				$child->parentNode = $this;
 			}
-			$this->childNodes[$name] = $child;
+			$this->childNodes[ $nodeName ] = $child;
 			return $child;
 		}
 
@@ -114,10 +128,10 @@
 		 *	@param string $name The index name of the child
 		 *	@return \arc\tree\NamedNode The removed child or null.
 		 */
-		public function removeChild( $name ) {
-			if ( isset( $this->childNodes[ $name ] ) ) {
-				$child = $this->childNodes[ $name ];
-				unset( $this->childNodes[$name] );
+		public function removeChild( $nodeName ) {
+			if ( isset( $this->childNodes[ $nodeName ] ) ) {
+				$child = $this->childNodes[ $nodeName ];
+				unset( $this->childNodes[ $nodeName ] );
 				$child->parentNode = null;
 				return $child;
 			} else {
@@ -128,27 +142,36 @@
 		/**
 		 */
 		public function getPath( $root = null ) {
-			return $this->dive( 
-				function( $name, $parent ) {
-					return $parent === $root ? '/' : null;
-				},
-				function( $name, $parent, $result ) {
-					return $result . $name . '/';
+			return $this->parents( 
+				function( $node, $result ) {
+					return $result . $node->nodeName . '/';
 				}
 			);
 		}
 
+
+		public function getRootNode() {
+			$result = $this->dive(
+				function( $node ) {
+					return isset( $node->parentNode ) ? null : $node;
+				}
+			);
+			return $result;
+		}
+
 		/**
-		 *	Returns the node with the given path, relative to this node.
+		 *	Returns the node with the given path, relative to this node. If the path
+		 *  does not exist, missing nodes will be created automatically.
 		 *	@param string $path The path to change to
-		 *	@param calleable $notFoundCallback optional Callback method that is invoked when a child node 
-		 *		is unavailable.
 		 *	@return \arc\tree\Node The target node corresponding with the given path.
-		 *	@throws \arc\Exception OBJECT_NOT_FOUND when the given path has no corresponding node and no
-		 *		$notFoundCallback is defined.
 		 */
-		public function cd( $path, $notFoundCallback = null ) {
-			return \arc\path::reduce( $path, function( $node, $name ) {
+		public function cd( $path ) {
+			if ( \arc\path::isAbsolute( $path ) ) {
+				$node = $this->getRootNode();
+			} else {
+				$node = $this;
+			}
+			$result = \arc\path::reduce( $path, function( $node, $name ) {
 				switch( $name ) {
 					case '..':
 						return ( isset( $node->parentNode ) ? $node->parentNode : $node );
@@ -158,30 +181,17 @@
 						return $node;
 					break;
 					default:
-						if ( isset( $node->childNodes[ $name ] ) ) {
-							return $node->childNodes[$name];
-						}
-						if ( isset( $notFoundCallback ) ) {
-							return call_user_func( $notFoundCallback, $node, $name );
+						if ( !isset( $node->childNodes[ $name ] ) ) {
+							return $node->appendChild( $name );
 						} else {
-							throw new \arc\Exception( 'Node '.$name.' not found', \arc\exceptions::OBJECT_NOT_FOUND );
+							return $node->childNodes[ $name ];
 						}
 					break;
 				}
-			}, $this);
+			}, $node);
+			return $result;
 		}
 
-
-		/**
-		 *	Returns the node with the given path, relative to this node. Creates empty nodes where needed.
-		 *	@param string $path The path to change to.
-		 *	@return \arc\tree\Node The target node corresponding with the given path.
-		 */
-		public function mkdir( $path ) {
-			return $this->cd( $path, function( $node, $name ) {
-				return $this->appendChild( $name );
-			});
-		}
 
 		/**
 		 *  Calls a callback method on each child of this node, returns an array with name => result pairs.
@@ -192,7 +202,7 @@
 		public function ls( $callback ) {
 			$result = array();
 			foreach( $this->childNodes as $child ) {
-				$result[$child->name] = call_user_func( $callback, $child );
+				$result[ $child->nodeName ] = call_user_func( $callback, $child );
 			}
 			return $result;
 		}
@@ -223,8 +233,13 @@
 
 		/**
 		*/
-		public function parents( $root = null ) {
-		
+		public function parents( $root = null, $callback = null ) {
+			if ( !isset( $callback ) ) {
+				$callback = function( $node, $result ) {
+					return ( (array) $result ) + array( $node );
+				};
+			}
+			return $this->dive(	null, $callback );
 		}
 		
 		/**
@@ -248,7 +263,7 @@
 		 */
 		public function map( $callback, $root = '' ) {
 			$result = array();
-			$path = $root . $this->name . '/';
+			$path = $root . $this->nodeName . '/';
 			$callbackResult = call_user_func( $callback, $this );
 			if ( isset($callbackResult) ) {
 				$result[ $path ] = $callbackResult;

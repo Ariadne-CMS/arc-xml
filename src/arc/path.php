@@ -168,6 +168,10 @@
 			return ( strpos( $path, $parent ) === 0 );
 		}
 
+		public static function isAbsolute( $path ) {
+			return $path[0]==='/';
+		}
+
 		protected static function getSplitPath( $path ) {
 			return array_filter( explode( '/', $path ), function( $entry ) {
 				return ( isset( $entry ) && $entry !== '' );

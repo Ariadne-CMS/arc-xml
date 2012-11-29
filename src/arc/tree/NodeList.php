@@ -9,14 +9,6 @@
 	 * file that was distributed with this source code.
 	 */
 	 
-	 /*
-		TODO: 
-		- parents() method, callback or just return an array of nodes?
-		- getPath() method, how to make this fast?
-		- cd() must accept absolute paths
-		- map / reduce should start with the current node, not the child nodes
-	 */
-
 	namespace arc\tree;
 
 	class Nodelist extends \ArrayObject {

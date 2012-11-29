@@ -62,5 +62,36 @@
 			$this->assertTrue( $tree->childNodes['foo'] == 'bar' );
 			$this->assertTrue( $clone->childNodes['foo'] == 'foo' );
 		}
+
+		function testCD() {
+			$collapsed = array(
+				'/foo/' => 'bar',
+				'/foo/test/' => 'a test',
+				'/bar/test/' => 'another test'
+			);
+			$tree = \arc\tree::expand($collapsed);
+			$foo = $tree->childNodes['foo'];
+			$test = $foo->cd('/bar/test/');
+			$this->assertTrue( $tree->bar->cd('/foo/test/') == 'a test' );
+		}
+
+		function testAutoCreateCD() {
+			$tree = \arc\tree::expand();
+			$tree->cd('foo')->nodeValue = 'bar';
+			$collapsed = \arc\tree::collapse($tree);
+			$this->assertTrue( $collapsed == array( '/foo/' => 'bar' ) );
+		}
+
+		function testShortAccess() {
+			$collapsed = array(
+				'/foo/' => 'bar',
+				'/foo/test/' => 'a test'
+			);
+			$tree = \arc\tree::expand($collapsed);
+			$this->assertTrue( $tree->foo == 'bar' );
+			$tree->foo->bar = 'test';
+			$this->assertTrue( $tree->foo->bar == 'test' );
+		}
+
 	}
 
