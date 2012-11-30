@@ -97,4 +97,14 @@
 				return str_replace( 'a','', $filename );
 			}) == '/n /');
 		}
+
+		function testIsChild() {
+			$this->assertTrue( \arc\path::isChild( '/a/b/', '/a/' ) );
+			$this->assertFalse( \arc\path::isChild( '/b/', '/a/' ) );
+		}
+
+		function testGetRelativePath() {
+			$this->assertTrue( \arc\path::getRelativePath( '/a/b/', '/a/' ) == 'b/' );
+			$this->assertTrue( \arc\path::getRelativePath( '/b/', '/a/' ) == '../b/' );
+		}
 	}

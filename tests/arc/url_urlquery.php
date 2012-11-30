@@ -13,14 +13,12 @@
 	 
 	class TestUrlQuery extends UnitTestCase {
 
-		function testparseUrl() {
+		function testparsePHPUrl() {
 			$type = ini_get('arg_separator.input');
 
 			$starturl = 'http://www.ariadne-cms.org/?frop=1;frml=2&frup=3';
 			$url = \arc\url::Url($starturl);
 			$query = $url->query;
-
-			var_dump($query);
 
 			switch ($type) {
 				case '&':
@@ -57,7 +55,19 @@
 
 		} 
 
+		function testparseSafeUrl() {
+			$starturl = 'http://www.ariadne-cms.org/?frop=1;frml=2&frup=3';
+			$url = \arc\url::safeUrl($starturl);
+			$query = $url->query;
 
+			$this->assertTrue ( isset($query['frop']) );
+			$this->assertTrue ( isset($query['frml']) );
+			$this->assertTrue ( isset($query['frup']) );
+			$this->assertTrue ( $query['frop'] == '1' );
+			$this->assertTrue ( $query['frml'] == '2' );
+			$this->assertTrue ( $query['frup'] == '3' );
+			$this->assertFalse( $query['frop'] == '1;frml=2' );
+			$this->assertFalse( $query['frml'] == '2;frup=3' );
+		}
 
-		
 	}

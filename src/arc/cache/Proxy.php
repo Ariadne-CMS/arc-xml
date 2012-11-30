@@ -8,6 +8,12 @@
 	 * For the full copyright and license information, please view the LICENSE
 	 * file that was distributed with this source code.
 	 */
+	// TODO: add cacheController options instead of timeout value
+	// this controller can check:
+	// 1) if the cache is still valid
+	// 2) how long to keep a new cache valid
+	// 3) if a cache image may be stored
+	// it needs access to the cache image stored/to store and the proxied object
 
 	namespace arc\cache;
 
@@ -17,14 +23,18 @@
 		//   perhaps through an extra option in __construct?
 		protected $cacheStore = null;
 		protected $cacheController = null;
-		protected $cacheTimeout = '2 hours';
+		protected $cacheTimeout = null;
 		protected $targetObject = null;
 
-		public function __construct( $targetObject, $cacheStore, $cacheTimeout = 7200, $cacheController = null ) {
+		public function __construct( $targetObject, $cacheStore, $cacheTimeout = 7200 ) {
 			$this->targetObject = $targetObject;
 			$this->cacheStore = $cacheStore;
-			$this->cacheController = $cacheController;
-			if ( isset($cacheTimeout) ) {
+			if ( is_object( $cacheTimeout ) ) {
+				$this->cacheController = $cacheTimeout;
+			} else {
+				// FIXME: add a timerController which just returns a configurable time
+				// independent of proxied object and output/return values
+				// replace cacheTimeout with that object
 				$this->cacheTimeout = $cacheTimeout;
 			}
 		}

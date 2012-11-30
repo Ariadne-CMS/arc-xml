@@ -98,7 +98,7 @@
 			} );
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
 			if ( $result ) {
-				$this->assertFalse( $result['test'] == '/test/listener/' ); // means the event listener didn't fire, which is correct
+				$this->assertFalse( isset( $result['test'] ) ); // means the event listener didn't fire, which is correct
 			} else {
 				$this->assertTrue( false );
 			}

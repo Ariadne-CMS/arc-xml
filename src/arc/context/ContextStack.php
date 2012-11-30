@@ -48,7 +48,7 @@
 
 		public function getVar( $name ) {
 			$context = $this->top();
-			return $context[$name];
+			return ( isset( $context[ $name ] ) ? $context[ $name ] : null );
 		}
 
 		// each stack entry in the context is an array
