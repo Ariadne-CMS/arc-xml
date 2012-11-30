@@ -24,8 +24,13 @@
 		public static function getGrantsConfiguration( $config = null ) {
 			if ( !isset( $config ) ) {
 				if ( !isset( self::$grantsConfig ) ) {
-					$config = \arc\config::getConfiguration();
-					self::$grantsConfig = new grants\GrantsConfiguration( $config );	
+					if ( class_exists( '\arc\context' ) ) {
+						$user = \arc\context::getvar('arc.user');
+					} else {
+						$user = 'public';
+					}
+					$config = new \arc\config\Configuration();
+					self::$grantsConfig = new grants\GrantsConfiguration( $config, $user );
 				}
 				return self::$grantsConfig;
 			} else {

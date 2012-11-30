@@ -12,46 +12,44 @@
 	namespace arc\grants;
 
 	class GrantsConfiguration {
-		protected $config = null;
-		protected $id = null;
+		protected $context = null;
+		protected $user = null;
 		protected $root = null;
-
-		public function __construct( $config = null, $id = null, $root = '/' ) {
-			$this->config = $config;
-			$this->id = $id;
-			$this->root = $root;
+		protected $path = null;
+		
+		public function __construct( $context = null, $user = null, $path = null ) {
+			$this->context = $context;
+			$this->user = $user;
+			$this->path = $path;
 		}
 
 		public function cd( $path ) {
-			return new GrantsConfiguration( $this->config->cd( $path ), $this->id, $this->root );
-		}
-
-		public function root( $path ) {
-			return new GrantsConfiguration( $this->config, $this->id, \arc\path::collapse( $path ) );
+			$path = \arc\path::collapse( $path, $this->path );
+			return new GrantsConfiguration( $this->context, $this->id, $path );
 		}
 
 		public function ls() {
 			$index = 'grants';
-			if ( $this->id ) {
-				$index .= '.'.$this->id;
+			if ( $this->user ) {
+				$index .= '.'.$this->user;
 			}
 			return $this->config->acquire( $index );
 		}
 
-		public function on( $id ) {
-			return new GrantsConfiguration( $this->config, $id, $this->root );
+		public function user( $user ) {
+			return new GrantsConfiguration( $this->config, $user, $this->path );
 		}
 
 		public function set( $grants ) {
-			$id = isset( $this->id) ? $this->id : 'public';
+			$user = isset( $this->user) ? $this->user : $this->context['arc.user'];
 			// save as string with a leading and trailing space, for faster comparison in check()
-			$this->config->configure( 'grants.'.$id, ' '.trim($grants).' ' );
+			$this->config->configure( 'grants.'.$user, ' '.trim($grants).' ' );
 		}
 
 		public function check( $grant ) {
 			// uses strpos since it is twice as fast as preg_match for the most common cases
-			$id = isset( $this->id) ? $this->id : 'public';
-			$grants = $this->config->acquire( 'grants.'.$id ); //, null, $this->root );
+			$user = isset( $this->user) ? $this->user : $this->context['arc.user'];
+			$grants = $this->config->acquire( 'grants.'.$user ); //, null, $this->root );
 			if ( strpos( $grants, $grant.' ' ) === false ) { // exit early if no possible match is found
 				return false;
 			}
