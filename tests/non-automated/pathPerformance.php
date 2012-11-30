@@ -10,9 +10,9 @@
 		$outputPath = \arc\path::collapse( $inputPath );
 	}
 	$endtime = microtime(true);
-	echo $outputPath;
-	echo $endtime - $starttime;
-	echo "<br>";
+	echo $outputPath."<br>\n";
+	echo $endtime - $starttime."<br>\n";
+	echo "<br>\n";
 
 	// 100 times a 1000 random paths - 1.5 - 1.9 naive implementation - 0.14 with cache
 	$max2 = 1000;
