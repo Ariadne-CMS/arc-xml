@@ -252,7 +252,7 @@
 
 		/**
 		*/
-		public function parents( $root = null, $callback = null ) {
+		public function parents( $callback = null ) {
 			if ( !isset( $callback ) ) {
 				$callback = function( $node, $result ) {
 					return ( (array) $result ) + array( $node );
