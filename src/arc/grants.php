@@ -19,43 +19,34 @@
 
 	class grants extends Pluggable {
 
-		protected static $grantsConfig = null;
+		protected static $grantsTree = null;
 
-		public static function getGrantsConfiguration( $config = null ) {
-			if ( !isset( $config ) ) {
-				if ( !isset( self::$grantsConfig ) ) {
-					if ( class_exists( '\arc\context' ) ) {
-						$user = \arc\context::getvar('arc.user');
-					} else {
-						$user = 'public';
-					}
-					$config = new \arc\config\Configuration();
-					self::$grantsConfig = new grants\GrantsConfiguration( $config, $user );
+		public static function getGrantsTree() {
+			if ( !isset( self::$grantsTree ) ) {
+				if ( class_exists( '\arc\context' ) ) {
+					$user = \arc\context::getvar('arc.user');
+					$groups = \arc\context::getvar('arc.groups');
+					$path = \arc\context::getvar('arc.path');
+				} else {
+					$user = 'public';
+					$groups = array( 'public' );
+					$path = '/';
 				}
-				return self::$grantsConfig;
-			} else {
-				return new grants\GrantsConfiguration( $config );
+				self::$grantsTree = new grants\GrantsTree( \arc\tree::expand()->cd( $path ), $user, $groups );
 			}
+			return self::$grantsTree;
 		}
 
 		public static function check( $grant ) {
-			return self::getGrantsConfiguration()->check( $grant );
-		}
-
-		public static function on( $id ) {
-			return self::getGrantsConfiguration()->on( $id );
-		}
-
-		public static function root( $path ) {
-			return self::getGrantsConfiguration()->root( $path );
+			return self::getGrantsTree()->check( $grant );
 		}
 
 		public static function cd( $path ) {
-			return self::getGrantsConfiguration()->cd( $path );
+			return self::getGrantsTree()->cd( $path );
 		}
 
 		public static function ls() {
-			return self::getGrantsConfiguration()->ls();
+			return self::getGrantsTree()->ls();
 		}
 
 	}

@@ -14,8 +14,8 @@
 	class TestGrants extends UnitTestCase {
 
 		function testGrantsSetGet() {
-			$testGrants = \arc\grants::on('test');
-			$testGrants->set('read =add >edit >delete');
+			$testGrants = \arc\grants::getGrantsTree()->switchUser('test');
+			$testGrants->setUserGrants('read =add >edit >delete');
 			$this->assertTrue( $testGrants->check('read') );
 			$this->assertTrue( $testGrants->check('add') );
 			$this->assertFalse( $testGrants->check('edit') );
@@ -23,11 +23,11 @@
 		}
 
 		function testGrantsOnPath() {
-			$config = \arc\config::getConfiguration();
-			$grants = \arc\grants::cd('/test/');
-			$testGrants = $grants->on('test');
-			$this->assertTrue( $testGrants->check('read') );
-			$this->assertFalse( $testGrants->check('add') );
-			$this->assertTrue( $testGrants->check('edit') );
+			$testGrants = \arc\grants::getGrantsTree()->switchUser('test');
+			$testGrants->setUserGrants('read =add >edit >delete');
+			$grants = $testGrants->cd('/test/');
+			$this->assertTrue( $grants->check('read') );
+			$this->assertFalse( $grants->check('add') );
+			$this->assertTrue( $grants->check('edit') );
 		}
 	}
