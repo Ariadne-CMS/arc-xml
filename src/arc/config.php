@@ -12,8 +12,8 @@
 	namespace arc;
 
 	/**
-		@requires \arc\path
-		@suggests \arc\context
+	 *	@requires \arc\path
+	 *	@suggests \arc\context
 	*/
 	class config extends Pluggable {
 
@@ -21,7 +21,7 @@
 
 		public static function getConfiguration() {
 			if ( !self::$configuration ) {
-				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
+				$context = class_exists( '\arc\context' ) ? context::getContextStack() : null;
 				if ( isset($context) ) {
 					$path = $context['arc.path'];
 				} else {

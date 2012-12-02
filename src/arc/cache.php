@@ -39,7 +39,7 @@
 				$prefix = 'default';
 			}
 			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
-				$context = context::getStack();
+				$context = context::getContextStack();
 				$path = $context['arc.path'];
 			} else {
 				$path = '/';

@@ -15,7 +15,7 @@
 
 		protected static $contextStack = null;
 
-		public static function getStack() {
+		public static function getContextStack() {
 			if ( !self::$contextStack ) {
 				self::$contextStack = new context\ContextStack();
 			}
@@ -23,27 +23,27 @@
 		}
 
 		public static function push( $params ) {
-			return self::getStack()->push( $params );
+			return self::getContextStack()->push( $params );
 		}
 
 		public static function top() {
-			return self::getStack()->top();
+			return self::getContextStack()->top();
 		}
 
 		public static function pop() {
-			return self::getStack()->pop();
+			return self::getContextStack()->pop();
 		}
 
 		public static function peek( $level = 0 ) {
-			return self::getStack()->peek( $level );
+			return self::getContextStack()->peek( $level );
 		}
 
 		public static function putVar( $name, $value ) {
-			self::getStack()->putVar( $name, $value );
+			self::getContextStack()->putVar( $name, $value );
 		}
 
 		public static function getVar( $name ) {
-			return self::getStack()->getVar( $name );
+			return self::getContextStack()->getVar( $name );
 		}
 
 	}
