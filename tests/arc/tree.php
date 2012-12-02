@@ -70,9 +70,8 @@
 				'/bar/test/' => 'another test'
 			);
 			$tree = \arc\tree::expand($collapsed);
-			$foo = $tree->childNodes['foo'];
-			$test = $foo->cd('/bar/test/');
-			$this->assertTrue( $tree->bar->cd('/foo/test/') == 'a test' );
+			$bar = $tree->childNodes['bar'];
+			$this->assertTrue( $bar->cd('/foo/test/') == 'a test' );
 		}
 
 		function testAutoCreateCD() {
@@ -82,16 +81,4 @@
 			$this->assertTrue( $collapsed == array( '/foo/' => 'bar' ) );
 		}
 
-		function testShortAccess() {
-			$collapsed = array(
-				'/foo/' => 'bar',
-				'/foo/test/' => 'a test'
-			);
-			$tree = \arc\tree::expand($collapsed);
-			$this->assertTrue( $tree->foo == 'bar' );
-			$tree->foo->bar = 'test';
-			$this->assertTrue( $tree->foo->bar == 'test' );
-		}
-
 	}
-

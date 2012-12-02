@@ -11,7 +11,7 @@
 	 
 	namespace arc\tree;
 
-	class Nodelist extends \ArrayObject {
+	class NamedNodelist extends \ArrayObject {
 
 		private $parentNode = null;
 
@@ -53,6 +53,14 @@
 			parent::offsetSet($name, $value);
 		}
 		
+		public function offsetUnset( $name ) {
+			if ( $this->offsetExists( $name ) ) {
+				$node = $this->offsetGet( $name );
+				$node->parentNode = null;
+			}
+			parent::offsetUnset( $name );
+		}
+		
 		public function __clone() {
 			$this->parentNode = null;
 			foreach( (array) $this as $name => $child ) {
@@ -61,5 +69,15 @@
 				parent::offsetSet( $name, $clone );
 			}
 		}
-
+		
+		public function exchangeArray( $input ) {
+			$oldArray = $this->getArrayCopy();
+			foreach ( $oldArray as $node ) {
+				$node->parentNode = null; // removes them from the childNodes list as well
+			}
+			foreach ( $input as $name => $node ) {
+				$this->offsetSet( $name, $node );
+			}
+		}
+		
 	}

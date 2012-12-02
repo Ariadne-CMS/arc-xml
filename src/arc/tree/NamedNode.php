@@ -11,7 +11,7 @@
 	 
 	namespace arc\tree;
 
-	class NamedNode {
+	class NamedNode implements \Serializable {
 
 		public $nodeValue = null;
 		private $parentNode = null;
@@ -21,7 +21,7 @@
 		public function __construct( $nodeName='', $parentNode = null, $childNodes = null, $nodeValue = null ) {
 			$this->nodeName = $nodeName;
 			$this->parentNode = $parentNode;
-			$this->childNodes = new NodeList( (array) $childNodes, $this );
+			$this->childNodes = new NamedNodeList( (array) $childNodes, $this );
 			$this->nodeValue = $nodeValue;
 		}
 
@@ -36,10 +36,10 @@
 				case 'parentNode' :
 					return $this->parentNode;
 				break;
-				default:
+/*				default:
 					return $this->cd( $name );
 				break;
-			}
+*/			}
 		}
 
 		public function __set( $name, $value ) {
@@ -54,18 +54,22 @@
 				break;
 				case 'childNodes' :
 					// make sure nodelists aren't shared between namednodes.
-					$this->childNodes = new NodeList( (array) $value, $this );
+					$this->childNodes = new NamedNodeList( (array) $value, $this );
 				break;
 				case 'parentNode' :
 					if ( $value instanceof NamedNode ) {
 						$value->appendChild( $this->nodeName, $this );
 					} else if ( isset($value) ) {
 						throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
+					} else if ( $this->parentNode ) {
+						$this->parentNode->removeChild( $this->nodeName );
 					}
 				break;
+/*
 				default:
 					$this->childNodes[ $name ] = $value;
 				break;
+*/
 			}
 		}
 
@@ -97,6 +101,15 @@
 			return (string) $this->nodeValue;
 		}
 
+		// \Serializable interface 
+		public function serialize() {
+			return serialize( \arc\tree::collapse( $this ) );
+		}
+		
+		public function unserialize( $data ) {
+			return \arc\tree::expand( unserialize( $data ) );
+		}
+		
 		/**
 		 *	Adds a new child element to this node with the given name as index in the child list.
 		 *	If an existing child has the same name, that child will be discarded.
@@ -207,6 +220,12 @@
 			return $result;
 		}
 
+		public function sort( $callback ) {
+			$this->map( function( $node ) {
+				$this->childNodes->uasort( $callback );
+			} );
+		}
+		
 		/**
 		 * Calls the first callback method on each successive parent untill a non-null value is returned. Then
 		 * calls all the parents from that point back to this node with the second callback in reverse order.
