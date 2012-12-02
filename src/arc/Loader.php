@@ -30,9 +30,15 @@
 			return new $name();
 		}
 
-		abstract public static function hasClass( $className );
+		public static function hasClass( $className ) {
+			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
+		}
 
-		abstract public static function autoload( $className );
+		public static function autoload( $className ) {
+			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
+		}
 
-		abstract public static function getPluginMethod( $namespace, $methodName );
+		public static function getPluginMethod( $namespace, $methodName ) {
+			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
+		}
 	}
