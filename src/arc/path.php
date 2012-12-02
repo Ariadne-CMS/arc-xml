@@ -145,6 +145,7 @@
 			if ( isset($parent[1]) ) { // fast check to see if there is a dirname
 				$parent .= '/';
 			}
+			$parent[0] = '/'; // dirname('/something/') returns '\' in windows.
 			if ( strpos( $parent, $root ) !== 0 ) { // parent is outside of the root
 				return null;
 			}
