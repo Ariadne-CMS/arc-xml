@@ -31,7 +31,7 @@
 		function testRecurse() {
 			$node = \arc\tree::expand();
 			$root = $node;
-			for ( $i = 0; $i < 1000; $i ++ ) {
+			for ( $i = 0; $i < 225; $i ++ ) {
 				$node = $node->appendChild($i, $i);
 			}
 			$arr = \arc\tree::collapse( $root );

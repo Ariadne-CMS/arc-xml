@@ -17,7 +17,6 @@
 		var $incorrectXML = "<?xml standalone=\"false\"><rss></rss>";
 		var $namespacedXML = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n<testroot xmlns:foo=\"http://www.example.com/\">\n<foo:bar>something</foo:bar><bar>something else</bar><bar foo:attr=\"an attribute\">something else again</bar>\n</testroot>";
 	
-
 		function testXMLNode() {
 			$preamble = \arc\xml::preamble();
 			$cdata = \arc\xml::cdata('Some " value');
@@ -33,6 +32,7 @@
 			$this->assertEqual( (string) $comment, '<!-- Another comment -->' );
 		}
 
+/*
 		function testXMLElement() {
 			$el = \arc\xml::el( 'name', array( 'title' => 'a title' ) );
 			$this->assertEqual( (string) $el, '<name title="a title"></name>' ); //asXML doesn't use immediate close tag
@@ -127,6 +127,6 @@
 			$this->assertTrue( count( $allbars ) == 5 );
 			$this->assertTrue( $bars[1]->tagName == 'foo:bar' );
 		}
-
+*/
 		
 	}
