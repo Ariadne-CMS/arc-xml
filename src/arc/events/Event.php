@@ -12,28 +12,28 @@
 	namespace arc\events;
 
 	/**
-		The event object that is passed to each listener. May contain extra information in the 'data' property.
+	*	The event object that is passed to each listener. May contain extra information in the 'data' property.
 	*/
-	class Event {
+	final class Event {
 		/**
-			May contain extra information for the event listeners, may be any type.
+		*	May contain extra information for the event listeners, may be any type.
 		*/
 		public $data = null;
 
 		/**
-			The name of the event. Can be accessed through __get() but not changed.
+		*	The name of the event. Can be accessed through __get() but not changed.
 		*/
-		protected $name = '';
+		private $name = '';
 
 		/**
-			If set to true will make fire() return false. Cannot be changed once set to true 
-			but can be read through __get().
+		*	If set to true will make fire() return false. Cannot be changed once set to true 
+		*	but can be read through __get().
 		*/
-		protected $preventDefault = false;
+		private $preventDefault = false;
 
 		/**
-			@param string $name The name of the event fired.
-			@param mixed $data Optional. Extra information for this event.
+		*	@param string $name The name of the event fired.
+		*	@param mixed $data Optional. Extra information for this event.
 		*/
 		public function __construct( $name, $data = null ) {
 			$this->name = $name;
@@ -41,8 +41,8 @@
 		}
 
 		/**
-			Sets the flag which will make \arc\events::fire() return false. Once set it cannot be unset.
-			@returns false
+		*	Sets the flag which will make \arc\events::fire() return false. Once set it cannot be unset.
+		*	@returns false
 		*/
 		public function preventDefault() {
 			$this->preventDefault = true;

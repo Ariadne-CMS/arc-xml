@@ -11,6 +11,14 @@
 
 	namespace arc\events;
 
-	interface EventStackInterface {
+	interface EventsTreeInterface {
+
+		public function listen( $eventName );
+
+		public function capture( $eventName );
+
+		public function fire( $eventName, $eventData = array() );
+
+		public function cd( $path );
 
 	}

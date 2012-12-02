@@ -26,18 +26,22 @@
 	 */
 	class events extends Pluggable {
 
-		protected static $stack;
+		protected static $eventsTree;
 
 		/**
 		 *	Factory method for the static stack. Returns the shared stack only. Use new \arc\events\Stack 
 		 *	or your own factory method to create a seperate Stack instance.
 		 */
-		public static function getStack() {
-			if ( !self::$stack ) {
-				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
-				self::$stack = new events\EventStack( $context );
+		public static function getEventsTree() {
+			if ( !self::$eventsTree ) {
+				if ( class_exists( '\arc\context' ) ) {
+					$path = \arc\context::getContextStack()['arc.path'];
+				} else {
+					$path = '/';
+				}
+				self::$eventsTree = new events\EventsTree( \arc\tree::expand()->cd( $path ) );
 			}
-			return self::$stack;
+			return self::$eventsTree;
 		}
 
 		/**
@@ -45,7 +49,7 @@
  		 *
 		 *	Usage:
 		 *		\arc\events::listen( 'onsave' )->call( function( $event ) { 
-		 *			$path = $event->data['path'];
+		 *			$path = $event->data['arc.path'];
 		 *			if ( $path == '/foo/bar/' ) {
 		 *				$event->preventDefault();
 		 *				return false; // cancel all other listeners
@@ -56,7 +60,7 @@
 		 *	@return IncompleteListener 
 		 */
 		public static function listen( $eventName ) {
-			return self::getStack()->listen( $eventName );
+			return self::getEventsTree()->listen( $eventName );
 		}
 
 		/**
@@ -67,7 +71,7 @@
 		 *	@return IncompleteListener 
 		 */
 		public static function capture( $eventName ) {
-			return self::getStack()->capture( $eventName );
+			return self::getEventsTree()->capture( $eventName );
 		}
 
 		/**
@@ -75,9 +79,8 @@
 		 *	will return false, otherwise the - potentially changed - eventData will be returned.
 		 *
 		 *	Usage:
-		 *		$eventData = \arc\events::fire( 'onbeforesave', array( 'path' => '/foo/bar/' ) );
+		 *		$eventData = \arc\events::fire( 'onbeforesave', array( 'your' => 'data' ) );
 		 *		if ( $eventData ) {
-		 *			$path = $eventData['path'];
 		 *			// now save it
 		 *		}
 		 *
@@ -86,7 +89,7 @@
 		 *	@return false or $eventData - which may have been modified
 		 */
 		public static function fire( $eventName, $eventData = array() ) {
-			return self::getStack()->fire( $eventName, $eventData );
+			return self::getEventsTree()->fire( $eventName, $eventData );
 		}
 
 		/**
@@ -95,7 +98,7 @@
 		 *	@return IncompleteListener
 		 */
 		public static function cd( $path ) {
-			return self::getStack()->cd( $path );
+			return self::getEventsTree()->cd( $path );
 		}
 
 	}

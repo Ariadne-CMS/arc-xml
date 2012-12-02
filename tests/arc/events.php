@@ -13,27 +13,6 @@
 	 
 	class TestEvents extends UnitTestCase {
 
-		function testContextLess() {
-			// create stack without \arc\context dependency injected
-			$stack = new \arc\events\EventStack();
-			$listener = $stack->listen( 'testEvent' )->call( function($event) {
-				$event->data['seen'] = true;
-			} );
-			$result = $stack->fire( 'testEvent', array( 'seen' => false ) );
-			if ( $result ) {
-				$this->assertTrue( $result['seen'] );
-			} else {
-				$this->assertTrue( false ); // means event->preventDefault was triggered somehow
-			}
-			// now test if an event with no listener attached doesn't trigger the testEvent listener
-			$result = $stack->fire( 'someOtherEvent', array( 'seen' => false ) );
-			if ( $result ) {
-				$this->assertFalse( $result['seen'] );
-			} else {
-				$this->assertTrue( false );
-			}
-		}
-
 		function testFireListenRemove() {
 			// test default event stack, with \arc\context
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
