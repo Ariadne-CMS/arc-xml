@@ -11,134 +11,41 @@
 
 	namespace arc\config;
 
-	class Configuration implements \arc\KeyValueStoreInterface, ConfigurationInterface {
-
-		protected $contextStack = null;
-		protected $configuration = array();
-
-		public function __construct( $contextStack = null ) {
-			$this->contextStack = $contextStack;
+	class Configuration implements ConfigurationInterface, \arc\KeyValueStoreInterface {
+	
+		private $tree = null;
+		
+		public function __construct( $tree) {
+			$this->tree = $tree;
 		}
-
-		protected function getPath( $path ) {
-			return \arc\path::collapse( $path, $this->contextStack ? $this->contextStack['arc.path'] : '/' );
-		}
-
-		protected function getFilledPath( $path, $name = '' ) {
-			if ( $path == '/' ) {
-				return $path;
-			}
-			$parent = $path;
-			do {
-				$path = $parent;
-				$config = $this->configuration[$path];
-				$parent = \arc\path::parent( $path );
-			} while ( !isset( $config ) && $parent );
-			if ( !isset($config) ) {
-				return null;
-			}
-			return $path;
-		}
-
-		protected function getValue( $config, $name ) {
-			$vars = explode('.', $name);
-			foreach( $vars as $var ) {
-				if ( !isset( $config[$var] ) ) {
-					return null;
+		
+		public function acquire( $name ) {
+			return $this->tree->dive(
+				function( $node ) use ( $name ){
+					return $this->getValueIfRoot( $name, $node->nodeValue );
+				},
+				function( $node, $result ) use ( $name ) {
+					return $this->mergeValue( $result, $this->getValue( $name, $node->nodeValue ) );
 				}
-				$config = $config[$var];
-			}
-			return $config;
+			);
 		}
 
-		// ConfigurationInterface
-		public function acquire( $name, $path = null, $root = '/' ) {
-			$path = $this->getPath( $path );
-			$parents = \arc\path::parents( $path, $root );
-			$parents = array_reverse( $parents );
-			$result = null;
-			foreach ( $parents as $parent ) {
-				if ( isset( $this->configuration[$parent] ) ) {
-					$value = $this->getValue( $this->configuration[$parent], $name );
-					if ( isset( $value ) ) {
-						if ( is_array( $value ) ) {
-							$result = array_replace_recursive( $value, (array) $result );
-						} else {
-							return $value;
-						}
-					}
-				}
+		public function configure( $name, $value ) {
+			if ( !isset( $this->tree->nodeValue ) ) {
+				$this->tree->nodeValue = array();
 			}
-			return $result;
+			$this->setValue( $name, $value, $this->tree->nodeValue );
+			return $this;
 		}
-
-		public function configure( $name, $value, $path = null ) {
-			$path = $this->getPath( $path );
-			$config = &$this->configuration[$path];
-			if ( !isset( $config ) ) {
-				$this->configuration[$path] = $config = array();
-			}
-			$vars = explode('.', $name);
-			foreach( $vars as $var ) {
-				if ( !isset( $config[$var] ) ) {
-					$config[$var] = array();
-				}
-				$config = &$config[$var];
-			}
-			$config = $value;
-		}
-
+		
 		public function cd( $path ) {
-			return new ConfigurationPath( $this, $path );
+			return new Configuration( $this->tree->cd( $path ) );
 		}
-
-		public function root( $root ) {
-			$root = \arc\path::collapse( $root );
-			return new ConfigurationPath( $this, $path, $root );	
-		}
-
-		public function ls( $path = null ) {
-			$path = $this->getPath( $path );
-			$parents = \arc\path::parents( $path, $root );
-			$parents = array_reverse( $parents );
-			$result = array();
-			foreach ( $parents as $parent ) {
-				if ( isset( $this->configuration[$parent] ) ) {
-					$result = array_replace_recursive( $this->configuration[$parent], $result );
-				}
-			}
-			return $result;
-			/*$path = $this->getPath( $path );
-			return $this->configuration[$path];*/
-		}
-
-		public function getConfiguredValue( $name, $path = null ) {
-			$path = $this->getPath( $path );
-			$value = null;
-			if ( isset( $this->configuration[$path] ) ) {
-				$value = $this->getValue( $this->configuration[$path], $name );
-			}
-			return $value; 
-		}
-
-		public function getConfiguredValues( $path = null ) {
-			$path = $this->getPath( $path );
-			return $this->configuration[$path];
-		}
-
-		public function getConfiguredPath( $name, $path = null, $root = '/' ) {
-			$path = $this->getPath( $path );
-			$parents = \arc\path::parents( $path, $root );
-			$parents = array_reverse( $parents );
-			$result = array();
-			foreach ( $parents as $parent ) {
-				if ( isset( $this->configuration[$parent] ) ) {
-					$value = $this->getValue( $this->configuration[$parent], $name );
-					if ( isset( $value ) ) {
-						return $parent;
-					}
-				}
-			}
+	
+		public function ls() {
+			return $this->tree->ls( function( $node ) {
+				return new Configuration( $node );
+			} );
 		}
 
 		// \arc\KeyValueStoreInterface
@@ -149,4 +56,59 @@
 		public function putVar( $name, $value ) {
 			return $this->configure( $name, $value );
 		}
+
+		private function getValue( $name, $config ) {
+			$vars = explode('.', $name);
+			$entry = $config;
+			foreach( $vars as $var ) {
+				if ( !isset( $entry[$var] ) ) {
+					return null;
+				}
+				$entry = $entry[$var];
+			}
+			return $entry;
+		}
+
+		private function setValue( $name, $value, &$config ) {
+			$vars = explode('.', $name);
+			$lastName = array_pop( $vars );
+			$entry = &$config;
+			foreach( $vars as $var ) {
+				if ( !isset( $entry[$var] ) ) {
+					$entry[$var] = array();
+				}
+				$entry = &$entry[$var];
+			}
+			if ( !is_array( $entry ) ) {
+				throw \arc\ExceptionDefault( 'Unable to configure '.$name.', parent set to non-array value', \arc\exceptions::FIXME );
+			} else {
+				$entry[ $lastName ] = $value;
+			}
+		}
+
+		private function getValueIfRoot( $name, $config ) {
+			$value = $this->getValue( $name, $config );
+			if ( !$this->isHash( $value ) ) {
+				return $value;
+			}
+		}
+
+		private function isHash( $array ) {
+			return ( is_array( $array ) && !is_numeric( key( $array ) ) );
+		}
+		
+		private function mergeValue( $initial, $additional ) {
+			if ( isset( $additional ) ) {
+				if ( !$this->isHash( $initial ) ) {
+					return $additional;
+				} else if ( $this->isHash( $additional ) ) {
+					return array_replace_recursive( $initial, $additional );
+				} else {
+					return $additional;
+				}
+			}
+			return $initial;
+		}
+			
 	}
+?>

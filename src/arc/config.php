@@ -22,7 +22,12 @@
 		public static function getConfiguration() {
 			if ( !self::$configuration ) {
 				$context = class_exists( '\arc\context' ) ? context::getStack() : null;
-				self::$configuration = new config\Configuration( $context );
+				if ( isset($context) ) {
+					$path = $context['arc.path'];
+				} else {
+					$path = '/';
+				}
+				self::$configuration = new config\Configuration( \arc\tree::expand()->cd( $path ) );
 			}
 			return self::$configuration;
 		}

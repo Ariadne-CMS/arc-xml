@@ -14,10 +14,10 @@
 	class TestConfig extends UnitTestCase {
 
 		function testContextLessConfigureAcquire() {
-			$config = new \arc\config\Configuration();
+			$config = \arc\config::getConfiguration();
 			$config->configure('a.b', true);
 			$result = $config->acquire('a.b');
-			$this->assertTrue( $result );
+			$this->assertTrue( $result === true );
 		}
 
 		function testConfigureAcquireByPath() {
@@ -40,10 +40,5 @@
 			$this->assertTrue( $result['c'] == 'test' );
 		}
 
-		function testAcquireRoot() {
-			\arc\config::cd('/')->configure('a.d', 'missing');
-			$result = \arc\config::cd('/test/child/')->root('/test/')->acquire('a');
-			$this->assertFalse( isset($result['d']) );
-		}
 
 	}
