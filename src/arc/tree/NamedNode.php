@@ -155,7 +155,8 @@
 		/**
 		 */
 		public function getPath( $root = null ) {
-			return $this->parents( 
+			return \arc\tree::parents(
+				$this, 
 				function( $node, $result ) {
 					return $result . $node->nodeName . '/';
 				}
@@ -164,7 +165,8 @@
 
 
 		public function getRootNode() {
-			$result = $this->dive(
+			$result = \arc\tree::dive(
+				$this,
 				function( $node ) {
 					return isset( $node->parentNode ) ? null : $node;
 				}
@@ -205,7 +207,6 @@
 			return $result;
 		}
 
-
 		/**
 		 *  Calls a callback method on each child of this node, returns an array with name => result pairs.
 		 *  The callback method must accept two parameters, the name of the child and the child node itself.
@@ -213,94 +214,7 @@
 		 *  @return array An array of result values with the name of each child as key.
 		 */
 		public function ls( $callback ) {
-			$result = array();
-			foreach( $this->childNodes as $child ) {
-				$result[ $child->nodeName ] = call_user_func( $callback, $child );
-			}
-			return $result;
-		}
-
-		public function sort( $callback ) {
-			$this->map( function( $node ) {
-				$this->childNodes->uasort( $callback );
-			} );
-		}
-		
-		/**
-		 * Calls the first callback method on each successive parent untill a non-null value is returned. Then
-		 * calls all the parents from that point back to this node with the second callback in reverse order.
-		 * The first callback (dive) must accept two parameters, the name of each child and the child node itself.
-		 * The second callback (rise) must accept threee parameters, the name of each child, the child node and the result upto then.
-		 * @param callable $diveCallback The callback for the dive phase.
-		 * @param callable $riseCallback The callback for the rise phase.
-		 * @return mixed
-		 */
-		public function dive( $diveCallback = null, $riseCallback = null ) {
-			$result = null;
-			if ( is_callable( $diveCallback ) ) {
-				$result = call_user_func( $diveCallback, $this );
-			}
-			if ( !isset( $result ) && $this->parentNode ) {
-				$result = $this->parentNode->dive( $diveCallback, $riseCallback );
-			}
-			if ( is_callable( $riseCallback ) ) {
-				return call_user_func( $riseCallback, $this, $result );
-			} else {
-				return $result;
-			}
-		}
-
-		/**
-		*/
-		public function parents( $callback = null ) {
-			if ( !isset( $callback ) ) {
-				$callback = function( $node, $result ) {
-					return ( (array) $result ) + array( $node );
-				};
-			}
-			return $this->dive(	null, $callback );
-		}
-		
-		/**
-		 * depth first search in the tree structure.
-		 */
-		public function walk( $callback ) {
-			$result = call_user_func( $callback, $this );
-			if ( isset( $result ) ) {
-				return $result;
-			}
-			foreach( $this->childNodes as $child ) {
-				$result = $child->walk( $callback );
-				if ( isset( $result ) ) {
-					return $result;
-				}
-			}
-			return null;	
-		}
-
-		/**
-		 */
-		public function map( $callback, $root = '' ) {
-			$result = array();
-			$path = $root . $this->nodeName . '/';
-			$callbackResult = call_user_func( $callback, $this );
-			if ( isset($callbackResult) ) {
-				$result[ $path ] = $callbackResult;
-			}
-			foreach ( $this->childNodes as $child ) {
-				$result += $child->map( $callback, $path );
-			}
-			return $result;
-		}
-
-		/**
-		 */
-		public function reduce( $callback, $initial = null ) {
-			$result = call_user_func( $callback, $initial, $child );
-			foreach ( $this->childNodes as $child ) {
-				$result = $child->reduce( $callback, $result );
-			}
-			return $result;
+			return \arc\tree::ls( $this, $callback );
 		}
 
  	}

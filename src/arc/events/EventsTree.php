@@ -120,7 +120,8 @@
 					}
 				}					
 			};
-			$result = $this->tree->parents( 
+			$result = \arc\tree::parents( 
+				$this->tree,
 				function( $node, $result ) use ( $callListeners, $event ) {
 					if ( $result !== false && isset( $node->nodeValue['capture.'.$event->name] ) ) {
 						return call_user_func($callListeners, $node->nodeValue['capture.'.$event->name] );
@@ -128,7 +129,8 @@
 				}
 			);
 			if ( !isset( $result ) ) {
-				$result = $this->tree->dive(
+				$result = \arc\tree::dive(
+					$this->tree,
 					function( $node ) use ( $callListeners, $event ) {
 						if ( isset( $node->nodeValue['listen.'.$event->name] ) ) {
 							return call_user_func($callListeners, $node->nodeValue['listen.'.$event->name ] );

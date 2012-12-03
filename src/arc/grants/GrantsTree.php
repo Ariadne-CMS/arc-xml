@@ -69,7 +69,8 @@
 		private function fetchGrants() {
 			$user = $this->user;
 			$groups = array_fill_keys( $this->groups, 1 );
-			$grants = (string) $this->tree->dive( 
+			$grants = (string) \arc\tree::dive( 
+				$this->tree, 
 				function( $node ) use ( $user ) {
 					if ( isset( $node->nodeValue['user.'.$user] ) ) {
 						return $node->nodeValue['user.'.$user];

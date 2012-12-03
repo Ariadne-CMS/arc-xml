@@ -20,7 +20,8 @@
 		}
 		
 		public function acquire( $name ) {
-			return $this->tree->dive(
+			return \arc\tree::Dive( 
+				$this->tree,
 				function( $node ) use ( $name ){
 					return $this->getValueIfRoot( $name, $node->nodeValue );
 				},
