@@ -82,9 +82,8 @@
 		}
 
 		private function importUrlComponents( $components, $validComponents ) {
-			$self = $this;
-			array_walk( $validComponents, function( $componentName ) use ( $components, $self ) {
-				$self->{$componentName} = ( isset( $components[$componentName] ) ? $components[$componentName] : '' );
+			array_walk( $validComponents, function( $componentName ) use ( $components ) {
+				$this->{$componentName} = ( isset( $components[$componentName] ) ? $components[$componentName] : '' );
 			} );
 		}
 
