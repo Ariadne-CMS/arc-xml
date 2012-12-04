@@ -13,7 +13,7 @@
 
 	/**
 	 *	@requires \arc\path;
-	 * 	@requires \arc\config;
+	 * 	@requires \arc\tree;
 	 *	@suggests \arc\context;
 	 */
 

@@ -21,9 +21,7 @@
 			);
 
 			$expandedTree = \arc\tree::expand( $collapsedTree );
-			//var_dump($expandedTree);
 			$recollapsedTree = \arc\tree::collapse( $expandedTree );
-			//var_dump($recollapsedTree);
 			$this->assertTrue( $collapsedTree == $recollapsedTree );
 			//not a requirement: $this->assertFalse( $collapsedTree === $recollapsedTree );
 		}
@@ -70,7 +68,7 @@
 				'/bar/test/' => 'another test'
 			);
 			$tree = \arc\tree::expand($collapsed);
-			$bar = $tree->childNodes['bar'];
+			$bar = $tree->cd('bar'); //childNodes['bar'];
 			$this->assertTrue( $bar->cd('/foo/test/') == 'a test' );
 		}
 

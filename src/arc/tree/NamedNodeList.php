@@ -11,7 +11,12 @@
 	 
 	namespace arc\tree;
 
-	class NamedNodelist extends \ArrayObject {
+    /**
+     * Implements an ArrayObject with constraint that a value is always a NamedNode and its key is always the name
+     * of that node
+     * @property \arc\tree\NamedNode $parentNode
+     */
+    class NamedNodelist extends \ArrayObject {
 
 		private $parentNode = null;
 

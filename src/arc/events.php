@@ -22,6 +22,7 @@
 	 *	to by changing the 'path' entry in the context stack.
 	 *
 	 *	@requires \arc\path
+     *  @requires \arc\tree
 	 *	@suggests \arc\context
 	 */
 	class events extends Pluggable {

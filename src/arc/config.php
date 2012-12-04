@@ -12,8 +12,9 @@
 	namespace arc;
 
 	/**
-	 *	@requires \arc\path
-	 *	@suggests \arc\context
+	 * @requires \arc\path
+     * @requires \arc\tree
+	 * @suggests \arc\context
 	*/
 	class config extends Pluggable {
 

@@ -11,6 +11,12 @@
 	 
 	namespace arc\tree;
 
+    /**
+     * Implements a tree node which has uniquely named child nodes, as in a filesystem.
+     * @property \arc\tree\NamedNodeList $childNodes
+     * @property \arc\tree\NamedNode $parentNode
+     * @property string $nodeName
+     */
 	class NamedNode implements \Serializable {
 
 		public $nodeValue = null;
@@ -153,8 +159,10 @@
 		}
 
 		/**
+         * Returns the absolute path of the node.
+         * @return string the absolute path of the node
 		 */
-		public function getPath( $root = null ) {
+		public function getPath() {
 			return \arc\tree::parents(
 				$this, 
 				function( $node, $result ) {
@@ -163,8 +171,11 @@
 			);
 		}
 
-
-		public function getRootNode() {
+        /**
+         * Returns the root node object of this tree.
+         * @return \arc\tree\Node the root node
+         */
+        public function getRootNode() {
 			$result = \arc\tree::dive(
 				$this,
 				function( $node ) {
@@ -178,7 +189,7 @@
 		 *	Returns the node with the given path, relative to this node. If the path
 		 *  does not exist, missing nodes will be created automatically.
 		 *	@param string $path The path to change to
-		 *	@return \arc\tree\Node The target node corresponding with the given path.
+		 *	@return \arc\tree\NamedNode The target node corresponding with the given path.
 		 */
 		public function cd( $path ) {
 			if ( \arc\path::isAbsolute( $path ) ) {
@@ -217,4 +228,4 @@
 			return \arc\tree::ls( $this, $callback );
 		}
 
- 	}
+    }
