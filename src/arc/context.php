@@ -11,7 +11,7 @@
 
 	namespace arc;
 
-	class context extends Pluggable {
+	class context {
 
 		protected static $contextStack = null;
 

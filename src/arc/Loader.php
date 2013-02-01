@@ -15,7 +15,7 @@
 
 	namespace arc;
 
-	abstract class Loader extends Pluggable {
+	abstract class Loader {
 
 		protected static function _parseClassName( $className ) {
 			$fileName = preg_replace( '/[^a-z0-9_\.\\\\\/]/i', '', $className );
@@ -35,10 +35,7 @@
 		}
 
 		public static function autoload( $className ) {
-			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
+			throw new \arc\ExceptionMethodNotFound('Method autoload Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
 		}
 
-		public static function getPluginMethod( $namespace, $methodName ) {
-			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
-		}
 	}
