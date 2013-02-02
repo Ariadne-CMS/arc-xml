@@ -13,10 +13,31 @@
 	 
 	class TestTemplate extends UnitTestCase {
 
-		function testTemplate() {
+		function testSimpleSubstitution() {
 			$template = 'Hello {{someone}}';
 			$args = [ 'someone' => 'World!' ];
 			$parsed = \arc\template::parse( $template, $args );
-			$this->assertTrue( $parsed, 'Hello World!' );
+			$this->assertTrue( $parsed === 'Hello World!' );
+		}
+
+		function testFunctionSubstitution() {
+			$template = 'Hello {{someone}}';
+			$args = [ 'someone' => function() { return 'World!'; } ];
+			$parsed = \arc\template::parse( $template, $args );
+			$this->assertTrue( $parsed === 'Hello World!' );
+		}
+
+		function testPartialSubstitution() {
+			$template = 'Hello {{someone}} from {{somewhere}}';
+			$args = [ 'someone' => 'World!' ];
+			$parsed = \arc\template::parse( $template, $args );
+			$this->assertTrue( $parsed === 'Hello World! from {{somewhere}}' );
+		}
+
+		function testClean() {
+			$template = 'Hello {{someone}} from {{somewhere}}';
+			$args = [ 'someone' => 'World!' ];
+			$parsed = \arc\template::clean( \arc\template::parse( $template, $args ) );
+			$this->assertTrue( $parsed === 'Hello World! from ' );			
 		}
 	}

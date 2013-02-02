@@ -18,7 +18,7 @@ class template {
 			$arguments = get_object_vars( $arguments );
 		}
 		$regex = '\{\{(' . join( array_keys( (array) $arguments ), '|' ) . ')\}\}';
-		return preg_replace_callback( '/'.$regex.'/g', function( $matches ) use ( $arguments ) {
+		return preg_replace_callback( '/'.$regex.'/', function( $matches ) use ( $arguments ) {
 			$argument = $arguments[ $matches[1] ];
 			if ( is_callable( $argument ) ) {
 				$argument = call_user_func( $argument );
@@ -28,6 +28,6 @@ class template {
 	}
 	
 	public static function clean( $template ) {
-		return preg_replace('/\{\{.*\}\}/g', '', $template );
+		return preg_replace('/\{\{.*\}\}/', '', $template );
 	}
 }
