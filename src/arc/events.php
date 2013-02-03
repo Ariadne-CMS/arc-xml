@@ -23,26 +23,20 @@
 	 *
 	 *	@requires \arc\path
      *  @requires \arc\tree
-	 *	@suggests \arc\context
+	 *	@requires \arc\context
 	 */
-	class events extends Pluggable {
-
-		protected static $eventsTree;
+	class events {
 
 		/**
 		 *	Factory method for the static stack. Returns the shared stack only. Use new \arc\events\Stack 
 		 *	or your own factory method to create a seperate Stack instance.
 		 */
 		public static function getEventsTree() {
-			if ( !self::$eventsTree ) {
-				if ( class_exists( '\arc\context' ) ) {
-					$path = \arc\context::getContextStack()['arc.path'];
-				} else {
-					$path = '/';
-				}
-				self::$eventsTree = new events\EventsTree( \arc\tree::expand()->cd( $path ) );
+			$context = \arc\context::top();
+			if ( !$context->arcEvents ) {
+				$context->arcEvents = new events\EventsTree( \arc\tree::expand() );
 			}
-			return self::$eventsTree;
+			return $context->arcEvents->cd( $context->arcPath );
 		}
 
 		/**

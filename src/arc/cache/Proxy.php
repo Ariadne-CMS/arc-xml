@@ -96,7 +96,6 @@
 			return $result;
 		}
 
-
 		public function __set( $name, $value ) {
 			$this->targetObject->{$name} = $value;
 		}

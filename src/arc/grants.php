@@ -14,27 +14,23 @@
 	/**
 	 *	@requires \arc\path;
 	 * 	@requires \arc\tree;
-	 *	@suggests \arc\context;
+	 *	@requires \arc\context;
 	 */
 
-	class grants extends Pluggable {
-
-		protected static $grantsTree = null;
+	class grants {
 
 		public static function getGrantsTree() {
-			if ( !isset( self::$grantsTree ) ) {
-				if ( class_exists( '\arc\context' ) ) {
-					$user = \arc\context::getvar('arc.user');
-					$groups = \arc\context::getvar('arc.groups');
-					$path = \arc\context::getvar('arc.path');
-				} else {
-					$user = 'public';
-					$groups = array( 'public' );
-					$path = '/';
-				}
-				self::$grantsTree = new grants\GrantsTree( \arc\tree::expand()->cd( $path ), $user, $groups );
+			$context = \arc\context::$context;
+			if ( !$context->arcUser ) {
+				$context->arcUser = 'public';
 			}
-			return self::$grantsTree;
+			if ( !$context->arcGroups ) {
+				$context->arcGroups  = [ 'public' ];
+			}
+			if ( !$context->arcGrants ) {
+				$context->arcGrants = new grants\GrantsTree( \arc\tree::expand(), $context->arcUser, $context->arcGroups );
+			}
+			return $context->arcGrants->cd( $context->arcPath );
 		}
 
 		public static function check( $grant ) {

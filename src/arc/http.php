@@ -11,29 +11,7 @@
 
 	namespace arc;
 
-	class http extends Pluggable {
-
-		public static $tainting = true;
-
-		public static function getvar( $name = null, $method = null) {
-			$result = null;
-			switch($method) {
-				case 'GET' :
-				case 'POST' :
-				case 'COOKIE' :
-				case 'SERVER' :
-					$result = isset($name) ? ${'_'.$method}[$name] : ${'_'.$method};
-				break;
-				default :
-					$result = !isset($name) ? $_REQUEST :
-						( isset($_POST[$name]) ? $_POST[$name] : $_GET[$name] );
-				break;
-			}
-			if ( self::$tainting && class_exists( '\arc\tainting' ) ) {
-				$result = \arc\tainting::taint( $result );
-			}
-			return $result;
-		}
+	class http {
 
 		public static function request( $method = null, $url = null, $postdata = null, $options = array() ) {
 			$client = new http\ClientStream();
@@ -44,20 +22,20 @@
 			return new http\ClientStream( $options );
 		}
 
-		public static function configure( $option, $value ) {
-			switch ( $option ) {
-				case 'tainting' :
-					self::$tainting = $value;
-				break;
-			}
-		}
-
 		public static function get( $url, $request = null, $options = array() ) {
 			return self::request( 'GET', $url, $request, $options);
 		}
 
 		public static function post( $url, $request = null, $options = array() ) {
 			return self::request( 'POST', $url, $request, $options);
+		}
+
+		public static function put( $url, $request = null, $options = array() ) {
+			return self::request( 'PUT', $url, $request, $options);
+		}
+
+		public static function delete( $url, $request = null, $options = array() ) {
+			return self::request( 'DELETE', $url, $request, $options);
 		}
 
 	}

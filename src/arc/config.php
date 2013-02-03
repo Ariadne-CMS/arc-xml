@@ -14,23 +14,16 @@
 	/**
 	 * @requires \arc\path
      * @requires \arc\tree
-	 * @suggests \arc\context
+	 * @requires \arc\context
 	*/
-	class config extends Pluggable {
-
-		protected static $configuration = null;
+	class config {
 
 		public static function getConfiguration() {
-			if ( !self::$configuration ) {
-				$context = class_exists( '\arc\context' ) ? context::getContextStack() : null;
-				if ( isset($context) ) {
-					$path = $context['arc.path'];
-				} else {
-					$path = '/';
-				}
-				self::$configuration = new config\Configuration( \arc\tree::expand()->cd( $path ) );
+			$context = \arc\context::$context;
+			if ( !$context->arcConfig ) {
+				$context->arcConfig = new config\Configuration( \arc\tree::expand() );
 			}
-			return self::$configuration;
+			return $context->arcConfig->cd( $context->arcPath );
 		}
 
 		public static function acquire( $name, $path = null, $root = '/' ) {

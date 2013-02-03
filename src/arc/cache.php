@@ -12,13 +12,11 @@
 
 	/**
 	 *	@requires \arc\path
-	 *	@suggests \arc\context
+	 *	@requires \arc\context
 	 */
 
-	class cache extends Pluggable {
+	class cache {
 
-		static $cacheStore = null;
-		
 		public static function create( $prefix = null, $timeout = 7200, $context = null ) {
 			if ( !defined("ARC_CACHE_DIR") ) {
 				define( "ARC_CACHE_DIR", sys_get_temp_dir().'/arc/cache' );
@@ -38,25 +36,21 @@
 			if ( !$prefix ) { // make sure you have a default prefix, so you won't clear other prefixes unintended
 				$prefix = 'default';
 			}
-			if ( !isset( $context ) && class_exists( '\arc\context' ) ) {
-				$context = context::getContextStack();
-				$path = $context['arc.path'];
-			} else {
-				$path = '/';
-			}
-			$fileStore = new cache\FileStore( ARC_CACHE_DIR . '/' . $prefix, $path );
+			$context = \arc\context::$context;
+			$fileStore = new cache\FileStore( ARC_CACHE_DIR . '/' . $prefix, $contect->arcPath );
 			return new cache\Store( $fileStore, $context, $timeout );
 		}
 
-		public static function getStore() {
-			if ( !self::$cacheStore ) {
-				self::$cacheStore = self::create();
+		public static function getCacheStore() {
+			$context = \arc\context::$context;
+			if ( !$context->arcCacheStore ) {
+				$context->arcCacheStore = self::create();
 			}
-			return self::$cacheStore;
+			return $context->arcCacheStore;
 		}
 
 		public static function __callStatic( $name, $args ) {
-			$store = self::getStore();
+			$store = self::getCacheStore();
 			if ( method_exists( $store, $name ) ) {
 				return call_user_func_array( array( $store, $name), $args);
 			} else {
@@ -65,7 +59,7 @@
 		}
 		
 		public static function proxy( $object, $timeout = 7200 ) {
-			return new cache\Proxy( $object, self::getStore(), $timeout );
+			return new cache\Proxy( $object, self::getCacheStore(), $timeout );
 		}
 
 	}

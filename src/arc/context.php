@@ -11,39 +11,29 @@
 
 	namespace arc;
 
-	class context extends Pluggable {
+	/*
+	* @requires \arc\mortar
+	*/
+	class context {
 
-		protected static $contextStack = null;
-
-		public static function getContextStack() {
-			if ( !self::$contextStack ) {
-				self::$contextStack = new context\ContextStack();
-			}
-			return self::$contextStack;
-		}
+		public static $context = new mortar\Prototype([
+			'arcPath' => '/'
+		]);
 
 		public static function push( $params ) {
-			return self::getContextStack()->push( $params );
-		}
-
-		public static function top() {
-			return self::getContextStack()->top();
+			self::$context = self::$context->extend( $params );
 		}
 
 		public static function pop() {
-			return self::getContextStack()->pop();
+			self::$context = self::$context->prototype;
 		}
 
 		public static function peek( $level = 0 ) {
-			return self::getContextStack()->peek( $level );
-		}
-
-		public static function putVar( $name, $value ) {
-			self::getContextStack()->putVar( $name, $value );
-		}
-
-		public static function getVar( $name ) {
-			return self::getContextStack()->getVar( $name );
+			$context = self::$context;
+			for ( $i=$level; $i>=0; $i-- ) {
+				$context = $context->prototype;
+			}
+			return $context;
 		}
 
 	}
