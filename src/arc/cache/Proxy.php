@@ -18,6 +18,10 @@
 	namespace arc\cache;
 
 	class Proxy {
+		use \arc\traits\Proxy {
+			\arc\traits\Proxy::__construct as private ProxyConstruct;	
+		}
+
 		// TODO: allow more control on retrieval:
 		// - get contents from cache even though cache may be stale
 		//   perhaps through an extra option in __construct?
@@ -27,6 +31,7 @@
 		protected $targetObject = null;
 
 		public function __construct( $targetObject, $cacheStore, $cacheTimeout = 7200 ) {
+			ProxyConstruct( $targetObject );
 			$this->targetObject = $targetObject;
 			$this->cacheStore = $cacheStore;
 			if ( is_object( $cacheTimeout ) ) {
@@ -83,7 +88,7 @@
 			echo $cacheData['output'];
 			$result = $cacheData['result'];
 			if ( is_object( $result ) ) { // for fluent interface we want to cache the returned object as well
-				$result = new Proxy( $result, $this->cacheStore->cd( $path ), $this->cacheTimeout );
+				$result = new static( $result, $this->cacheStore->cd( $path ), $this->cacheTimeout );
 			}
 			return $result;
 		}
@@ -91,12 +96,9 @@
 		public function __get( $name ) {
 			$result = $this->targetObject->{$name};
 			if ( is_object( $result ) ) {
-				$result = new Proxy( $result, $this->cacheStore->cd( $name ), $this->cacheTimeout );
+				$result = new static( $result, $this->cacheStore->cd( $name ), $this->cacheTimeout );
 			}
 			return $result;
 		}
 
-		public function __set( $name, $value ) {
-			$this->targetObject->{$name} = $value;
-		}
 	}

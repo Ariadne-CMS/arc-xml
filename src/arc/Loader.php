@@ -35,7 +35,7 @@
 		}
 
 		public static function autoload( $className ) {
-			throw new \arc\ExceptionMethodNotFound('Method hasClass Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
+			throw new \arc\ExceptionMethodNotFound('Method autoload Not Implemented', \arc\exceptions::OBJECT_NOT_FOUND );
 		}
 
 	}
