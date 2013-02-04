@@ -12,11 +12,11 @@
 	namespace arc;
 
 	/*
-	* @requires \arc\mortar
+	* @requires \arc\lambda
 	*/
 	class context {
 
-		public static $context = new mortar\Prototype([
+		public static $context = new lambda\Prototype([
 			'arcPath' => '/'
 		]);
 
