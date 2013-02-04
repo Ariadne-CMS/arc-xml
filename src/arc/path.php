@@ -152,6 +152,40 @@
 			return $parent;
 		}
 
+
+		/**
+		 *  Returns the root entry of the given path. Path must be absolute.
+		 *  
+		 *  Usage:
+		 *    $rootEntry = \arc\path::head( '/root/of/a/path/' ); // => 'root'
+		 *
+		 *  @param string $path The path to get the root entry of.
+		 *  @return string The root entry of the given path, without slashes.
+		 */
+		public static function head( $path ) {
+			return substr( $path, 1, strpos( $path, '/', 1) - 1 );
+		}
+
+		/**
+		 *  Returns the path without its root entry. Path must be absolute.
+		 *  
+		 *  Usage:
+		 *    $remainder = \arc\path::tail( '/root/of/a/path/' ); // => '/of/a/path/'
+		 *  @param string $path The path to get the tail of.
+		 *  @return string The path without its root entry.
+		 */
+		public static function tail( $path ) {
+			return substr( $path, strpos( $path, '/', 1) );
+		}
+
+		/**
+		 *  Returns the relative path that maps from the sourcePath to the targetPath in
+		 *  such a way that if you append the relative path to the source path and collapse
+		 *  that, the result is the targetPath.
+		 *  @param string $targetPath The target path to map to.
+		 *  @param string $sourcePath The source path to start with.
+		 *  @return string The relative path from source to target.
+		 */
 		public static function getRelativePath( $targetPath, $sourcePath ) {
 			$relativePath = '';
 			$commonParent = \arc\path::walk( $sourcePath, function( $path) use ( $targetPath, &$relativePath ) {
@@ -165,10 +199,21 @@
 			return $relativePath;
 		}
 
+		/**
+		 *  Returns true if the path is a child or descendant of the parent.
+		 *  @param string $path The path to check
+		 *  @param string $parent The parent to check.
+		 *  @return bool True if path is a child or descendant of parent
+		 */
 		public static function isChild( $path, $parent ) {
 			return ( strpos( $path, $parent ) === 0 );
 		}
 
+		/**
+		 *  Returns true if the given path starts with a '/'.
+		 * @param string $path The path to check
+		 * @return bool True is the path starts with a '/'
+		 */
 		public static function isAbsolute( $path ) {
 			return $path[0]==='/';
 		}
