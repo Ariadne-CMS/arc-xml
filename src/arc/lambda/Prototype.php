@@ -1,12 +1,12 @@
 <?php
 
-namespace arc\mortar;
+namespace arc\lambda;
 
 /**
  * This class allows you to create throw-away objects with methods and properties. It is meant to be used
  * as a way to create rendering objects for a certain data set. e.g.
  * <code>
- * $view = \arc\mortar::prototype( [
+ * $view = \arc\lambda::prototype( [
  *		'menu' => function( $children ) {
  *			return \arc\html::ul(['class' => 'menu'], array_map( $this->menuitem, (array) $children ) );
  *		},
@@ -33,7 +33,7 @@ class Prototype {
 
 	public function extend( $properties ) {
 		$properties['prototype'] = $this;
-		$descendant = new self($properties);
+		$descendant = new static($properties);
 		return $descendant;
 	}
 
@@ -76,10 +76,6 @@ class Prototype {
 
 			case 'prototype':
 				return $this->prototype;
-			break;
-
-			case 'implementations':
-				return clone $this->implementations;
 			break;
 
 			case 'properties':

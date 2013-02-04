@@ -2,10 +2,10 @@
 
 namespace arc;
 
-class mortar {
+class lambda {
 
 	public static function prototype( $properties ) {
-		return new mortar\Prototype( $properties );
+		return new lambda\Prototype( $properties );
 	}
 
 	/** 
@@ -61,8 +61,8 @@ class mortar {
 	* The first call generates the result. Each subsequent call simply returns that same result. This allows you
 	* to create in-context singletons for any kind of object.
 	* <code>
-	*   $proto = \arc\jazz::prototype([
-	*     'getSingleton' => \arc\jazz::singleton( function() {
+	*   $proto = \arc\lambda::prototype([
+	*     'getSingleton' => \arc\lambda::singleton( function() {
 	*       return new ComplexObject();
 	*     })
 	*   ]);
