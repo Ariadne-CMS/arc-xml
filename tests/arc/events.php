@@ -22,7 +22,7 @@
 				$this->assertTrue( false );
 			}
 
-			$listener = \arc\events::listen( 'testEvent' )->call( function( $event ) {
+			$listener = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->data['seen'] = true;
 			});
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
@@ -43,16 +43,16 @@
 		}
 
 		function testCaptureListenOrder() {
-			$listener1 = \arc\events::listen( 'testEvent')->call( function( $event ) {
+			$listener1 = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->data[] = 'listener1';
 			} );
-			$capturer1 = \arc\events::capture( 'testEvent' )->call( function( $event ) {
+			$capturer1 = \arc\events::capture( 'testEvent', function( $event ) {
 				$event->data[] = 'capturer1';
 			} );
-			$listener2 = \arc\events::listen( 'testEvent')->call( function( $event ) {
+			$listener2 = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->data[] = 'listener2';
 			} );
-			$capturer2 = \arc\events::capture( 'testEvent' )->call( function( $event ) {
+			$capturer2 = \arc\events::capture( 'testEvent', function( $event ) {
 				$event->data[] = 'capturer2';
 			} );
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
@@ -72,7 +72,7 @@
 		}
 
 		function testPathVisibility() {
-			$listener = \arc\events::cd( '/test/' )->listen( 'testEvent' )->call( function($event) {
+			$listener = \arc\events::cd( '/test/' )->listen( 'testEvent', function($event) {
 				$event->data['test'] = '/test/listener';
 			} );
 			$result = \arc\events::fire( 'testEvent', array( 'seen' => false ) );
@@ -100,16 +100,16 @@
 		}
 
 		function testPathOrder() {
-			$listener1 = \arc\events::listen( 'testEvent')->call( function( $event ) {
+			$listener1 = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->data[] = 'listener1';
 			} );
-			$capturer1 = \arc\events::capture( 'testEvent' )->call( function( $event ) {
+			$capturer1 = \arc\events::capture( 'testEvent', function( $event ) {
 				$event->data[] = 'capturer1';
 			} );
-			$listener2 = \arc\events::cd('/test/')->listen( 'testEvent')->call( function( $event ) {
+			$listener2 = \arc\events::cd('/test/')->listen( 'testEvent', function( $event ) {
 				$event->data[] = 'listener2';
 			} );
-			$capturer2 = \arc\events::cd('/test/')->capture( 'testEvent' )->call( function( $event ) {
+			$capturer2 = \arc\events::cd('/test/')->capture( 'testEvent', function( $event ) {
 				$event->data[] = 'capturer2';
 			} );
 			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
@@ -129,10 +129,10 @@
 		}
 
 		function testCancel() {
-			$listener1 = \arc\events::listen( 'testEvent' )->call( function( $event ) {
+			$listener1 = \arc\events::listen( 'testEvent', function( $event ) {
 				return false;
 			} );
-			$listener2 = \arc\events::listen( 'testEvent' )->call( function( $event ) {
+			$listener2 = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->data['seen'] = true;
 			} );
 			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
@@ -142,7 +142,7 @@
 		}
 
 		function testPreventDefault() {
-			$listener = \arc\events::listen( 'testEvent' )->call( function( $event ) {
+			$listener = \arc\events::listen( 'testEvent', function( $event ) {
 				$event->preventDefault();
 			} );
 			$result = \arc\events::cd('/test/')->fire( 'testEvent', array( 'seen' => false ) );
