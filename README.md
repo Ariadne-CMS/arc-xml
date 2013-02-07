@@ -1,14 +1,14 @@
 ARC: Ariadne Component Library 
 ========================= 
 
-A flexible component library for PHP 5.3+ 
+A flexible component library for PHP 5.4+ 
 ----------------------------------------- 
 
 The Ariadne Component Library is a spinoff from the Ariadne Web 
 Application Framework and Content Management System 
 [ http://www.ariadne-cms.org/ ]
 
-The PHP 5.3 version is very much a work in progress. It is by no
+The PHP 5.4 version is very much a work in progress. It is by no
 means complete yet.
 
 It is designed to make it simpler to do many common web application
@@ -24,26 +24,30 @@ It doesn't provide a MVC (Model View Controller) framework or URL
 router, that is left to other frameworks. Instead it provides the 
 following components:
 
-Generic components
+Common abstractions
 ------------------
-- xml: generate, parse and traverse xml, native or through dom methods
-- url: create and parse urls and query arguments
 - path: parse paths, including relative paths, get parents, etc.
+- tree: methods to parse filesystem-like trees and search and alter them
+- hash: methods to ease common tasks with nested hashes
+- url: create and parse urls and query arguments
 - http: simple http requests and generic access to user input
-- tainting: taint variables as unsafe, with automatic filtering
+- xml: xml writer and parser
+- html: html writer and parser
 
 (Web) application building blocks
 ---------------------------------
-- events: dom-like event system
+- events: W3C style event system, with a filesystem tree as the DOM
 - cache: easy caching system, can be used as a proxy for other objects
-- context: a context stack system with automatic inheritance
+- context: a stackable dependency injection container
 - config: a configuration/acquisition component
 - template: a very simple substitution template language
+- lambda: adhoc objects using closures and with prototype support
 
 Connectivity components
 -----------------------
 - atom
 - rss
+
 
 Coming soon
 -----------
@@ -58,12 +62,13 @@ These are already in Ariadne, they just need to be refactored.
 - connect\twitter: twitetr client
 - connect\xmlrpc: easy xmlrpc client
 
+
 TODO
 ----
 - tests and more tests
 - documentation - see [the Wiki pages](https://github.com/Ariadne-CMS/arc/wiki)
   which are far from complete, but you can edit them yourself!
-- Refactor some static variables away - e.g. \arc\http::$tainting
+- make it easier
 
 What makes ARC useful/interesting/unique?
 =========================================
@@ -90,16 +95,14 @@ We did this using the following architectural guidelines:
   ARC is not a framework. It does provice factory methods to ease and
   standardize the use of components.
 - Limit static / global state.
-  Static methods are limited to factory methods. In addition there are
-  some static variables which are optional but make life easier for
-  simple systems.
-- Use Interfaces liberally, define them minimally.
+  Static methods are limited to either pure stateless functions or 
+  factory methods, which get all state information from a stackable 
+  dependency injection container.
+- Define interfaces as documentation only.
   Wherever there are multiple implementations possible, components 
-  define an interface and implement it. Wherever an existing interface
-  can be usefully implemented in a component, do so. But interfaces
-  themselves should contain only the minimal set of methods needed for
-  such a component. It should _never_ define a constructor, since that
-  would break constructor based dependency injection.
+  define an interface that defines the minimum API they need.
+  There are no checks on these Interfaces and they may not be
+  implemented by classes that still provide the required API, because:
 - Duck typing all the way
   PHP is a dynamic language, strict type checking is out the window. 
   So why not go completely in the opposite direction? Don't specify
