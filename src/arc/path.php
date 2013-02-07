@@ -154,27 +154,32 @@
 
 
 		/**
-		 *  Returns the root entry of the given path. Path must be absolute.
+		 *  Returns the root entry of the given path.
 		 *  
 		 *  Usage:
 		 *    $rootEntry = \arc\path::head( '/root/of/a/path/' ); // => 'root'
+		 *    $rootEntry = \arc\path::head( '/a/../b/c/' ); // => 'b'
 		 *
 		 *  @param string $path The path to get the root entry of.
 		 *  @return string The root entry of the given path, without slashes.
 		 */
 		public static function head( $path ) {
+			$path = \arc\path::collapse( $path );
 			return substr( $path, 1, strpos( $path, '/', 1) - 1 );
 		}
 
 		/**
-		 *  Returns the path without its root entry. Path must be absolute.
+		 *  Returns the path without its root entry.
 		 *  
 		 *  Usage:
 		 *    $remainder = \arc\path::tail( '/root/of/a/path/' ); // => '/of/a/path/'
+		 *    $rootEntry = \arc\path::head( '/a/../b/c/' ); // => '/c/'
+		 *
 		 *  @param string $path The path to get the tail of.
 		 *  @return string The path without its root entry.
 		 */
 		public static function tail( $path ) {
+			$path = \arc\path::collapse( $path );
 			return substr( $path, strpos( $path, '/', 1) );
 		}
 
