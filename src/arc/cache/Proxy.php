@@ -31,7 +31,7 @@
 		protected $targetObject = null;
 
 		public function __construct( $targetObject, $cacheStore, $cacheTimeout = 7200 ) {
-			ProxyConstruct( $targetObject );
+			$this->ProxyConstruct( $targetObject );
 			$this->targetObject = $targetObject;
 			$this->cacheStore = $cacheStore;
 			if ( is_object( $cacheTimeout ) ) {
