@@ -163,7 +163,7 @@
 		 *  @return string The root entry of the given path, without slashes.
 		 */
 		public static function head( $path ) {
-			if ( $path[0] !== '/' ) {
+			if ( !\arc\path::isAbsolute($path) ) {
 				$path = '/' . $path;
 			}
 			return substr( $path, 1, strpos( $path, '/', 1) - 1 );
@@ -179,7 +179,7 @@
 		 *  @return string The path without its root entry.
 		 */
 		public static function tail( $path ) {
-			if ( $path[0] !== '/' ) {
+			if ( !\arc\path::isAbsolute($path) ) {
 				$path = '/' . $path;
 			}
 			return substr( $path, strpos( $path, '/', 1) );
