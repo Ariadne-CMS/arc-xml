@@ -54,8 +54,8 @@
 		 *	@param string $eventName The name of the event to listen for.
 		 *	@return IncompleteListener 
 		 */
-		public static function listen( $eventName ) {
-			return self::getEventsTree()->listen( $eventName );
+		public static function listen( $eventName, $callback ) {
+			return self::getEventsTree()->listen( $eventName, $callback );
 		}
 
 		/**
@@ -65,8 +65,8 @@
 		 *	@param string $eventName The name of the event to listen for.
 		 *	@return IncompleteListener 
 		 */
-		public static function capture( $eventName ) {
-			return self::getEventsTree()->capture( $eventName );
+		public static function capture( $eventName, $callback ) {
+			return self::getEventsTree()->capture( $eventName, $callback );
 		}
 
 		/**
