@@ -26,21 +26,24 @@
 		}
 
 		/**
-		*	Returns an IncompleteListener for the given event name.
+		*	Adds an event listener for the given event and returns it.
 		*	@param string $eventName The event to listen for
+		*   @param callable $callback The function to call when the event occurs.
+		*   @return Listener
 		*/
-		public function listen( $eventName ) {
-			return new IncompleteListener( $this, $eventName, false );
+		public function listen( $eventName, $callback ) {
+			return $this->addListener( $eventName, $callback, false );
 		}
 
 		/**
-		*	Returns an IncompleteListener for the given event, objectType and path. The listener
+		*	Adds an event listener for the given event and returns it. The listener
 		*	will trigger in the capture phase - before any listeners in the listen phase.
 		*	@param string $eventName The name of the event to listen for.
-		*	@return IncompleteListener 
+		*   @param callable $callback The function to call when the event occurs.
+		*	@return Listener 
 		*/
-		public function capture( $eventName) {
-			return new IncompleteListener( $this, $eventName, true );
+		public function capture( $eventName, $callback ) {
+			return $this->addListener( $eventName, $callback, true );
 		}
 
 		/**
@@ -80,7 +83,7 @@
 		*	@param bool $capture Optional. If true listen in the capture phase. Default is false - listen phase.
 		*	@return Listener
 		*/
-		public function addListener( $eventName, $callback, $capture = false ) {
+		private function addListener( $eventName, $callback, $capture = false ) {
 			$listenerSection = ( $capture ? 'capture' : 'listen' ) . '.' . $eventName;
 			if ( ! is_callable($callback) ) {
 				throw new \arc\ExceptionIlligalRequest('Method is not callable.', \arc\exceptions::ILLEGAL_ARGUMENT);

@@ -13,9 +13,9 @@
 
 	interface EventsTreeInterface {
 
-		public function listen( $eventName );
+		public function listen( $eventName, $callback );
 
-		public function capture( $eventName );
+		public function capture( $eventName, $callback );
 
 		public function fire( $eventName, $eventData = array() );
 

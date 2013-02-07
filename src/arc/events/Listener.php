@@ -46,5 +46,12 @@
 			}
 		}
 
-		/* FIXME: add an add() method, which re-adds the listener, potentially as last in the list */
+		/*
+		 *   This allows you to chain listeners and cd() calls on the eventtree.
+		 */
+		public function __call( $method, $args ) {
+			return call_user_func_array( [ $this->eventStack, $method ], $args );
+		}
+
+		/* TODO: add an add() method, which re-adds the listener, potentially as last in the list */
 	}
