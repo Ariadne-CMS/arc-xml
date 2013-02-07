@@ -54,7 +54,7 @@
 			$previousParent = $root;
 			foreach( $tree as $path => $data ) {
 				$previousPath = $previousParent->getPath();
-				$subPath = \arc\path::diff( $path, $previousPath );
+				$subPath = \arc\path::diff( $previousPath, $path );
 				if ( $subPath ) {
 					// create missing parent nodes, input tree may be sparsely filled
 					$node = \arc\path::reduce(

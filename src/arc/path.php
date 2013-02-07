@@ -158,13 +158,14 @@
 		 *  
 		 *  Usage:
 		 *    $rootEntry = \arc\path::head( '/root/of/a/path/' ); // => 'root'
-		 *    $rootEntry = \arc\path::head( '/a/../b/c/' ); // => 'b'
 		 *
 		 *  @param string $path The path to get the root entry of.
 		 *  @return string The root entry of the given path, without slashes.
 		 */
 		public static function head( $path ) {
-			$path = \arc\path::collapse( $path );
+			if ( $path[0] !== '/' ) {
+				$path = '/' . $path;
+			}
 			return substr( $path, 1, strpos( $path, '/', 1) - 1 );
 		}
 
@@ -173,13 +174,14 @@
 		 *  
 		 *  Usage:
 		 *    $remainder = \arc\path::tail( '/root/of/a/path/' ); // => '/of/a/path/'
-		 *    $remainder = \arc\path::head( '/a/../b/c/' ); // => '/c/'
 		 *
 		 *  @param string $path The path to get the tail of.
 		 *  @return string The path without its root entry.
 		 */
 		public static function tail( $path ) {
-			$path = \arc\path::collapse( $path );
+			if ( $path[0] !== '/' ) {
+				$path = '/' . $path;
+			}
 			return substr( $path, strpos( $path, '/', 1) );
 		}
 
@@ -191,8 +193,10 @@
 		 *  @param string $sourcePath The source path to start with.
 		 *  @return string The relative path from source to target.
 		 */
-		public static function diff( $targetPath, $sourcePath ) {
+		public static function diff( $sourcePath, $targetPath ) {
 			$diff = '';
+			$targetPath = \arc\path::collapse( $targetPath );
+			$sourcePath = \arc\path::collapse( $sourcePath );
 			$commonParent = \arc\path::walk( $sourcePath, function( $path) use ( $targetPath, &$diffPath ) {
 				if ( !\arc\path::isChild( $targetPath, $path ) ) {
 					$diff .= '../';

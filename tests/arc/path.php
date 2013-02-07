@@ -104,7 +104,7 @@
 		}
 
 		function testDiff() {
-			$this->assertTrue( \arc\path::diff( '/a/b/', '/a/' ) == 'b/' );
-			$this->assertTrue( \arc\path::diff( '/b/', '/a/' ) == '../b/' );
+			$this->assertTrue( \arc\path::diff( '/a/', '/a/b/' ) == 'b/' );
+			$this->assertTrue( \arc\path::diff( '/a/', '/b/' ) == '../b/' );
 		}
 	}
