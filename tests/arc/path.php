@@ -103,8 +103,8 @@
 			$this->assertFalse( \arc\path::isChild( '/b/', '/a/' ) );
 		}
 
-		function testGetRelativePath() {
-			$this->assertTrue( \arc\path::getRelativePath( '/a/b/', '/a/' ) == 'b/' );
-			$this->assertTrue( \arc\path::getRelativePath( '/b/', '/a/' ) == '../b/' );
+		function testDiff() {
+			$this->assertTrue( \arc\path::diff( '/a/b/', '/a/' ) == 'b/' );
+			$this->assertTrue( \arc\path::diff( '/b/', '/a/' ) == '../b/' );
 		}
 	}

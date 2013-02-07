@@ -173,7 +173,7 @@
 		 *  
 		 *  Usage:
 		 *    $remainder = \arc\path::tail( '/root/of/a/path/' ); // => '/of/a/path/'
-		 *    $rootEntry = \arc\path::head( '/a/../b/c/' ); // => '/c/'
+		 *    $remainder = \arc\path::head( '/a/../b/c/' ); // => '/c/'
 		 *
 		 *  @param string $path The path to get the tail of.
 		 *  @return string The path without its root entry.
@@ -184,24 +184,24 @@
 		}
 
 		/**
-		 *  Returns the relative path that maps from the sourcePath to the targetPath in
+		 *  Returns the difference between sourcePath and targetPath as a relative path in
 		 *  such a way that if you append the relative path to the source path and collapse
 		 *  that, the result is the targetPath.
 		 *  @param string $targetPath The target path to map to.
 		 *  @param string $sourcePath The source path to start with.
 		 *  @return string The relative path from source to target.
 		 */
-		public static function getRelativePath( $targetPath, $sourcePath ) {
-			$relativePath = '';
-			$commonParent = \arc\path::walk( $sourcePath, function( $path) use ( $targetPath, &$relativePath ) {
+		public static function diff( $targetPath, $sourcePath ) {
+			$diff = '';
+			$commonParent = \arc\path::walk( $sourcePath, function( $path) use ( $targetPath, &$diffPath ) {
 				if ( !\arc\path::isChild( $targetPath, $path ) ) {
-					$relativePath .= '../';
+					$diff .= '../';
 				} else {
 					return $path;
 				}
 			}, false);
-			$relativePath .= substr( $targetPath, strlen( $commonParent ) );
-			return $relativePath;
+			$diff .= substr( $targetPath, strlen( $commonParent ) );
+			return $diff;
 		}
 
 		/**
