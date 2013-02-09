@@ -21,9 +21,9 @@
 		public static function getConfiguration() {
 			$context = \arc\context::$context;
 			if ( !$context->arcConfig ) {
-				$context->arcConfig = new config\Configuration( \arc\tree::expand() );
+				$context->arcConfig = new config\Configuration( \arc\tree::expand()->cd( $context->arcPath ) );
 			}
-			return $context->arcConfig->cd( $context->arcPath );
+			return $context->arcConfig;
 		}
 
 		public static function acquire( $name, $path = null, $root = '/' ) {

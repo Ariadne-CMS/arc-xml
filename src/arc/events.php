@@ -34,9 +34,9 @@
 		public static function getEventsTree() {
 			$context = \arc\context::top();
 			if ( !$context->arcEvents ) {
-				$context->arcEvents = new events\EventsTree( \arc\tree::expand() );
+				$context->arcEvents = new events\EventsTree( \arc\tree::expand()->cd( $context->arcPath) );
 			}
-			return $context->arcEvents->cd( $context->arcPath );
+			return $context->arcEvents;
 		}
 
 		/**

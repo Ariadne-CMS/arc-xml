@@ -28,9 +28,9 @@
 				$context->arcGroups  = [ 'public' ];
 			}
 			if ( !$context->arcGrants ) {
-				$context->arcGrants = new grants\GrantsTree( \arc\tree::expand(), $context->arcUser, $context->arcGroups );
+				$context->arcGrants = new grants\GrantsTree( \arc\tree::expand()->cd( $context->arcPath ), $context->arcUser, $context->arcGroups );
 			}
-			return $context->arcGrants->cd( $context->arcPath );
+			return $context->arcGrants;
 		}
 
 		public static function check( $grant ) {
