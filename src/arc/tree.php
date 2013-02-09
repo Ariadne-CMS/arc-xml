@@ -14,7 +14,7 @@
 	/**
 	 *	Utility methods to handle common path related tasks, cleaning, changing relative to absolute, etc.
 	 */
-	class tree extends Pluggable {
+	class tree {
 
 
         /**
@@ -49,7 +49,7 @@
 			if ( !is_array($tree) ) {
 				return $root; // empty tree
 			}
-			ksort($tree); // sort by path, so parents are always earlier in the array than children
+			//ksort($tree); // sort by path, so parents are always earlier in the array than children
 			$previousPath = '/';
 			$previousParent = $root;
 			foreach( $tree as $path => $data ) {
@@ -80,9 +80,8 @@
 		/**
 		 * Calls the first callback method on each successive parent until a non-null value is returned. Then
 		 * calls all the parents from that point back to this node with the second callback in reverse order.
-		 * The first callback (dive) must accept two parameters, the name of each child and the child node itself.
-		 * The second callback (rise) must accept three parameters, the name of each child, the child node and the
-         * result up to that point.
+		 * The first callback (dive) must accept one parameter, the node.
+		 * The second callback (rise) must accept two parameters, the nde and the result up to that point.
          * @param \arc\tree\Node $node A tree node, must have traversable childNodes property and a parentNode property
          * @param callable $diveCallback The callback for the dive phase.
 		 * @param callable $riseCallback The callback for the rise phase.
@@ -136,18 +135,18 @@
 
 		/**
 		 * Calls the callback method on each child of the current node, including the node itself, until a non-null
-         * result is returned. Returns that result. The tree is walked depth first.
+         * result is returned. Returns that result. The tree is searched depth first.
          * @param \arc\tree\Node $node
          * @param callable $callback The callback function applied to each child node
          * @return mixed
 		 */
-		static public function walk( $node, $callback ) {
+		static public function search( $node, $callback ) {
 			$result = call_user_func( $callback, $node );
 			if ( isset( $result ) ) {
 				return $result;
 			}
 			foreach( $node->childNodes as $child ) {
-				$result = self::walk( $child, $callback );
+				$result = self::search( $child, $callback );
 				if ( isset( $result ) ) {
 					return $result;
 				}
@@ -162,7 +161,7 @@
          * @param callable $callback The callback function applied to each child node
          * @param string $root
          * @param mixed $nodeName The name of the 'name' property or a function that returns the name of a node.
-         * @return mixed
+         * @return array
 		 */
 		static public function map( $node, $callback, $root = '', $nodeName = 'nodeName' ) {
 			$result = [];
@@ -184,6 +183,7 @@
          * @param \arc\tree\Node $node
          * @param callable $callback
          * @param mixed $initial The value to pass to the first callback call.
+         * @return mixed
 		 */
 		static public function reduce( $node, $callback, $initial = null ) {
 			$result = call_user_func( $callback, $initial, $node );
@@ -191,6 +191,22 @@
 				$result = self::reduce( $child, $callback, $result );
 			}
 			return $result;
+		}
+
+		/**
+		 * Filters the tree using a callback method. If the callback method returns true, the node's value is included
+		 * in the result, otherwise it is skipped. Filter returns a collapsed tree: [ path => nodeValue ]
+		 * The callback method must take one argument: the current node.
+		 * @param \arc\tree\Node $node
+		 * @param callable $callback
+		 * @return array
+		 */
+		static public function filter( $node, $callback, $root = '', $nodeName = 'nodeName' ) {
+			return self::map( $node, function( $node ) use ( $callback ) {
+				if ( call_user_func( $callback, $node ) ) {
+					return $node->nodeValue;
+				}
+			}, $root, $nodeName );
 		}
 
         /**
