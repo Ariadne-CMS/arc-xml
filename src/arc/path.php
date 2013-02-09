@@ -14,7 +14,7 @@
 	/**
 	 *	Utility methods to handle common path related tasks, cleaning, changing relative to absolute, etc.
 	 */
-	class path extends Pluggable {
+	class path {
 		
 		protected static $collapseCache = array();
 
@@ -197,7 +197,7 @@
 			$diff = '';
 			$targetPath = \arc\path::collapse( $targetPath );
 			$sourcePath = \arc\path::collapse( $sourcePath );
-			$commonParent = \arc\path::walk( $sourcePath, function( $path) use ( $targetPath, &$diffPath ) {
+			$commonParent = \arc\path::search( $sourcePath, function( $path) use ( $targetPath, &$diffPath ) {
 				if ( !\arc\path::isChild( $targetPath, $path ) ) {
 					$diff .= '../';
 				} else {
@@ -279,7 +279,7 @@
 		 *	returns the result of the callback method.
 		 *
 		 *	Usage:
-		 *		$result = \arc\path::walk( '/foo/bar/', function( $parent ) {
+		 *		$result = \arc\path::search( '/foo/bar/', function( $parent ) {
 		 *			if ( $parent == '/foo/' ) { // silly test
 		 *				return true;
 		 *			}
@@ -293,7 +293,7 @@
 		 *		Defaults to '/'.
 		 *	@return mixed The first non-null result of the callback method
 		 */
-		public static function walk( $path, $callback, $startAtRoot = true, $root = '/' ) {
+		public static function search( $path, $callback, $startAtRoot = true, $root = '/' ) {
 			$parents = self::parents( $path, $root );
 			if ( !$startAtRoot ) {
 				$parents = array_reverse( $parents );

@@ -36,10 +36,10 @@
 			$this->assertTrue( $result === '/a/' );
 		}
 
-		function testWalk() {
+		function testSearch() {
 			$path = '/a/b/c/';
 			$count = 0;
-			$result = \arc\path::walk( $path, function( $parent ) use ( &$count ) {
+			$result = \arc\path::search( $path, function( $parent ) use ( &$count ) {
 				$count++;
 				if ( $parent == '/a/' ) {
 					return true;
@@ -49,7 +49,7 @@
 			$this->assertTrue( $count == 2 );
 
 			$count = 0;
-			$result = \arc\path::walk( $path, function( $parent ) use ( &$count ) {
+			$result = \arc\path::search( $path, function( $parent ) use ( &$count ) {
 				$count++;
 				if ( $parent == '/a/' ) {
 					return true;
