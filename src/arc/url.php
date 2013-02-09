@@ -11,7 +11,7 @@
 
 	namespace arc;
 
-	class url extends Pluggable {
+	class url {
 
 		/**
 		 *	Returns a new URL object with easy access to the components (scheme, host, port, path, etc) and
