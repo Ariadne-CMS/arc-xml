@@ -13,35 +13,7 @@
 	 
 	class TestArc extends UnitTestCase {
 
-		function testPluggable() {
-
-			try {
-				\arc\arc::thisMethodDoesNotExist();
-			} catch( \Exception $e ) {
-				$this->assertTrue( $e instanceof \arc\Exception );
-				$this->assertTrue( $e->getCode() == \arc\exceptions::OBJECT_NOT_FOUND );
-			}
-
-			try {
-				\arc\arc::plugin( __DIR__.'/arc/arc_plugin_helper.php', 'arc_wrong_methodsearcher' );
-			} catch( \Exception $e ) {
-				$this->assertTrue( $e instanceof \arc\Exception );
-				$this->assertTrue( $e->getCode() == \arc\exceptions::OBJECT_NOT_FOUND );				
-			}
-
-			try {
-				\arc\arc::plugin( __DIR__.'/arc/arc_plugin_helper.php', 'arc_plugin_methodsearcher' );
-				$this->assertTrue(true);
-			} catch( \Exception $e ) {
-				echo $e;
-				$this->assertTrue(false); //should not throw an exception
-			}
-
-			$result = arc_plugin::arc_plugin_test();
-			$this->assertTrue( $result );
-
-			$result = \arc\arc::arc_plugin_test();
-			$this->assertTrue( $result );
+		function testArc() {
 		}
 
 
