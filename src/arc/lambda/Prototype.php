@@ -20,7 +20,7 @@ namespace arc\lambda;
  * echo $view->menu( $menulist );
  * </code>
  */
-class Prototype {
+final class Prototype {
 	
 	/**
 	* @var Object prototype Readonly reference to a prototype object. Can only be set in the constructor.
@@ -45,10 +45,6 @@ class Prototype {
 			return true;
 		}
 		return $this->prototype->hasPrototype( $object );
-	}
-
-	public function new() {
-		return clone $this;
 	}
 
 	public function __construct( $properties ) {
