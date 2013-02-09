@@ -12,13 +12,17 @@
 	namespace arc\config;
 
 	class Configuration implements ConfigurationInterface, \arc\KeyValueStoreInterface {
-	
+		use \arc\traits\Proxy {
+			\arc\traits\Proxy::__construct as private ProxyConstruct;
+		}	
+
 		private $tree = null;
-		
-		public function __construct( $tree) {
+
+		public function __construct( $tree ) {
+			$this->ProxyConstruct( $tree );
 			$this->tree = $tree;
 		}
-		
+
 		public function acquire( $name ) {
 			return \arc\tree::Dive( 
 				$this->tree,

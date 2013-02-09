@@ -15,6 +15,9 @@
 	*	This class implements an event stack on which listeners can be added and removed and events can be fired.
 	*/
 	class EventsTree implements EventsTreeInterface {
+		use \arc\traits\Proxy {
+			\arc\traits\Proxy::__construct as private ProxyConstruct;
+		}	
 
 		private $tree = null;
 
@@ -22,6 +25,7 @@
 		*	@param \arc\tree\NamedNode $tree The tree storage for event listeners.
 		*/
 		public function __construct( $tree ) {
+			$this->ProxyConstruct( $tree );
 			$this->tree = $tree;
 		}
 

@@ -17,12 +17,22 @@
 	namespace arc\grants;
 
 	class GrantsTree {
+		use \arc\traits\Proxy {
+			\arc\traits\Proxy::__construct as private ProxyConstruct;
+		}	
 
-		private $tree   = null;
+		private $tree = null;
 		private $user   = null;
 		private $groups = array();
 		
+
+		/**
+		*	@param \arc\tree\NamedNode $tree The tree storage for event listeners.
+		*   @param string $user
+		*   @param array $groups
+		*/
 		public function __construct( $tree, $user, $groups = array() ) {
+			$this->ProxyConstruct( $tree );
 			$this->tree = $tree;
 			$this->user = $user;
 			$this->groups = $groups;
@@ -33,7 +43,7 @@
 		}
 
 		public function ls() {
-
+			// FIXME: implement this
 		}
 
 		public function switchUser( $user, $groups = array() ) {
