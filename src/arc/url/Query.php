@@ -28,7 +28,7 @@
 
    		public function __toString() {
    			return str_replace( array('%7E', '%2B' ), array( '~', '+' ),  // ~ and + are often unnecesarily encoded
-   				$this->compile( \arc\tainting::untaint( (array) $this, FILTER_UNSAFE_RAW ) )
+   				$this->compile( (array) $this )
    			);
    		}
 
