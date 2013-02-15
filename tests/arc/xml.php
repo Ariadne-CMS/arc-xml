@@ -31,8 +31,7 @@
 				\arc\xml::li('menu 1')
 				->li('menu 2')
 			);
-			$this->assertTrue( $xml == "<ul class=\"menu\">\n\t<li>menu 1</li>\n\t<li>menu 2</li>\n</ul>" );
-			echo $xml;
+			$this->assertTrue( $xml == "<ul class=\"menu\"><li>menu 1</li><li>menu 2</li></ul>" );
 		}
 
 /*
