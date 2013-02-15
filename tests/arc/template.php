@@ -16,28 +16,28 @@
 		function testSimpleSubstitution() {
 			$template = 'Hello {{someone}}';
 			$args = [ 'someone' => 'World!' ];
-			$parsed = \arc\template::parse( $template, $args );
+			$parsed = \arc\template::substitute( $template, $args );
 			$this->assertTrue( $parsed === 'Hello World!' );
 		}
 
 		function testFunctionSubstitution() {
 			$template = 'Hello {{someone}}';
 			$args = [ 'someone' => function() { return 'World!'; } ];
-			$parsed = \arc\template::parse( $template, $args );
+			$parsed = \arc\template::substitute( $template, $args );
 			$this->assertTrue( $parsed === 'Hello World!' );
 		}
 
 		function testPartialSubstitution() {
 			$template = 'Hello {{someone}} from {{somewhere}}';
 			$args = [ 'someone' => 'World!' ];
-			$parsed = \arc\template::parse( $template, $args );
+			$parsed = \arc\template::substitute( $template, $args );
 			$this->assertTrue( $parsed === 'Hello World! from {{somewhere}}' );
 		}
 
-		function testClean() {
+		function testSubstituteAll() {
 			$template = 'Hello {{someone}} from {{somewhere}}';
 			$args = [ 'someone' => 'World!' ];
-			$parsed = \arc\template::clean( \arc\template::parse( $template, $args ) );
+			$parsed = \arc\template::substituteAll( $template, $args ) );
 			$this->assertTrue( $parsed === 'Hello World! from ' );			
 		}
 	}
