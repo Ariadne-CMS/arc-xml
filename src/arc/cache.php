@@ -37,7 +37,7 @@
 				$prefix = 'default';
 			}
 			$context = \arc\context::$context;
-			$fileStore = new cache\FileStore( ARC_CACHE_DIR . '/' . $prefix, $contect->arcPath );
+			$fileStore = new cache\FileStore( ARC_CACHE_DIR . '/' . $prefix, $context->arcPath );
 			return new cache\Store( $fileStore, $context, $timeout );
 		}
 
