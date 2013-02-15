@@ -61,7 +61,7 @@ class Writer {
 		return '<![CDATA[' . str_replace( ']]>', ']]&gt;', $content ) . ']]>';
 	}
 
-	static public function preamble( $encoding = false, $version = '1.0', $standalone = false ) {
+	static public function preamble( $version = '1.0', $encoding = null, $standalone = null ) {
 		if ( isset($standalone) ) {
 			if ( $standalone === 'false' ) {
 				$standalone = 'no';
@@ -72,8 +72,12 @@ class Writer {
 		} else {
 			$standalone = '';
 		}
-		return '<?xml version="' . self::value($version) 
-			. '" encoding="' . self::value($encoding) . '"' . $standalone . ' ?>';
+		$preamble = '<?xml version="' . self::value($version) . '"';
+		if ( isset( $encoding ) ) { 
+			$preamble .= ' " encoding="' . self::value($encoding) . '"';
+		}
+		$preamble .= $standalone . ' ?>';
+		return $preamble;
 	}
 
 }
