@@ -17,19 +17,22 @@
 		var $incorrectXML = "<?xml standalone=\"false\"><rss></rss>";
 		var $namespacedXML = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n<testroot xmlns:foo=\"http://www.example.com/\">\n<foo:bar>something</foo:bar><bar>something else</bar><bar foo:attr=\"an attribute\">something else again</bar>\n</testroot>";
 	
-		function testXMLNode() {
+		function testXMLBasics() {
 			$preamble = \arc\xml::preamble();
 			$cdata = \arc\xml::cdata('Some " value');
 			$this->assertEqual( (string) $preamble, '<?xml version="1.0" ?>' );
-			$this->assertTrue( $preamble instanceof \arc\xml\NodeInterface );
 			$this->assertEqual( (string) $cdata, '<![CDATA[Some " value]]>' );
-			$this->assertTrue( $cdata instanceof \arc\xml\Node );
 			$comment = \arc\xml::comment('A comment');
 			$this->assertEqual( (string) $comment, '<!-- A comment -->' );
-			$this->assertTrue( $comment instanceof \arc\xml\Node );
-			$this->assertEqual( $comment->nodeValue, 'A comment' );
-			$comment->nodeValue = 'Another comment';
-			$this->assertEqual( (string) $comment, '<!-- Another comment -->' );
+		}
+
+		function testXMLWriter() {
+			$xml = \arc\xml::ul( [ 'class' => 'menu' ],
+				\arc\xml::li('menu 1')
+				->li('menu 2')
+			);
+			$this->assertTrue( $xml == "<ul class=\"menu\">\n\t<li>menu 1</li>\n\t<li>menu 2</li>\n</ul>" );
+			echo $xml;
 		}
 
 /*
