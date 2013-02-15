@@ -37,7 +37,7 @@
 		function testSubstituteAll() {
 			$template = 'Hello {{someone}} from {{somewhere}}';
 			$args = [ 'someone' => 'World!' ];
-			$parsed = \arc\template::substituteAll( $template, $args ) );
+			$parsed = \arc\template::substituteAll( $template, $args );
 			$this->assertTrue( $parsed === 'Hello World! from ' );			
 		}
 	}
