@@ -14,14 +14,14 @@
 	class Store implements StoreInterface, \arc\KeyValueStoreInterface, \arc\PathTreeInterface {
 
 		protected $timeout = 7200;
-		protected $contextStack = null;
+		protected $context = null;
 		protected $storage = null;
 
 		public function __construct( $storage, $context = null, $timeout = 7200, $currentPath = null ) {
-			$this->contextStack = $context;
+			$this->context = $context;
 			$this->timeout = $this->getTimeout( $timeout );
 			if ( !isset( $currentPath ) ) {
-				$currentPath = ( isset($context) ? $context['path'] : '/' );
+				$currentPath = ( isset($context) ? $context->arcPath : '/' );
 			}
 			$this->currentPath = $currentPath;
 			$this->storage = $storage->cd( $this->currentPath );
@@ -39,7 +39,7 @@
 		/* PathTreeInterface */
 		public function cd( $path ) {
 			$path = \arc\path::collapse( $path, $this->currentPath );
-			return new Store( $this->storage, $this->contextStack, $this->timeout, $path);
+			return new Store( $this->storage, $this->context, $this->timeout, $path);
 		}
 		
 		public function ls() {
@@ -58,7 +58,7 @@
 		}
 
 		public function timeout( $timeout ) {
-			return new Store( $this->storage, $this->contextStack, $timeout, $this->currentPath );
+			return new Store( $this->storage, $this->context, $timeout, $this->currentPath );
 		}
 		
 		public function get( $name ) {
