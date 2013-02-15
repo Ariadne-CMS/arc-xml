@@ -54,7 +54,7 @@ class Writer {
 	}
 
 	static public function comment( $content ) {
-		return '<!-- ' . self::value( $comment ) . ' -->';
+		return '<!-- ' . self::value( $content ) . ' -->';
 	}
 
 	static public function cdata( $content ) {
