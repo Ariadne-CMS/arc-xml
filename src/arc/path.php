@@ -197,7 +197,7 @@
 			$diff = '';
 			$targetPath = \arc\path::collapse( $targetPath );
 			$sourcePath = \arc\path::collapse( $sourcePath );
-			$commonParent = \arc\path::search( $sourcePath, function( $path) use ( $targetPath, &$diffPath ) {
+			$commonParent = \arc\path::search( $sourcePath, function( $path) use ( $targetPath, &$diff ) {
 				if ( !\arc\path::isChild( $targetPath, $path ) ) {
 					$diff .= '../';
 				} else {
