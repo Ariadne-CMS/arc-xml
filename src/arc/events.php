@@ -32,7 +32,7 @@
 		 *	or your own factory method to create a seperate Stack instance.
 		 */
 		public static function getEventsTree() {
-			$context = \arc\context::top();
+			$context = \arc\context::$context;
 			if ( !$context->arcEvents ) {
 				$context->arcEvents = new events\EventsTree( \arc\tree::expand()->cd( $context->arcPath) );
 			}
