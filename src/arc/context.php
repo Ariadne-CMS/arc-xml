@@ -16,9 +16,7 @@
 	*/
 	class context {
 
-		public static $context = new lambda\Prototype([
-			'arcPath' => '/'
-		]);
+		public static $context = null;
 
 		public static function push( $params ) {
 			self::$context = self::$context->extend( $params );
@@ -37,3 +35,7 @@
 		}
 
 	}
+
+	context::$context = new lambda\Prototype([
+		'arcPath' => '/'
+	]);
