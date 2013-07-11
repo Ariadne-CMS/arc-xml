@@ -97,13 +97,21 @@
 				$values = preg_split( '/[\&\;]/', $queryString );
 				foreach( $values as $queryStringEntry ) {
 					list( $name, $value ) = $this->parseQueryStringEntry( $queryStringEntry );
-					if ( !$value ) {
+					if ( !isset($value) ) { 
+						// no '=' in query entry 
+						// => ?name&...
 						$result[] = $name;
 					} else if ( !isset( $result[$name] ) ) {
+						// new entry 
+						// => ?name=1&...
 						$result[ $name ] = $value;
 					} else if ( !is_array( $result[$name] ) ) {
+						// entry with same name exists already but is not an array yet
+						// => ?name=1&name=2&...
 						$result[ $name ] = array( $result[$name], $value );
 					} else {
+						// entry with same name exists and is an array
+						// => ?name=1&name=2&name=3&...
 						$result[ $name ][] = $value;
 					}
 				}
@@ -112,7 +120,10 @@
 		}
 
 		private function parseQueryStringEntry( $queryStringEntry ) {
-			$result = explode( '=', $queryStringEntry, 2 ) + array( '' ); // make sure the array always has at least two entries
+			$result = explode( '=', $queryStringEntry, 2 ); // value may be null if no '=' is found in the query string
+			foreach( $result as $key => $value ) {
+				$result[$key] = urldecode($value);
+			}
 			return $result;
 		}
 
@@ -130,5 +141,7 @@
    				);
    			}
    		}
+		
+		private function decodeValue( 
 
    	}
