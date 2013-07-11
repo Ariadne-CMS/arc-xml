@@ -21,7 +21,7 @@
 
 		public function delete( $url, $request = null, $options = array() );
 
-		public function send( $type, $url, $request = null, $options = array() );
+		public function request( $type, $url, $request = null, $options = array() );
 
 		public function headers( $headers );
 

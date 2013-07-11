@@ -13,29 +13,29 @@
 
 	class http {
 
-		public static function request( $method = null, $url = null, $postdata = null, $options = array() ) {
+		public static function request( $method = null, $url = null, $query = null, $options = array() ) {
 			$client = new http\ClientStream();
-			return $client->send( $method, $url, $postdata, $options );
+			return $client->send( $method, $url, $query, $options );
 		}
 
 		public static function client( $options = array() ) {
 			return new http\ClientStream( $options );
 		}
 
-		public static function get( $url, $request = null, $options = array() ) {
-			return self::request( 'GET', $url, $request, $options);
+		public static function get( $url, $query = null, $options = array() ) {
+			return self::request( 'GET', $url, $query, $options);
 		}
 
-		public static function post( $url, $request = null, $options = array() ) {
-			return self::request( 'POST', $url, $request, $options);
+		public static function post( $url, $query = null, $options = array() ) {
+			return self::request( 'POST', $url, $query, $options);
 		}
 
-		public static function put( $url, $request = null, $options = array() ) {
-			return self::request( 'PUT', $url, $request, $options);
+		public static function put( $url, $query = null, $options = array() ) {
+			return self::request( 'PUT', $url, $query, $options);
 		}
 
-		public static function delete( $url, $request = null, $options = array() ) {
-			return self::request( 'DELETE', $url, $request, $options);
+		public static function delete( $url, $query = null, $options = array() ) {
+			return self::request( 'DELETE', $url, $query, $options);
 		}
 
 	}
