@@ -27,7 +27,7 @@
    		}
 
    		public function __toString() {
-   			return str_replace( array('%7E', '%2B' ), array( '~', '+' ),  // ~ and + are often unnecesarily encoded
+   			return str_replace( array('%7E', '%20' ), array( '~', '+' ),  // ~ and + are often unnecesarily encoded
    				$this->compile( (array) $this )
    			);
    		}
@@ -120,9 +120,12 @@
 		}
 
 		private function parseQueryStringEntry( $queryStringEntry ) {
-			$result = explode( '=', $queryStringEntry, 2 ); // value may be null if no '=' is found in the query string
+			$result = explode( '=', $queryStringEntry, 2 ) + array( 1 => null ); // value may be null if no '=' is found in the query string
 			foreach( $result as $key => $value ) {
-				$result[$key] = urldecode($value);
+                                if ( isset($value) ) {
+                                        $value = urldecode( $value );
+                                }
+                                $result[$key] = $value;
 			}
 			return $result;
 		}
@@ -142,6 +145,4 @@
    			}
    		}
 		
-		private function decodeValue( 
-
    	}

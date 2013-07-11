@@ -89,7 +89,7 @@
 
 		// note: both '//google.com/' and 'file:///C:/' are valid URL's - so if either a scheme or host is set, add the // part
 		private function getSchemeAndAuthority() {
-			return ( ( $this->scheme || $this->host ) ? $this->getScheme() . '//' . $this->host : '' );
+			return ( ( $this->scheme || $this->host ) ? $this->getScheme() . '//' . $this->getAuthority() : '' );
 		}
 
 		private function getScheme() {
