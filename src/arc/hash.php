@@ -15,7 +15,7 @@ class hash {
 
 	public static function exists( $path, $hash ) {
 		$parent = \arc\path::parent($path);
-		$filename = rawurldecode(basename( $parent ));
+		$filename = rawurldecode(basename( $path ));
 		$hash = self::get( $parent, $hash );
 		return ( is_array($hash) && array_key_exists( $filename, $hash ) );
 	}
@@ -36,11 +36,31 @@ class hash {
 		return '/'.implode( '/', $path ).'/';
 	}
 
-	public static function compileName( $path, $root ) {
+	public static function compileName( $path, $root = '' ) {
 		// parse /name/index/index2/ to name[index][index2]
 		return \arc\path::reduce( $path, function( $result, $item ) {
 			$item = rawurldecode($item);
 			return ( !$result ? $item : $result . '[' . $item . ']' );
 		}, $root );
 	}
+	
+	public static function tree( $hash, $parent = null ) {
+		if ( !isset( $parent ) ) {
+			$parent = \arc\tree::expand();
+		}
+		if ( is_array( $hash ) || $hash instanceof \Traversable ) {
+			foreach ( $hash as $index => $value ) {
+				$child = $parent->appendChild( $index );
+				if ( is_array( $value ) ) {
+					self::tree( $value, $child );
+				} else {
+					$child->nodeValue = $value;
+				}
+			}
+		} else {
+			$parent->nodeValue = $hash;
+		}
+		return $parent;
+	}
+
 }
