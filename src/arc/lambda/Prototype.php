@@ -34,7 +34,7 @@ final class Prototype {
 		return isset( $props[$name] );
 	}
 
-	public function extend( $properties ) {
+	public function extend( $properties = [] ) {
 		$properties['prototype'] = $this;
 		$descendant = new static($properties);
 		return $descendant;
