@@ -5,6 +5,8 @@ namespace arc;
 class lambda {
 
 	public static function prototype( $properties ) {
+		// do not ever use a single prototype for every other lambda\Prototype
+		// it will allow evil stuff with state shared across everything
 		return new lambda\Prototype( $properties );
 	}
 
@@ -77,6 +79,8 @@ class lambda {
 				$result = $f();
 			}
 			return $result;		
-		}
+		};
 	}
+
+
 }
