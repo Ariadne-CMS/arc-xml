@@ -18,11 +18,9 @@
         	$_GET['unsafe'] = "This is ' unsafe";
         	\arc\noxss::detect();
         	echo $_GET['unsafe'];
-        	try {
-        		\arc\noxss::prevent();
-        	} catch ( \arc\ExceptionIllegalRequest $e ) {
-        		$caught = true;
-        	}
+       		\arc\noxss::prevent( function() use ( &$caught ) {
+                $caught = true;
+            } );
         	$this->assertTrue( $caught );
         }
 
