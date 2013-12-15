@@ -74,7 +74,6 @@ class Parser {
 		}
 		$errors = libxml_get_errors();
 		libxml_clear_errors();
-		libxml_clear_errors();
 		libxml_use_internal_errors( $prevErrorSetting );
 		$message = 'Incorrect xml passed.';
 		foreach ( $errors as $error ) {
