@@ -35,7 +35,8 @@
 			$prevpath = '/';
 			$parents = self::reduce( $path, function( $result, $entry ) use ( $root, &$prevpath ) {
 				$prevpath .= $entry . '/';
-				if ( strpos( $prevpath , $root ) === 0 && $prevpath !== $root ) { // Add only parents below the root
+				if ( strpos( $prevpath , $root ) === 0 && $prevpath !== $root ) { 
+					// Add only parents below the root
 					$result[] = $prevpath;
 				}
 				return $result;
