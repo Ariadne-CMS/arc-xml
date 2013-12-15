@@ -131,12 +131,11 @@
 		}
 
 		private static function _checkForProblems() {
-			$xssDetected = false;
 			// sort by length of string so longer strings are matched first
 			// key is set to the length of the string by detect()
-			foreach( self::$xss as $method => $inputs ) {
+			foreach( self::$xss as $inputs ) {
 				krsort( $inputs, SORT_NUMERIC );
-				foreach ( $inputs as $length => $values) {
+				foreach ( $inputs as $values) {
 					if ( is_array($values) ) {
 						foreach ( $values as $value ) {
 							if ( false !== strpos( self::$output, $value) ) {

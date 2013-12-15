@@ -60,8 +60,6 @@
 			// check the cache, if fresh, use the cached version
 			$cacheData = $this->cacheStore->getIfFresh( $path );
 			if ( !isset( $cacheData ) ) {
-				$check = $this->cacheStore->get( $path );
-				$info = $this->cacheStore->getInfo( $path );
 				if ( $this->cacheStore->lock( $path ) ) { 
 					// try to get a lock to calculate the value
 					$cacheData = $this->__callCatch( $method, $args );

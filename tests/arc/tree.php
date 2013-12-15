@@ -33,6 +33,7 @@
 				$node = $node->appendChild($i, $i);
 			}
 			$arr = \arc\tree::collapse( $root );
+			$this->assertTrue( count($arr) == 225 );
 		}
 
 

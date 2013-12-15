@@ -83,12 +83,11 @@
 		}
 
 		public function ls() {
-			$filePath = $this->root . \arc\path::collapse( $path, $this->currentPath );
-			$dir = dir( $filePath );
+			$dir = dir( $this->basePath );
 			$result = array();
 			if ( $dir ) {
 				while ( $name = $dir->read() ) {
-					if ( !is_dir($filePath . $name ) ) {
+					if ( !is_dir($this->basePath . $name ) ) {
 						$name = base64_decode($name);
 					}
 					$result[] = $name;

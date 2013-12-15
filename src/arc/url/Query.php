@@ -129,7 +129,7 @@
    		private function encodeValue( $name, $value = null ) {
    			if ( is_array( $value ) ) {
    				$result = array();
-   				foreach( $value as $key => $val ) {
+   				foreach( $value as $val ) {
    					$result[] = $this->encodeValue( $name, $val );
    				}
    				return implode( '&', $result );

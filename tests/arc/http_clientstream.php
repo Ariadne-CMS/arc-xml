@@ -25,7 +25,7 @@
 			$client = new \arc\http\ClientStream($options);
 
 			// do request, any will do, just that requestHeaders will get set
-			$res = $client->get('http://www.ariadne-cms.org/');
+			$client->get('http://www.ariadne-cms.org/');
 
 			$this->assertTrue(strstr($client->requestHeaders,"X-Test-Header: frop\r\n") !== false);
 
@@ -33,7 +33,6 @@
 		}
 
 		function testGet() {
-			$testurl = "http://www.ariadne-cms.org/";
 			$client = new \arc\http\ClientStream();
 			$res = $client->get('http://www.ariadne-cms.org/');
 
@@ -42,13 +41,11 @@
 		}
 
 		function testHeader() {
-			$testurl = "http://www.ariadne-cms.org/";
 			$client = new \arc\http\ClientStream();
-
 			$client->headers(array('User-Agent: SimpleTestClient'));
 
 			// do request, any will do
-			$res = $client->get('http://www.ariadne-cms.org/');
+			$client->get('http://www.ariadne-cms.org/');
 
 			$this->assertTrue(strstr($client->requestHeaders,"User-Agent: SimpleTestClient\r\n") !== false);
 		}
