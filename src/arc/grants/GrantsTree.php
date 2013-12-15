@@ -87,12 +87,6 @@
 					}
 				}, 
 				function( $node, $grants ) use ( &$user, $groups ) {
-					$localGrants = '';
-					foreach ( $groups as $group ) {
-						if ( isset( $node->nodeValue[ 'group.'.$group ] ) ) {
-							$localGrants .= $node->nodeValue['group.'.$group ];
-						}
-					}
 					if ( !$user ) { // don't do this for user grants the first time
 						$grants = preg_replace( 
 							array( '/\=[^ ]*/', '/\>([^ ]*)/' ), 
@@ -101,7 +95,11 @@
 						);
 					}
 					$user = false;
-					$grants .= $localGrants;
+					foreach ( $groups as $group ) {
+						if ( isset( $node->nodeValue[ 'group.'.$group ] ) ) {
+							$grants .= $node->nodeValue['group.'.$group ];
+						}
+					}
 					return $grants;
 				}
 			);
