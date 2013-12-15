@@ -11,27 +11,32 @@ class lambda {
 	}
 
 	/** 
-	* Returns a function with the given arguments already entered. 
+	* Returns a function with the given arguments already entered or partially applied. 
 	* @param callable $function The function to curry
 	* @param mixed $argument,... unlimited Optional arguments to curry the function with
 	* @return callable
 	*/
-	public static function curry( $callable, $curriedArgs ) {
-		return function() use ( $callable, $curriedArgs ) {
-			return call_user_func_array( $callable, self::curryMerge( $curriedArgs, func_get_args() ) );
+	public static function partial( $callable, $partialArgs, $defaultArgs = [] ) {
+		return function() use ( $callable, $partialArgs, $defaultArgs ) {
+			return call_user_func_array( $callable, self::partialMerge( $partialArgs, func_get_args(), $defaultArgs ) );
 		};
 	}
 
-	private static function curryMerge( $curriedArgs, $addedArgs ) {
-		end( $curriedArgs );
-		$l = key( $curriedArgs );
+	private static function partialMerge( $partialArgs, $addedArgs, $defaultArgs = [] ) {
+		end( $partialArgs );
+		$l = key( $partialArgs );
 		for( $i=0; $i<=$l; $i++ ) {
-			if ( !array_key_exists($i, $curriedArgs) ) {
-				$curriedArgs[ $i ] = array_shift( $addedArgs );
+			if ( !array_key_exists($i, $partialArgs) && count($addedArgs) ) {
+				$partialArgs[ $i ] = array_shift( $addedArgs );
 			}
 		}
-		ksort($curriedArgs);
-		return array_merge( $curriedArgs, $addedArgs );
+		if ( count($addedArgs) ) { // there are $addedArgs left, so there should be no 'holes' in $partialArgs
+			$partialArgs =array_merge( $partialArgs, $addedArgs );
+		} 
+		// fill any 'holes' in $partialArgs with entries from $defaultArgs
+		$result =  array_replace( $defaultArgs, $partialArgs );
+		ksort($result);
+		return $result;
 	}
 
 	/**
@@ -59,7 +64,7 @@ class lambda {
 	}
 
 	/**
-	* Returns a method that will generate call the given function only once and return its result for every call.
+	* Returns a method that will generate and call the given function only once and return its result for every call.
 	* The first call generates the result. Each subsequent call simply returns that same result. This allows you
 	* to create in-context singletons for any kind of object.
 	* <code>
@@ -73,7 +78,7 @@ class lambda {
 	* @return mixed The singleton.
 	*/
 	public static function singleton( $f ) {
-		return function( $f ) {
+		return function() use ($f) {
 			static $result;
 			if ( null === $result ) {
 				$result = $f();

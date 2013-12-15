@@ -74,4 +74,35 @@
             $this->assertTrue( $bar->foo() === '<b>foobar</b>' );
         }
 
+        function testSingleton() {
+            $bar = \arc\lambda::singleton( function() {
+                return 'bar' . time();
+            } );
+            $baz = \arc\lambda::singleton( function() {
+                return 'baz';
+            } );
+            $test1 = $bar();
+            sleep(1);
+            $test2 = $bar();
+            $this->assertTrue( $test1 == $test2 );
+            $this->assertTrue( $baz() == 'baz' );
+        }
+
+        function testPartial() {
+            $bar = function( $x, $y, $z, $q=1 ) {
+                return [ 'x' => $x, 'y' => $y, 'z' => $z, 'q' => $q];
+            };
+            $baz = \arc\lambda::partial( $bar, [ 0 => 'x', 2 => 'z' ] );
+            $result = $baz( 'y' );
+            $this->assertTrue( $result == [ 'x' => 'x', 'y' => 'y', 'z' => 'z', 'q' => 1 ] );   
+        }
+
+        function testPartialPartial() {
+            $bar = function( $x, $y, $z='z', $q=1 ) {
+                return [ 'x' => $x, 'y' => $y, 'z' => $z, 'q' => $q];
+            };
+            $baz = \arc\lambda::partial( $bar, [ 0 => 'x', 3 => 'q' ], [ 2 => 'z' ] );
+            $result = $baz( 'y' );
+            $this->assertTrue( $result == [ 'x' => 'x', 'y' => 'y', 'z' => 'z', 'q' => 'q' ] );
+        }
     }
