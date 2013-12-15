@@ -8,7 +8,7 @@ namespace arc\xml;
 class Proxy {
 
 	use \arc\traits\Proxy {
-		\arc\traits\Proxy::__construct as private ProxyConstruct
+		\arc\traits\Proxy::__construct as private ProxyConstruct;
 	}	
 
 	private $parser = null;
