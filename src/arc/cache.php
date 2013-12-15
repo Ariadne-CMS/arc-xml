@@ -63,7 +63,7 @@
 			if ( method_exists( $store, $name ) ) {
 				return call_user_func_array( array( $store, $name), $args);
 			} else {
-				return parent::__callStatic( $name, $args );
+				throw new \arc\ExceptionMethodNotFound("Method $name not found in Cache Store", \arc\exceptions::OBJECT_NOT_FOUND);
 			}
 		}
 		
