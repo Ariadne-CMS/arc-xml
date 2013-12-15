@@ -42,40 +42,40 @@
 				case 'parentNode' :
 					return $this->parentNode;
 				break;
-/*				default:
-					return $this->cd( $name );
-				break;
-*/			}
+			}
 		}
 
 		public function __set( $name, $value ) {
 			switch ( $name ) {
 				case 'nodeName' :
-					if ( $this->parentNode ) {
-						if ( $this->parentNode->childNodes[$value] !== $this ) {
-							$this->parentNode->childNodes[$value] = $this;
-						}
-					}
-					$this->nodeName = $value;
+					$this->_setNodeName( $value );
 				break;
 				case 'childNodes' :
 					// make sure nodelists aren't shared between namednodes.
 					$this->childNodes = new NamedNodeList( (array) $value, $this );
 				break;
 				case 'parentNode' :
-					if ( $value instanceof NamedNode ) {
-						$value->appendChild( $this->nodeName, $this );
-					} else if ( isset($value) ) {
-						throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
-					} else if ( $this->parentNode ) {
-						$this->parentNode->removeChild( $this->nodeName );
-					}
+					$this->_setParentNode( $value );
 				break;
-/*
-				default:
-					$this->childNodes[ $name ] = $value;
-				break;
-*/
+			}
+		}
+
+		private function _setNodeName( $name ) {
+			if ( $this->parentNode ) {
+				if ( $this->parentNode->childNodes[$name] !== $this ) {
+					$this->parentNode->childNodes[$name] = $this;
+				}
+			}
+			$this->nodeName = $name;
+		}
+
+		private function _setParentNode( $node ) {
+			if ( $node instanceof NamedNode ) {
+				$node->appendChild( $this->nodeName, $this );
+			} else if ( isset($node) ) {
+				throw new \arc\Exception( 'parentNode is not a \arc\tree\NamedNode', \arc\exceptions::ILLEGAL_ARGUMENT );
+			} else if ( $this->parentNode ) {
+				$this->parentNode->removeChild( $this->nodeName );
 			}
 		}
 
