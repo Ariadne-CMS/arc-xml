@@ -49,18 +49,23 @@
 		public static $minimumLength = 10;
 
 		/**
+		 * @var (array) A list of inputs to ignore, keyed to the input method - GET, POST, COOKIE, SERVER
+		 */
+		public static $ignoreList = [];
+
+		/**
 		 * This method checks all user inputs ( get/post/cookie variables, client sent headers ) for potential XSS attacks
 		 * If found it flags these and sets self::$potentialXSS to true and starts an output buffer
 		 */
 		public static function detect() {
-			foreach ( [ $_GET, $_POST, $_COOKIE ] as $method ) {
-				if ( is_array( $method ) ) {
-					self::_gatherXSSInput( $method );
+			foreach ( [ 'GET' => $_GET, 'POST' => $_POST, 'COOKIE' => $_COOKIE ] as $method => $inputs ) {
+				if ( is_array( $inputs ) ) {
+					self::_gatherXSSInput( $inputs, $method );
 				}
 			}
 			foreach ( self::$xssHeaders as $header ) {
 				if ( array_key_exists( $header, $_SERVER ) ) {
-					self::_gatherXSSInput( $_SERVER[$header] );
+					self::_gatherXSSInput( $_SERVER[$header], 'SERVER' );
 				}
 			}
 
@@ -72,17 +77,22 @@
 			}
 		}
 
-		private static function _gatherXSSInput( $input ) {
+		private static function _gatherXSSInput( $input, $method, $name = null ) {
 			if ( is_array( $input ) ) {
 				foreach ( $input as $key => $value ) {
-					self::_gatherXSSInput( $value );
+					if ( !isset($name) ) {
+						self::_gatherXSSInput( $value, $method, $key );
+					} else {
+						self::_gatherXSSInput( $value, $method, $name );
+					}
 				}
 			} else {
 				$input = (string) $input;
-				if ( ( strlen( $input ) > self::$minimumLength ) 
+				if ( ( !array_key_exists( $method, self::$ignoreList ) || !array_key_exists( $name, self::$ignoreList[$method] ) )
+					&& ( strlen( $input ) > self::$minimumLength ) 
 					&& preg_match( self::$reXSS, $input, $matches) ) 
 				{
-					self::$xss[ strlen($input) ][] = $input;
+					self::$xss[ $method ][ strlen($input) ][] = $input;
 				}
 			}
 		}
@@ -124,18 +134,24 @@
 			$xssDetected = false;
 			// sort by length of string so longer strings are matched first
 			// key is set to the length of the string by detect()
-			krsort( self::$xss, SORT_NUMERIC );
-			foreach ( self::$xss as $length => $values) {
-				if ( is_array($values) ) {
-					foreach ( $values as $value ) {
-						if ( false !== strpos( self::$output, $value) ) {
-							// One of the potential XSS attack inputs has been found _unchanged_ in the output
-							return true;
+			foreach( self::$xss as $method => $inputs ) {
+				krsort( $inputs, SORT_NUMERIC );
+				foreach ( $inputs as $length => $values) {
+					if ( is_array($values) ) {
+						foreach ( $values as $value ) {
+							if ( false !== strpos( self::$output, $value) ) {
+								// One of the potential XSS attack inputs has been found _unchanged_ in the output
+								return true;
+							}
 						}
 					}
 				}
 			}
 			return false;
+		}
+
+		public static function ignore( $name, $method = 'GET' ) {
+			self::$ignoreList[$method][$name] = 1;
 		}
 
 	}
