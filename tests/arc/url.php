@@ -7,6 +7,8 @@
      *
      * For the full copyright and license information, please view the LICENSE
      * file that was distributed with this source code.
+      
+
      */
 
     require_once( __DIR__.'/../bootstrap.php' );
@@ -60,6 +62,26 @@
             $url = \arc\url::url($starturl);
             $this->assertIsA($url, '\arc\url\Url');
             $this->assertEqual($url.'', $starturl);
+        }
+
+        function testParseCommonURLS() {
+            $commonUrls = [
+                'ftp://ftp.is.co.za/rfc/rfc1808.txt',
+                'http://www.ietf.org/rfc/rfc2396.txt',
+                'ldap://[2001:db8::7]/c=GB?objectClass?one',
+                'mailto:John.Doe@example.com',
+                'news:comp.infosystems.www.servers.unix',
+                'tel:+1-816-555-1212',
+                'telnet://192.0.2.16:80/',
+                'urn:oasis:names:specification:docbook:dtd:xml:4.1.2',
+                '//google.com',
+                '../../relative/',
+                'file:///C:/'
+            ];
+            foreach ( $commonUrls as $sourceUrl ) {
+                $url =\arc\url::safeUrl( $sourceUrl );
+                $this->assertEqual( ''.$url, $sourceUrl );
+            }
         }
         
     }

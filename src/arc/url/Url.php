@@ -46,7 +46,21 @@
 		}
 
 		public function __toString() {
-			return $this->getSchemeAndAuthority() . $this->getPath() . $this->getQuery() . $this->getFragment();
+			switch ( $this->scheme ) {
+				case 'file':
+					return $this->getScheme() . '//' . $this->host . $this->getFilePath();
+				break;
+				case 'mailto':
+				case 'news':
+					return ( $this->path ? $this->getScheme() . $this->getPath() : '' );
+				break;
+				case 'ldap':
+					return $this->getSchemeAndAuthority() . $this->getPath() . $this->getLdapQuery();
+				break;
+				default:
+					return $this->getSchemeAndAuthority() . $this->getPath() . $this->getQuery() . $this->getFragment();
+				break;
+			}
 		}
 
 		public function __get( $name ) {
@@ -87,9 +101,9 @@
 			} );
 		}
 
-		// note: both '//google.com/' and 'file:///C:/' are valid URL's - so if either a scheme or host is set, add the // part
 		private function getSchemeAndAuthority() {
-			return ( ( $this->scheme || $this->host ) ? $this->getScheme() . '//' . $this->getAuthority() : '' );
+			// note: both '//google.com/' and 'file:///C:/' are valid URL's - so if either a scheme or host is set, add the // part
+			return ( ( $this->scheme || $this->host ) ? $this->getScheme() . $this->getAuthority() : '' );
 		}
 
 		private function getScheme() {
@@ -97,37 +111,57 @@
 		}
 
 		private function getAuthority() {
-			return ( $this->host ? $this->getUser() . $this->host . $this->getPort() : '' );
+			return ( $this->host ? '//' . $this->getUser() . $this->host . $this->getPort() : '' );
 		}
 
 		private function getUser() {
-			return ( $this->user ? $this->user . $this->getPassword() . '@' : '' );
+			return ( $this->user ? rawurlencode( $this->user ) . $this->getPassword() . '@' : '' );
 		}
 
 		private function getPassword() {
-			return ( $this->pass ?  ':' . $this->pass : '' );
+			return ( $this->user && $this->pass ?  ':' . rawurlencode( $this->pass ) : '' );
 		}
 
 		private function getPort() {
-			return ( $this->port ? ':' . $this->port : '' );
+			return ( $this->port ? ':' . (int) $this->port : '' );
 		}
 
-		// note: if either a scheme or host is set, the path _must_ be made absolute or the URL will be invalid
+		// note: if a host is set, the path _must_ be made absolute or the URL will be invalid
 		private function getPath() {
+			if ( !$this->path ) { 
+				return ''; 
+			}
 			$path = $this->path;
-			if ( ( $this->host || $this->scheme ) && ( !$path || $path[0] !== '/' ) ) {
+			if ( $this->host && ( !$path || $path[0] !== '/' ) ) {
+				$path = '/' . $path;
+			}
+			// urlencode encodes too many characters for the path part, so we decode them back to get readable urls.
+			return str_replace( [ '%3D', '%2B', '%3A', '%40' ], [ '=', '+', ':', '@' ], join( '/', array_map( 'urlencode', explode( '/', $path ) ) ) );
+		}
+
+		private function getFilePath() {
+			// in the file: scheme, a path must start with a '/' even if no host is set. This contradicts with the email: scheme.
+			$path = $this->getPath();
+			if ( $path && $path[0]!=='/' ) {
 				$path = '/' . $path;
 			}
 			return $path;
 		}
 
 		private function getQuery() {
+			// queries are assumed to handle themselves, so no encoding here.
 			$query = (string) $this->query; // convert explicitly to string first, because the query object may exist but still return an empty string
 			return ( $query ? '?' . $query : '' );
 		}
 
+		private function getLdapQuery() {
+			// ldap queries may contain multiple ? tokens - so these are unencoded here.
+			$query = (string) $this->query; // convert explicitly to string first, because the query object may exist but still return an empty string
+			return ( $query ? '?' . str_replace( '%3F', '?', $query ) : '' );	
+		}
+
 		private function getFragment() {
-			return ( $this->fragment ? '#' . $this->fragment : '' );
+			return ( $this->fragment ? '#' . urlencode($this->fragment) : '' );
 		}
 
 	}
