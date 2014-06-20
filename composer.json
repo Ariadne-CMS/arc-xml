@@ -1,7 +1,8 @@
 {
-	"name": "arc/arc",
+	"name": "arc/xml",
+	"version": "1.0",
 	"type": "library",
-	"description": "Ariadne Component Library",
+	"description": "Ariadne Component Library: Cache Component",
 	"keywords": ["component","components"],
 	"homepage": "https://github.com/Ariadne-CMS/arc/wiki",
 	"license": "GPL",
@@ -12,11 +13,12 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3"
+		"php": ">=5.4",
+		"arc/base": "1.0"
 	},
 	"autoload": {
-		"psr-0": {
-			"arc": "src/"
+		"psr-4": {
+			"arc\\": "src/"
 		}
 	}
 }
