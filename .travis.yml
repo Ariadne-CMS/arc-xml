@@ -11,5 +11,3 @@ notifications:
   email: false
   irc: "open.ircnet.org#ariadne"
 
-
-

@@ -32,10 +32,6 @@ trait Proxy {
 		return call_user_func_array( [ $this->target, $name ],  $args );
 	}
 
-	public function __implements( $type ) {
-		return ( ( $this instanceof $type ) || \arc\isA( $this->target, $type ) );
-	}
-
 	public function __toString() {
 		return (string) $this->target;
 	}
