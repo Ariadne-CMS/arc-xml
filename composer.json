@@ -1,6 +1,5 @@
 {
 	"name": "arc/xml",
-	"version": "1.0",
 	"type": "library",
 	"description": "Ariadne Component Library: Cache Component",
 	"keywords": ["component","components"],
