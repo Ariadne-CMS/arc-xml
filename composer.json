@@ -13,7 +13,7 @@
 	],
 	"require": {
 		"php": ">=5.4",
-		"arc/base": "1.*"
+		"arc/base": "~1.0"
 	},
 	"autoload": {
 		"psr-4": {
