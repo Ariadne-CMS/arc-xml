@@ -35,26 +35,22 @@ class Parser
 
 	private function parsePartial( $xml, $encoding ) 
 	{
-		try {
-			// add a known (single) root element with all declared namespaces
-			// libxml will barf on multiple root elements
-			// and it will silently drop namespace prefixes not defined in the document
-			$root = '<arcxmlroot';
-			foreach ( $this->namespaces as $name => $uri ) {
-				if ( $name === 0 ) {
-					$root .= ' xmlns="';
-				} else {
-					$root .= ' xmlns:'.$name.'="';
-				}
-				$root .= htmlspecialchars( $uri ) . '"';
+		// add a known (single) root element with all declared namespaces
+		// libxml will barf on multiple root elements
+		// and it will silently drop namespace prefixes not defined in the document
+		$root = '<arcxmlroot';
+		foreach ( $this->namespaces as $name => $uri ) {
+			if ( $name === 0 ) {
+				$root .= ' xmlns="';
+			} else {
+				$root .= ' xmlns:'.$name.'="';
 			}
-			$root .= '>';
-			$result = $this->parseFull( $root.$xml.'</arcxmlroot>', $encoding );
-			$result = $result->firstChild->childNodes;
-			return $result;
-		} catch( \arc\Exception $e ) {
-			return new Proxy( $xml, $this );
+			$root .= htmlspecialchars( $uri ) . '"';
 		}
+		$root .= '>';
+		$result = $this->parseFull( $root.$xml.'</arcxmlroot>', $encoding );
+		$result = $result->firstChild->childNodes;
+		return $result;
 	}
 
 	private function parseFull( $xml, $encoding = null ) 
