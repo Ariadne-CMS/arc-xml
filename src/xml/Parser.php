@@ -84,7 +84,7 @@ class Parser
 		foreach ( $errors as $error ) {
 			$message .= "\nline: ".$error->line."; column: ".$error->column."; ".$error->message;
 		}
-		throw new \arc\Exception( $message, exceptions::ILLEGAL_ARGUMENT );
+		throw new \arc\Exception( $message, \arc\exceptions::ILLEGAL_ARGUMENT );
 	}
 
 }
