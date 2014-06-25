@@ -2,11 +2,13 @@
 
 namespace arc\xml;
 
-class Parser {
+class Parser 
+{
 	
 	public $namespaces = array();
 
-	public function __construct( $options = array() ) {
+	public function __construct( $options = array() ) 
+	{
 		$optionList = array( 'namespaces' );
 		foreach( $options as $option => $optionValue ) {
 			if ( in_array( $option, $optionList ) ) {
@@ -15,7 +17,8 @@ class Parser {
 		}
 	}
 
-	public function parse( $xml, $encoding = null ) {
+	public function parse( $xml, $encoding = null ) 
+	{
 		if ( !$xml ) {
 			return Proxy( null );
 		}
@@ -30,7 +33,8 @@ class Parser {
 		}
 	}
 
-	private function parsePartial( $xml, $encoding ) {
+	private function parsePartial( $xml, $encoding ) 
+	{
 		try {
 			// add a known (single) root element with all declared namespaces
 			// libxml will barf on multiple root elements
@@ -53,7 +57,8 @@ class Parser {
 		}
 	}
 
-	private function parseFull( $xml, $encoding = null ) {
+	private function parseFull( $xml, $encoding = null ) 
+	{
 		$dom = new \DomDocument();
 		if ( $encoding ) {
 			$xml = '<?xml encoding="' . $encoding . '">' . $xml;
@@ -70,7 +75,7 @@ class Parser {
 				}
 				$dom->encoding = $encoding;
 			}
-			return new Proxy( $dom, $this );
+			return new Proxy( simplexml_import_dom( $dom ), $this );
 		}
 		$errors = libxml_get_errors();
 		libxml_clear_errors();
@@ -80,44 +85,6 @@ class Parser {
 			$message .= "\nline: ".$error->line."; column: ".$error->column."; ".$error->message;
 		}
 		throw new \arc\Exception( $message, exceptions::ILLEGAL_ARGUMENT );
-	}
-
-	static public function css2XPath( $cssSelector ) {
-		/* (c) Tijs Verkoyen - http://blog.verkoyen.eu/blog/p/detail/css-selector-to-xpath-query/ */
-		$cssSelectors = array(
-			// E F: Matches any F element that is a descendant of an E element
-			'/(\w)\s+(\w)/',
-			// E > F: Matches any F element that is a child of an element E
-			'/(\w)\s*>\s*(\w)/',
-			// E:first-child: Matches element E when E is the first child of its parent
-			'/(\w):first-child/',
-			// E + F: Matches any F element immediately preceded by an element
-			'/(\w)\s*\+\s*(\w)/',
-			// E[foo]: Matches any E element with the "foo" attribute set (whatever the value)
-			'/(\w)\[([\w\-]+)]/',
-			// E[foo="warning"]: Matches any E element whose "foo" attribute value is exactly equal to "warning"
-			'/(\w)\[([\w\-]+)\=\"(.*)\"]/',
-			// div.warning: HTML only. The same as DIV[class~="warning"]
-			'/(\w+|\*)?\.([\w\-]+)+/',
-			// E#myid: Matches any E element with id-attribute equal to "myid"
-			'/(\w+)+\#([\w\-]+)/',
-			// #myid: Matches any E element with id-attribute equal to "myid"
-			'/\#([\w\-]+)/'
-		);
-
-		$xPathQueries = array(
-			'\1//\2',
-			'\1/\2',
-			'*[1]/self::\1',
-			'\1/following-sibling::*[1]/self::\2',
-			'\1 [ @\2 ]',
-			'\1[ contains( concat( " ", @\2, " " ), concat( " ", "\3", " " ) ) ]',
-			'\1[ contains( concat( " ", @class, " " ), concat( " ", "\2", " " ) ) ]',
-			'\1[ @id = "\2" ]',
-			'*[ @id = "\1" ]'
-		);
-
-		return (string) '//'. preg_replace($cssSelectors, $xPathQueries, $cssSelector);
 	}
 
 }
