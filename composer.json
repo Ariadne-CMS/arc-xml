@@ -1,7 +1,7 @@
 {
 	"name": "arc/xml",
 	"type": "library",
-	"description": "Ariadne Component Library: Cache Component",
+	"description": "Ariadne Component Library: xml writer and parser Component",
 	"keywords": ["component","components"],
 	"homepage": "https://github.com/Ariadne-CMS/arc/wiki",
 	"license": "MIT",
