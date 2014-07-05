@@ -11,7 +11,7 @@
 
 require_once( __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php' );
  
-class TestXML extends UnitTestCase 
+class TestXML extends PHPUnit_Framework_TestCase 
 {
 
 	var $RSSXML = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
@@ -30,10 +30,10 @@ class TestXML extends UnitTestCase
 	{
 		$preamble = \arc\xml::preamble();
 		$cdata = \arc\xml::cdata('Some " value');
-		$this->assertEqual( (string) $preamble, '<?xml version="1.0" ?>' );
-		$this->assertEqual( (string) $cdata, '<![CDATA[Some " value]]>' );
+		$this->assertEquals( (string) $preamble, '<?xml version="1.0" ?>' );
+		$this->assertEquals( (string) $cdata, '<![CDATA[Some " value]]>' );
 		$comment = \arc\xml::comment('A comment');
-		$this->assertEqual( (string) $comment, '<!-- A comment -->' );
+		$this->assertEquals( (string) $comment, '<!-- A comment -->' );
 	}
 
 	function testXMLWriter() 
@@ -73,7 +73,7 @@ class TestXML extends UnitTestCase
 /*
 	function testXMLElement() {
 		$el = \arc\xml::el( 'name', array( 'title' => 'a title' ) );
-		$this->assertEqual( (string) $el, '<name title="a title"></name>' ); //asXML doesn't use immediate close tag
+		$this->assertEquals( (string) $el, '<name title="a title"></name>' ); //asXML doesn't use immediate close tag
 	}
 
 	function testXMLNodes() {
@@ -106,7 +106,7 @@ class TestXML extends UnitTestCase
 		);
 
 		$this->assertTrue( $xml instanceof \arc\xml\NodeList );
-		$this->assertEqual( (string) $xml, $this->RSSXML );
+		$this->assertEquals( (string) $xml, $this->RSSXML );
 
 	}
 
@@ -122,8 +122,8 @@ class TestXML extends UnitTestCase
 			$result = \arc\xml::parse( $this->incorrectXML );
 		} catch( \arc\Exception $error ) {
 		}
-		$this->assertEqual( $channelTitle, 'Wikipedia' );
-		$this->assertEqual( $xmlString, $this->RSSXML );
+		$this->assertEquals( $channelTitle, 'Wikipedia' );
+		$this->assertEquals( $xmlString, $this->RSSXML );
 	
 		$this->assertTrue( $error instanceof \arc\Exception );
 	}
