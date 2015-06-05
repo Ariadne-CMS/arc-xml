@@ -18,3 +18,7 @@ notifications:
     on_success: change
     on_failure: always
 
+after_script:
+    - wget https://scrutinizer-ci.com/ocular.phar
+    - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
