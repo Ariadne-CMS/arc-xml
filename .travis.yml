@@ -8,7 +8,7 @@ php:
 before_script:
    - composer install
 
-script: phpunit ./tests
+script: phpunit --coverage-clover=coverage.clover ./tests
 
 notifications:
   email: false
