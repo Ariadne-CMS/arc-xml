@@ -8,13 +8,19 @@ php:
 before_script:
    - composer install
 
-script: phpunit ./tests
+script: phpunit --coverage-clover=coverage.clover ./tests
 
 notifications:
   email: false
   irc:
     channels:
-       - "open.ircnet.org#ariadne"
+       secure: "oPoQ3znLse98X3go3m1IVu7nGvXGXXu90U3/kooLeJ3wCJnk/H7ZHzLXu5RIm/2mqEd+CPWFdpyLVa95Ldy+qJ6qcoO6FzC6ID9vw1t781nnxfNHe1tb3pSb4GMKrpPgumSNqY10TIRYBNem9N7rGHtG6MUOtXVsLX20YpBgSAU="
     on_success: change
     on_failure: always
 
+after_script:
+    - wget https://scrutinizer-ci.com/ocular.phar
+    - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+
+
+sudo: false
