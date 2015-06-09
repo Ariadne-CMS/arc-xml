@@ -14,18 +14,18 @@ namespace arc;
 class xml
 {
 
-    static public function __callStatic( $name, $args )
+    public static function __callStatic( $name, $args )
     {
         return call_user_func_array( [ new xml\Writer(), $name ], $args );
     }
 
-    static public function parse( $xml, $encoding = null )
+    public static function parse( $xml, $encoding = null )
     {
         $parser = new xml\Parser();
         return $parser->parse( $xml, $encoding );
     }
 
-    static public function css2XPath( $cssSelector )
+    public static function css2XPath( $cssSelector )
     {
         /* (c) Tijs Verkoyen - http://blog.verkoyen.eu/blog/p/detail/css-selector-to-xpath-query/ */
         $cssSelectors = array(
