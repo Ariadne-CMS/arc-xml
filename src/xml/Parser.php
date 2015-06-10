@@ -78,7 +78,7 @@ class Parser
         libxml_use_internal_errors( $prevErrorSetting );
         $message = 'Incorrect xml passed.';
         foreach ($errors as $error) {
-            $message .= "\nline: ".$error->line."; column: ".$error->column."; ".$error->message;
+            $message .= '\nline: '.$error->line.'; column: '.$error->column.'; '.$error->message;
         }
         throw new \arc\Exception( $message, \arc\exceptions::ILLEGAL_ARGUMENT );
     }

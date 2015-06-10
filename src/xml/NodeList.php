@@ -26,7 +26,7 @@ class NodeList extends \ArrayObject {
         return join( $indent, (array) $this );
     }
 
-    static public function indent( $indent, $content ) {
+    public static function indent( $indent, $content ) {
         if ($indent && ( strpos( $content, '<' ) !== false )) {
             $indent = ( is_string( $indent ) ? $indent : "\t" );
             return "\r\n" . preg_replace( '/^(\s*)</m', $indent.'$1<', $content ) . "\r\n";

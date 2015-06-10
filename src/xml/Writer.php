@@ -21,14 +21,14 @@ class Writer {
         return call_user_func_array( [ new NodeList( array(), $this ), $name ], $args );
     }
 
-    static public function name( $name)
+    public static function name( $name)
     {
         return preg_replace( '/^[^:a-z_]*/isU', '',
             preg_replace( '/[^-.0-9:a-z_]/isU', '', $name
         ) );
     }
 
-    static public function value( $value)
+    public static function value( $value)
     {
         if (is_array( $value )) {
             $content = array_reduce( $value, function( $result, $value)
@@ -48,7 +48,7 @@ class Writer {
         return $content;
     }
 
-    static public function attribute( $name, $value)
+    public static function attribute( $name, $value)
     {
         if ($name === $value) {
             return ' ' . self::name( $name );
@@ -59,17 +59,17 @@ class Writer {
         }
     }
 
-    static public function comment( $content)
+    public static function comment( $content)
     {
         return '<!-- ' . self::value( $content ) . ' -->';
     }
 
-    static public function cdata( $content)
+    public static function cdata( $content)
     {
         return '<![CDATA[' . str_replace( ']]>', ']]&gt;', $content ) . ']]>';
     }
 
-    static public function preamble( $version = '1.0', $encoding = null, $standalone = null)
+    public static function preamble( $version = '1.0', $encoding = null, $standalone = null)
     {
         if (isset($standalone)) {
             if ($standalone === 'false') {
