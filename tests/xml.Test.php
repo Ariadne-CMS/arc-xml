@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-require_once( __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php' );
  
 class TestXML extends PHPUnit_Framework_TestCase 
 {
