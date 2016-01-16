@@ -6,9 +6,9 @@ class Writer {
 
     public $indent = false;
 
-    public function __construct( $options = array())
+    public function __construct( $options = [])
     {
-        $optionList = array( 'indent' );
+        $optionList = [ 'indent' ];
         foreach( $options as $option => $optionValue) {
             if (in_array( $option, $optionList )) {
                 $this->{$option} = $optionValue;
@@ -17,8 +17,8 @@ class Writer {
     }
 
     public function __call( $name, $args)
-    {
-        return call_user_func_array( [ new NodeList( array(), $this ), $name ], $args );
+    {	
+        return call_user_func_array( [ new NodeList( [], $this ), $name ], $args );
     }
 
     public static function name( $name)

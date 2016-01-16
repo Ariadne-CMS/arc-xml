@@ -71,6 +71,7 @@ class Parser
                 }
                 $dom->encoding = $encoding;
             }
+	        libxml_use_internal_errors( $prevErrorSetting );
             return new Proxy( simplexml_import_dom( $dom ), $this );
         }
         $errors = libxml_get_errors();
