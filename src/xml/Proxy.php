@@ -36,12 +36,7 @@ class Proxy extends \ArrayObject {
     }
     
     public function __call( $name, $args ) {
-        $simpleXMLMethods = [
-            'addAttribute', 'addChild', 'asXML', 'attributes', 'children', 
-            'count', 'getDocNamespaces', 'getName', 'getNamespaces', 
-            'registerXPathNamespace', 'saveXML', 'xpath'
-        ];
-        if ( !in_array( $name, $simpleXMLMethods ) ) {
+        if ( !method_exists($this->target, $name) ) {
             $dom = dom_import_simplexml($this->target);
             $result = call_user_func_array( [ $dom, $name], $args );
             if ( isset($result) && is_object($result) ) {
