@@ -77,9 +77,4 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertEquals( '2.0', $version );
 	}
 
-	function testProxyForMethods()
-	{
-		$xml = \arc\xml::parse( $this->RSSXML );
-						
-	}
 }
