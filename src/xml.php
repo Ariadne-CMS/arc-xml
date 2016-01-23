@@ -23,7 +23,7 @@ class xml
     /**
      * @var xml\Writer The writer instance to use by default
      */
-    static $writer = null;
+    public static $writer = null;
 
     public static function __callStatic( $name, $args )
     {
@@ -63,7 +63,7 @@ class xml
             // E:first-child: Matches element E when E is the first child of its parent
             '/(\w+|\*):first-child/'
             => '*[1]/self::\1',
-            // E:checked, E:disabled or E:selected
+            // Matches E:checked, E:disabled or E:selected (and just for scrutinizer: this is not code!)
             '/(\w+|\*):(checked|disabled|selected)/'
             => '\1 [ @\2 ]',
             // E + F: Matches any F element immediately preceded by an element
