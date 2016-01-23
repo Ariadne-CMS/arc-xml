@@ -60,13 +60,13 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $error instanceof \arc\Exception );
 	}
 
-/*	function testXMLFind() 
+	function testXMLFind() 
 	{
 		$xml = \arc\xml::parse( $this->RSSXML );
 		$title = $xml->find('channel title')[0];
 		$this->assertTrue( $title->nodeValue == 'Wikipedia' );
 	}
-*/
+
 	function testProxyForAttributes()
 	{
 		$xml = \arc\xml::parse( $this->RSSXML );
@@ -92,6 +92,7 @@ class TestXML extends PHPUnit_Framework_TestCase
 			'list item' => ['item1','item2','item3'],
 			'list > item' => ['item1','item2'],
 			'item:first-child' => ['item1','item3'],
+			'input:checked' => ['a radio'],
 			'item + item' => ['item2'],
 			'item ~ item' => ['item2'],
 			'item[data]' => ['item3'],
@@ -105,12 +106,13 @@ class TestXML extends PHPUnit_Framework_TestCase
 			'.first' => ['item1'],
 			'.last' => ['item3'],
 			'.item' => ['item1', 'item2', 'item3'],
+			'item.special-class' => ['item2'],
 			'list > item.item' => ['item1','item2'],
-			'list > item > item' => ['item3']
+			'list > item > item.last' => ['item3'],
+			'list > item ~ item' => ['item2']
 		];
 
 		foreach ( $selectors as $css => $expectedValues ) {
-			$xpath = \arc\xml::css2XPath($css);
 			$result = $xml->find($css);
 			foreach ( $result as $index => $value ) {
 				$result[$index] = (string) $value->nodeValue;
