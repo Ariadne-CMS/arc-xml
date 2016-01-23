@@ -79,7 +79,7 @@ class TestXML extends PHPUnit_Framework_TestCase
 
 	function testCSSSelectors()
 	{
-		$xmlString = \arc\xml::list(
+		$xmlString = \arc\xml::{'list'}(
 			\arc\xml::item(['class' => 'first item', 'id' => 'special'], 'item1',
 				\arc\xml::input(['type' => 'radio', 'checked' => 'checked' ], 'a radio')
 			),
