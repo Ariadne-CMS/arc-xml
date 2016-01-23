@@ -17,13 +17,19 @@ class Parser
         }
     }
 
-    public function parse( $xml, $encoding = null )
+    /**
+     * Parses an XML string and returns a Proxy for it.
+     * @param string|Proxy|null $xml
+     * @param string $encoding The character set to use, defaults to UTF-8
+     * @return Proxy
+     */
+    public function parse( $xml=null, $encoding = null )
     {
         if (!$xml) {
             return Proxy( null );
         }
         if ($xml instanceof Proxy) { // already parsed
-            return $xml;
+            return $xml->cloneNode();
         }
         $xml = (string) $xml;
         try {
