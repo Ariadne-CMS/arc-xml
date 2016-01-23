@@ -11,20 +11,42 @@
 
 namespace arc;
 
+/**
+ * This class contains the parse and css2XPath methods.
+ * In addition any other method statically called on this class
+ * will reroute the call to the XML writer instance at 
+ * \arc\xml::$writer. It is automatically instantiated if needed.
+ * Or you can set it yourself to another Writer instance.
+ */
 class xml
 {
+    static $writer = null;
 
     public static function __callStatic( $name, $args )
     {
-        return call_user_func_array( [ new xml\Writer(), $name ], $args );
+        if ( !isset(self::$writer) ) {
+            self::$writer = new xml\Writer();
+        }
+        return call_user_func_array( [ self::$writer, $name ], $args );
     }
 
-    public static function parse( $xml, $encoding = null )
+    /**
+     * This parses an XML string and returns a Proxy
+     * @param string|Proxy $xml
+     * @return Proxy
+     * @throws \arc\Exception
+     */
+    public static function parse( $xml=null, $encoding = null )
     {
         $parser = new xml\Parser();
         return $parser->parse( $xml, $encoding );
     }
 
+    /**
+     * This method turns a single CSS 2 selector into an XPath query
+     * @param string $cssSelector
+     * @return string
+     */
     public static function css2XPath( $cssSelector )
     {
         /* based on work by Tijs Verkoyen - http://blog.verkoyen.eu/blog/p/detail/css-selector-to-xpath-query/ */
@@ -76,7 +98,7 @@ class xml
                 if ( preg_match($selector, $cssSelector) ) {
                     $continue = true;
                     break;
-                }       
+                }
             }
         } while ( $continue );
         return '//'.$cssSelector;

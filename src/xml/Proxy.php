@@ -1,11 +1,20 @@
 <?php
 /*
-    TODO: implement simplexml access methods to the proxy
-    probably needs to extend ArrayObject in some way to do this properly
+ * This file is part of the Ariadne Component Library.
+ *
+ * (c) Muze <info@muze.nl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 namespace arc\xml;
 
-class Proxy extends \ArrayObject {
+/**
+ * This class is a proxy for both the SimpleXMLElement and DOMElement 
+ * properties and methods.
+ */
+class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     use \arc\traits\Proxy {
         \arc\traits\Proxy::__construct as private ProxyConstruct;
@@ -107,6 +116,11 @@ class Proxy extends \ArrayObject {
         }
     }
 
+    /**
+     * Search through the XML DOM with a single CSS selector
+     * @param string $query the CSS selector, most CSS 2 selectors work
+     * @return Proxy
+     */
     public function find( $query) {
         $xpath = \arc\xml::css2Xpath( $query );
         $temp = $this->target->xpath( $xpath );
