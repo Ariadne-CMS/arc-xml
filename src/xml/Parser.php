@@ -1,12 +1,32 @@
 <?php
+/*
+ * This file is part of the Ariadne Component Library.
+ *
+ * (c) Muze <info@muze.nl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace arc\xml;
 
+/**
+ * This class implements a XML parser based on DOMDocument->loadXML()
+ * But it returns a Proxy for both SimpleXMLElement and DOMElement.
+ * It also allows parsing of partial XML content.
+ */
 class Parser
 {
 
+    /**
+     * A list of namespaces to use when importing partial xml
+     * @var string[] $namespaces
+     */
     public $namespaces = array();
 
+    /**
+     * @param array $options Allows you to set the namespaces property immediately
+     */
     public function __construct( $options = array() )
     {
         $optionList = array( 'namespaces' );
@@ -17,13 +37,19 @@ class Parser
         }
     }
 
-    public function parse( $xml, $encoding = null )
+    /**
+     * Parses an XML string and returns a Proxy for it.
+     * @param string|Proxy|null $xml
+     * @param string $encoding The character set to use, defaults to UTF-8
+     * @return Proxy
+     */
+    public function parse( $xml=null, $encoding = null )
     {
         if (!$xml) {
             return Proxy( null );
         }
         if ($xml instanceof Proxy) { // already parsed
-            return $xml;
+            return $xml->cloneNode();
         }
         $xml = (string) $xml;
         try {

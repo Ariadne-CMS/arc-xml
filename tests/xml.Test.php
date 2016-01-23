@@ -123,4 +123,20 @@ class TestXML extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	function testXMLUpdates()
+	{
+		$xml = \arc\xml::parse( $this->RSSXML );
+		$xml->channel->addChild('language','en-us');
+		$language = $xml->channel->language->nodeValue;
+		$this->assertEquals('en-us', (string) $language);
+		$xml->channel->language = 'nl-NL';
+		$this->assertEquals('nl-NL', (string) $xml->channel->language->nodeValue );
+		$xml['version'] = '1.0';
+		$this->assertEquals('1.0', $xml['version']);		
+		$category = \arc\xml::parse('<category>Encyclopedia</category>');
+		$xml->channel->appendChild( $category );
+		$cat = $xml->channel->category->nodeValue;
+		$this->assertEquals('Encyclopedia', (string) $cat);
+	}
+
 }

@@ -1,11 +1,26 @@
 <?php
+/*
+ * This file is part of the Ariadne Component Library.
+ *
+ * (c) Muze <info@muze.nl>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace arc\xml;
 
+/**
+ * This trait is used by the XML Writer to represent a list of child nodes
+ */
 trait NodeListTrait {
 
     protected $writer = null;
 
+    /**
+     * @param array $list
+     * @param Writer $writer
+     */
     public function __construct( $list = null, $writer = null ) 
     {
         parent::__construct( $list );
@@ -29,7 +44,7 @@ trait NodeListTrait {
         return join( $indent, (array) $this );
     }
 
-    public static function indent( $content, $indent="\t", $newLine="\r\n" ) 
+    protected static function indent( $content, $indent="\t", $newLine="\r\n" ) 
     {
         if ($indent && ( strpos( $content, '<' ) !== false )) {
             $indent = ( is_string( $indent ) ? $indent : "\t" );
