@@ -20,6 +20,9 @@ namespace arc;
  */
 class xml
 {
+    /**
+     * @var xml\Writer The writer instance to use by default
+     */
     static $writer = null;
 
     public static function __callStatic( $name, $args )
@@ -60,7 +63,7 @@ class xml
             // E:first-child: Matches element E when E is the first child of its parent
             '/(\w+|\*):first-child/'
             => '*[1]/self::\1',
-            // E:checked or E:disabled or E:selected
+            // E:checked, E:disabled or E:selected
             '/(\w+|\*):(checked|disabled|selected)/'
             => '\1 [ @\2 ]',
             // E + F: Matches any F element immediately preceded by an element
@@ -92,7 +95,7 @@ class xml
         $cssSelectors = array_keys($translateList);
         $xPathQueries = array_values($translateList);
         do {
-            $continue = false;
+            $continue    = false;
             $cssSelector = (string) preg_replace($cssSelectors, $xPathQueries, $cssSelector);
             foreach ( $cssSelectors as $selector ) {
                 if ( preg_match($selector, $cssSelector) ) {
