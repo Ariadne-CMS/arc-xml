@@ -23,35 +23,85 @@ class Proxy extends \ArrayObject {
         return $this->target->asXML();
     }
 
-    public function __get( $name) {
-        if ($name == 'nodeValue') {
-            return $this->target.'';
+    private function _isDomProperty( $name ) {
+        $domProperties = [
+            'tagName', 'nodeType', 'parentNode', 
+            'firstChild', 'lastChild', 'previousSibling', 'nextSibling',
+            'ownerDocument', 'namespaceURI', 'prefix', 
+            'localName', 'baseURI', 'textContent'
+        ];
+        return in_array( $name, $domProperties );
+    }
+
+    private function _getTargetProperty($name) {
+        $value = null;
+        if ( !$this->_isDomProperty($name) ) {
+            $value = $this->target->{$name};
+        } else {
+            $dom = dom_import_simplexml($this->target);
+            if ( isset($dom) ) {
+                $value = $dom->{$name};
+            }
         }
-        $value = $this->target->{$name};
-        if (is_object( $value )) {
+        return $value;
+    }
+
+    private function _proxyResult( $value ) {
+        if ( $value instanceof \DOMElement ) {
+            $value = simplexml_import_dom($value);
+        }
+        if ( $value instanceof \SimpleXMLElement ) {
             return new static( $value, $this->parser );
         } else {
             return $value;
         }
     }
+
+    public function __get( $name) {
+        if ($name == 'nodeValue') {
+            return $this->target;
+        }
+        return $this->_proxyResult( $this->_getTargetProperty($name) );
+    }
     
-    public function __call( $name, $args ) {
-        if ( !method_exists($this->target, $name) ) {
-            $dom = dom_import_simplexml($this->target);
-            $result = call_user_func_array( [ $dom, $name], $args );
-            if ( isset($result) && is_object($result) ) {
-                if ( $result instanceof \DOMNode ) {
-                    return new static( $result, $this->parser );
-                }
-                if ( $result instanceof \DOMNodeList ) {
-                    $resultArray = [];
-                    for ( $i=0, $l=$result->length; $i<$l; $i ++ ) {
-                        $resultArray[$i] = new static( simplexml_import_dom($result->item($i)), $this->parser );
-                    }
-                    return $resultArray;
+    private function _domCall( $name, $args ) {
+        $dom = dom_import_simplexml($this->target);
+        foreach ( $args as $index => $arg ) {
+            if ( $arg instanceof \arc\xml\Proxy ) {
+                $args[$index] = dom_import_simplexml( $arg->nodeValue );
+            } else if ( $arg instanceof \SimpleXMLElement ) {
+                $args[$index] = dom_import_simplexml( $arg );
+            }
+        }
+        $importMethods = [
+            'appendChild', 'insertBefore', 'replaceChild'
+        ];
+        if ( in_array( $name, $importMethods ) ) {
+            if ( isset($args[0]) && $args[0] instanceof \DOMNode ) {
+                if ( $args[0]->ownerDocument !== $this->ownerDocument ) {
+                    $args[0] = $this->ownerDocument->importNode( $args[0], true);
                 }
             }
-            return $result;
+        }
+        $result = call_user_func_array( [ $dom, $name], $args );
+        if ( isset($result) && is_object($result) ) {
+            if ( $result instanceof \DOMElement ) {
+                return new static( $result, $this->parser );
+            }
+            if ( $result instanceof \DOMNodeList ) {
+                $resultArray = [];
+                for ( $i=0, $l=$result->length; $i<$l; $i ++ ) {
+                    $resultArray[$i] = new static( simplexml_import_dom($result->item($i)), $this->parser );
+                }
+                return $resultArray;
+            }
+        }
+        return $result;
+    }
+
+    public function __call( $name, $args ) {
+        if ( !method_exists($this->target, $name) ) {
+            return $this->_domCall( $name, $args );
         } else {
             return $this->ProxyCall($name, $args);
         }
