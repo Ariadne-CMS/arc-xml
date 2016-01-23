@@ -4,11 +4,12 @@ namespace arc\xml;
 
 class Writer {
 
-    public $indent = false;
+    public $indent = "\t";
+    public $newLine = "\r\n";
 
     public function __construct( $options = [])
     {
-        $optionList = [ 'indent' ];
+        $optionList = [ 'indent', 'newLine' ];
         foreach( $options as $option => $optionValue) {
             if (in_array( $option, $optionList )) {
                 $this->{$option} = $optionValue;
@@ -50,13 +51,7 @@ class Writer {
 
     public static function attribute( $name, $value)
     {
-        if ($name === $value) {
-            return ' ' . self::name( $name );
-        } else if (is_numeric( $name )) {
-            return ' ' . self::name( $value );
-        } else {
-            return ' ' . self::name( $name ) . '="' . self::value( $value ) . '"';
-        }
+        return ' ' . self::name( $name ) . '="' . self::value( $value ) . '"';
     }
 
     public static function comment( $content)

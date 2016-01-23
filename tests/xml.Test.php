@@ -39,9 +39,11 @@ class TestXML extends PHPUnit_Framework_TestCase
 	{
 		$xml = \arc\xml::ul( [ 'class' => 'menu' ],
 			\arc\xml::li('menu 1')
-			->li('menu 2')
+			->li('menu 2 ',
+				\arc\xml::em('emphasized')
+			)
 		);
-		$this->assertTrue( $xml == "<ul class=\"menu\"><li>menu 1</li><li>menu 2</li></ul>" );
+		$this->assertEquals( "<ul class=\"menu\">\r\n\t<li>menu 1</li>\r\n\t<li>\r\n\t\tmenu 2 <em>emphasized</em>\r\n\t</li>\r\n</ul>", (string) $xml );
 	}
 
 	function testXMLParsing() 
@@ -49,7 +51,7 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$xml = \arc\xml::parse( $this->RSSXML );
 		$error = null;
 		$xmlString = ''.$xml;
-		$this->assertTrue( $xml == $this->RSSXML );
+		$this->assertEquals( $this->RSSXML, $xmlString );
 		$this->assertTrue( $xml->channel->title == '<title>Wikipedia</title>' );
 		$this->assertTrue( $xml->channel->title->nodeValue == 'Wikipedia' );
 
@@ -75,6 +77,50 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertEquals( '2.0', $attributes['version']);
 		$version = $xml->getAttribute('version');
 		$this->assertEquals( '2.0', $version );
+	}
+
+	function testCSSSelectors()
+	{
+		$xmlString = \arc\xml::{'list'}(
+			\arc\xml::item(['class' => 'first item', 'id' => 'special'], 'item1',
+				\arc\xml::input(['type' => 'radio', 'checked' => 'checked' ], 'a radio')
+			),
+			\arc\xml::item(['class' => 'item special-class'], 'item2',
+				\arc\xml::item(['class' => 'item last', 'data' => 'extra data'], 'item3')
+			)
+		);
+		$xml = \arc\xml::parse($xmlString);
+		$selectors = [
+			'list item' => ['item1','item2','item3'],
+			'list > item' => ['item1','item2'],
+			'item:first-child' => ['item1','item3'],
+			'input:checked' => ['a radio'],
+			'item + item' => ['item2'],
+			'item ~ item' => ['item2'],
+			'item[data]' => ['item3'],
+			'item[data="extra data"]' => ['item3'],
+			'item[data="extra"]' => ['item3'],
+			'item#special' => ['item1'],
+			'#special' => ['item1'],
+			'item.first' => ['item1'],
+			'item.last' => ['item3'],
+			'item.item' => ['item1', 'item2', 'item3'],
+			'.first' => ['item1'],
+			'.last' => ['item3'],
+			'.item' => ['item1', 'item2', 'item3'],
+			'item.special-class' => ['item2'],
+			'list > item.item' => ['item1','item2'],
+			'list > item > item.last' => ['item3'],
+			'list > item ~ item' => ['item2']
+		];
+
+		foreach ( $selectors as $css => $expectedValues ) {
+			$result = $xml->find($css);
+			foreach ( $result as $index => $value ) {
+				$result[$index] = (string) trim($value->nodeValue);
+			}
+			$this->assertEquals( $expectedValues, $result, 'selector: '.$css );
+		}
 	}
 
 }
