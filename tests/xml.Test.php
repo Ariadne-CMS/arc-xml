@@ -60,13 +60,13 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertTrue( $error instanceof \arc\Exception );
 	}
 
-	function testXMLFind() 
+/*	function testXMLFind() 
 	{
 		$xml = \arc\xml::parse( $this->RSSXML );
 		$title = $xml->find('channel title')[0];
 		$this->assertTrue( $title->nodeValue == 'Wikipedia' );
 	}
-
+*/
 	function testProxyForAttributes()
 	{
 		$xml = \arc\xml::parse( $this->RSSXML );
@@ -75,6 +75,46 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertEquals( '2.0', $attributes['version']);
 		$version = $xml->getAttribute('version');
 		$this->assertEquals( '2.0', $version );
+	}
+
+	function testCSSSelectors()
+	{
+		$xmlString = \arc\xml::list(
+			\arc\xml::item(['class' => 'first item', 'id' => 'special'], 'item1'),
+			\arc\xml::item(['class' => 'item'], 'item2',
+				\arc\xml::item(['class' => 'item last', 'data' => 'extra data'], 'item3')
+			)
+		);
+		$xml = \arc\xml::parse($xmlString);
+		$selectors = [
+			'list item' => ['item1','item2','item3'],
+			'list > item' => ['item1','item2'],
+			'item:first-child' => ['item1','item3'],
+			'item + item' => ['item2'],
+			'item ~ item' => ['item2'],
+			'item[data]' => ['item3'],
+			'item[data="extra data"]' => ['item3'],
+			'item[data="extra"]' => ['item3'],
+			'item#special' => ['item1'],
+			'#special' => ['item1'],
+			'item.first' => ['item1'],
+			'item.last' => ['item3'],
+			'item.item' => ['item1', 'item2', 'item3'],
+			'.first' => ['item1'],
+			'.last' => ['item3'],
+			'.item' => ['item1', 'item2', 'item3'],
+			'list > item.item' => ['item1','item2'],
+			'list > item > item' => ['item3']
+		];
+
+		foreach ( $selectors as $css => $expectedValues ) {
+			$xpath = \arc\xml::css2XPath($css);
+			$result = $xml->find($css);
+			foreach ( $result as $index => $value ) {
+				$result[$index] = (string) $value->nodeValue;
+			}
+			$this->assertEquals( $expectedValues, $result, 'selector: '.$css );
+		}
 	}
 
 }
