@@ -39,7 +39,7 @@ trait NodeListTrait {
         }
     }
 
-    private function parseArgs( $args ) 
+    protected function parseArgs( $args ) 
     {
         $attributes = array();
         $content = '';
@@ -82,11 +82,7 @@ trait NodeListTrait {
         $result = '';
         if (count( $attributes )) {
             foreach ($attributes as $name => $value ) {
-                $result .= ' ' . $this->writer->name( $name );
-                $value = $this->writer->value( $value );
-                if ($value !== $name ) {
-                    $result .= '="' . $value . '"';
-                }
+                $result .= $this->writer->attribute( $name, $value );
             }
         }
         return $result;
