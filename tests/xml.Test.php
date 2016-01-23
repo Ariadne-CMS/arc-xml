@@ -39,9 +39,11 @@ class TestXML extends PHPUnit_Framework_TestCase
 	{
 		$xml = \arc\xml::ul( [ 'class' => 'menu' ],
 			\arc\xml::li('menu 1')
-			->li('menu 2')
+			->li('menu 2 ',
+				\arc\xml::em('emphasized')
+			)
 		);
-		$this->assertEquals( "<ul class=\"menu\"><li>menu 1</li><li>menu 2</li></ul>", (string) $xml );
+		$this->assertEquals( "<ul class=\"menu\">\r\n\t<li>menu 1</li>\r\n\t<li>\r\n\t\tmenu 2 <em>emphasized</em>\r\n\t</li>\r\n</ul>", (string) $xml );
 	}
 
 	function testXMLParsing() 
@@ -49,7 +51,7 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$xml = \arc\xml::parse( $this->RSSXML );
 		$error = null;
 		$xmlString = ''.$xml;
-		$this->assertTrue( $xml == $this->RSSXML );
+		$this->assertEquals( $this->RSSXML, $xmlString );
 		$this->assertTrue( $xml->channel->title == '<title>Wikipedia</title>' );
 		$this->assertTrue( $xml->channel->title->nodeValue == 'Wikipedia' );
 
@@ -115,7 +117,7 @@ class TestXML extends PHPUnit_Framework_TestCase
 		foreach ( $selectors as $css => $expectedValues ) {
 			$result = $xml->find($css);
 			foreach ( $result as $index => $value ) {
-				$result[$index] = (string) $value->nodeValue;
+				$result[$index] = (string) trim($value->nodeValue);
 			}
 			$this->assertEquals( $expectedValues, $result, 'selector: '.$css );
 		}

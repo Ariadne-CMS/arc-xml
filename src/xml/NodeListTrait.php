@@ -29,11 +29,11 @@ trait NodeListTrait {
         return join( $indent, (array) $this );
     }
 
-    public static function indent( $indent, $content ) 
+    public static function indent( $content, $indent="\t", $newLine="\r\n" ) 
     {
         if ($indent && ( strpos( $content, '<' ) !== false )) {
             $indent = ( is_string( $indent ) ? $indent : "\t" );
-            return "\r\n" . preg_replace( '/^(\s*)</m', $indent.'$1<', $content ) . "\r\n";
+            return $newLine . preg_replace( '/^(\s*[^\<]*)</m', $indent.'$1<', $content ) . $newLine;
         } else {
             return $content;
         }
@@ -69,7 +69,7 @@ trait NodeListTrait {
         $el = '<' . $tagName;
         $el .= $this->getAttributes( $attributes );
         if ($this->hasContent( $content )) {
-            $el .=  '>' . self::indent( $this->writer->indent, $content );
+            $el .=  '>' . self::indent( $content, $this->writer->indent, $this->writer->newLine );
             $el .= '</' . $tagName . '>';
         } else {
             $el .= '/>';

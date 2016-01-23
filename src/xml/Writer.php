@@ -4,11 +4,12 @@ namespace arc\xml;
 
 class Writer {
 
-    public $indent = false;
+    public $indent = "\t";
+    public $newLine = "\r\n";
 
     public function __construct( $options = [])
     {
-        $optionList = [ 'indent' ];
+        $optionList = [ 'indent', 'newLine' ];
         foreach( $options as $option => $optionValue) {
             if (in_array( $option, $optionList )) {
                 $this->{$option} = $optionValue;
