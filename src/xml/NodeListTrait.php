@@ -50,7 +50,7 @@ trait NodeListTrait {
                 foreach( $arg as $key => $subArg ) {
                     if (is_numeric( $key )) {
                         list( $subattributes, $subcontent ) = $this->parseArgs( $subArg );
-                        $attributes = $subattributes + $attributes;
+                        $attributes = array_merge( $attributes, $subattributes);
                         $content .= $subcontent;
                     } else {
                         $attributes[ $key ] = $subArg;

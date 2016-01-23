@@ -67,19 +67,18 @@ class xml
             => '*[ @id = "\1" ]'
         );
 
-        $continue = true;
         $cssSelectors = array_keys($translateList);
         $xPathQueries = array_values($translateList);
-        while ( $continue ) {
-            $cssSelector = (string) preg_replace($cssSelectors, $xPathQueries, $cssSelector);
+        do {
             $continue = false;
+            $cssSelector = (string) preg_replace($cssSelectors, $xPathQueries, $cssSelector);
             foreach ( $cssSelectors as $selector ) {
                 if ( preg_match($selector, $cssSelector) ) {
                     $continue = true;
                     break;
                 }       
             }
-        }
+        } while ( $continue );
         return '//'.$cssSelector;
     }
 }
