@@ -29,7 +29,7 @@ trait NodeListTrait {
         return join( $indent, (array) $this );
     }
 
-    public static function indent( $content, $indent="\t", $newLine="\r\n" ) 
+    protected static function indent( $content, $indent="\t", $newLine="\r\n" ) 
     {
         if ($indent && ( strpos( $content, '<' ) !== false )) {
             $indent = ( is_string( $indent ) ? $indent : "\t" );
