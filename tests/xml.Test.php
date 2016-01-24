@@ -139,4 +139,12 @@ class TestXML extends PHPUnit_Framework_TestCase
 		$this->assertEquals('Encyclopedia', (string) $cat);
 	}
 
+	function testGetElemById()
+	{
+		$xmlString = '<list><item id="item1">item 1</item><item id="item2">item 2</item></list>';
+		$xml = \arc\xml::parse($xmlString);
+		$item1 = $xml->getElementById('item1');
+		$this->assertEquals('item 1', (string) $item1->nodeValue );
+	}
+
 }

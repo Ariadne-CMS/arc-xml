@@ -129,6 +129,10 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         }
         return $temp;
     }
+
+    public function getElementById( $id ) {
+        return current($this->find('#'.$id));
+    }
     
     public function offsetGet( $offset )
     {
