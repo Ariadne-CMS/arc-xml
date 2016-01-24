@@ -12,11 +12,11 @@
 namespace arc;
 
 /**
- * This class contains the parse and css2XPath methods.
- * In addition any other method statically called on this class
+ * Any method statically called on this class
  * will reroute the call to the XML writer instance at 
- * \arc\xml::$writer. It is automatically instantiated if needed.
- * Or you can set it yourself to another Writer instance.
+ * \arc\xml::$writer. Except for the methods:
+ * parse, css2XPath, name, value, attribute, comment, cdata and preamble
+ * If you need those call the Writer instance directly
  */
 class xml
 {
@@ -138,7 +138,7 @@ class xml
             if (preg_match( '/^\s*<!\[CDATA\[/', $value )) {
                 $content = $value;
             } else {
-                $content = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+                $content = htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' );
             }
         }
         return $content;
