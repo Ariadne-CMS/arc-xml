@@ -10,10 +10,12 @@ ARC: Ariadne Component Library
 arc/xml
 =======
 
-This component provides a unified xml parser and writer. The writer allows for readable and correct xml in code, not using templates. The parser is a wrapper around both DOMDocument and SimpleXML. 
+This component provides a unified xml parser and writer. The writer allows for readable and correct xml in code, not using 
+templates. The parser is a wrapper around both DOMDocument and SimpleXML. 
 
-The parser and writer also work on fragments of XML. The parser also makes sure that the output is identical to the input (except for whitespace issues at the moment.)
-When converting a node to a string, \arc\xml will return the full xml string, including tags. If you don't want that, you can always access the 'nodeValue' property to get the original SimpleXMLElement.
+The parser and writer also work on fragments of XML. The parser also makes sure that the output is identical to the input.
+When converting a node to a string, \arc\xml will return the full xml string, including tags. If you don't want that, you 
+can always access the 'nodeValue' property to get the original SimpleXMLElement.
 
 Finally the parser also adds the ability to use basic CSS selectors to find elements in the XML.
 
@@ -115,3 +117,17 @@ EOF;
 ```
 
 And when you convert the xml back to a string, it will still be a partial XML fragment.
+
+
+Why use this instead of DOMDocument or SimpleXML?
+-------------------------------------------------
+
+arc\xml::parse has the following differences:
+
+  - When converted to string, it returns the original XML, without additions you didn't make.
+  - You can use it with partial XML fragments.
+  - No need to remember calling importNode() before appendChild() or insertBefore()
+  - No need to switch between SimpleXML and DOMDocument, because you need that one method only available in the other API.
+  - When returning a list of elements, you always get a simple Array, not a magic NodeList.
+
+In addition arc\xml doubles as a simple way to generate valid and indented XML, with readable and self-validating code.

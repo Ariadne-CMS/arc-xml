@@ -12,11 +12,11 @@
 namespace arc;
 
 /**
- * This class contains the parse and css2XPath methods.
- * In addition any other method statically called on this class
+ * Any method statically called on this class
  * will reroute the call to the XML writer instance at 
- * \arc\xml::$writer. It is automatically instantiated if needed.
- * Or you can set it yourself to another Writer instance.
+ * \arc\xml::$writer. Except for the methods:
+ * parse, css2XPath, name, value, attribute, comment, cdata and preamble
+ * If you need those call the Writer instance directly
  */
 class xml
 {
@@ -27,10 +27,10 @@ class xml
 
     public static function __callStatic( $name, $args )
     {
-        if ( !isset(self::$writer) ) {
-            self::$writer = new xml\Writer();
+        if ( !isset(static::$writer) ) {
+            static::$writer = new xml\Writer();
         }
-        return call_user_func_array( [ self::$writer, $name ], $args );
+        return call_user_func_array( [ static::$writer, $name ], $args );
     }
 
     /**
@@ -86,10 +86,10 @@ class xml
             => '\1[ contains( concat( " ", normalize-space(@class), " " ), concat( " ", "\2", " " ) ) ]',
             // E#myid: Matches any E element with id-attribute equal to "myid"
             '/(\w+)+\#([\w\-]+)/'
-            => '\1[ @id = "\2" ]',
+            => "\\1[@id='\\2']",
             // #myid: Matches any E element with id-attribute equal to "myid"
             '/\#([\w\-]+)/'
-            => '*[ @id = "\1" ]'
+            => "*[@id='\\1']"
         );
 
         $cssSelectors = array_keys($translateList);
@@ -106,4 +106,100 @@ class xml
         } while ( $continue );
         return '//'.$cssSelector;
     }
+
+    /**
+     * Returns a guaranteed valid XML name. Removes illegal characters from the name.
+     * @param string $name
+     * @return string
+     */
+    public static function name( $name)
+    {
+        return preg_replace( '/^[^:a-z_]*/isU', '',
+            preg_replace( '/[^-.0-9:a-z_]/isU', '', $name
+        ) );
+    }
+
+    /**
+     * Returns a guaranteed valid XML attribute value. Removes illegal characters.
+     * @param string|array|bool $value
+     * @return string
+     */
+    public static function value( $value)
+    {
+        if (is_array( $value )) {
+            $content = array_reduce( $value, function( $result, $value)
+            {
+                return $result . ' ' . static::value( $value );
+            } );
+        } else if (is_bool( $value )) {
+            $content = $value ? 'true' : 'false';
+        } else {
+            $value = (string) $value;
+            if (preg_match( '/^\s*<!\[CDATA\[/', $value )) {
+                $content = $value;
+            } else {
+                $content = htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' );
+            }
+        }
+        return $content;
+    }
+
+    /**
+     * Returns a guaranteed valid XML attribute. Removes illegal characters.
+     * @param string $name
+     * @param string|array|bool $value
+     * @return string
+     */
+    public static function attribute( $name, $value)
+    {
+        return ' ' . static::name( $name ) . '="' . static::value( $value ) . '"';
+    }
+
+    /**
+     * Returns a guaranteed valid XML comment. Removes illegal characters.
+     * @param string $content
+     * @return string
+     */
+    public static function comment( $content)
+    {
+        return '<!-- ' . static::value( $content ) . ' -->';
+    }
+
+    /**
+     * Returns a guaranteed valid XML CDATA string. Removes illegal characters.
+     * @param string $content
+     * @return string
+     */
+    public static function cdata( $content)
+    {
+        return '<![CDATA[' . str_replace( ']]>', ']]&gt;', $content ) . ']]>';
+    }
+
+    /**
+     * Returns an XML preamble.
+     * @param string $version Defaults to '1.0'
+     * @param string $encoding Defaults to null
+     * @param string $standalone Defaults to null
+     * @return string
+     */
+    public static function preamble( $version = '1.0', $encoding = null, $standalone = null)
+    {
+        if (isset($standalone)) {
+            if ($standalone === 'false') {
+                $standalone = 'no';
+            } else if ($standalone !== 'no') {
+                $standalone = ( $standalone ? 'yes' : 'no' );
+            }
+            $standalone = static::attribute( 'standalone', $standalone );
+        } else {
+            $standalone = '';
+        }
+        $preamble = '<?xml version="' . static::value($version) . '"';
+        if (isset( $encoding )) {
+            $preamble .= ' " encoding="' . static::value($encoding) . '"';
+        }
+        $preamble .= $standalone . ' ?>';
+        return $preamble;
+    }
+
 }

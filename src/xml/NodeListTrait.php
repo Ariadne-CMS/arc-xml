@@ -80,7 +80,7 @@ trait NodeListTrait {
 
     protected function element( $tagName, $attributes, $content ) 
     {
-        $tagName =  $this->writer->name( $tagName );
+        $tagName =  \arc\xml::name( $tagName );
         $el = '<' . $tagName;
         $el .= $this->getAttributes( $attributes );
         if ($this->hasContent( $content )) {
@@ -97,7 +97,7 @@ trait NodeListTrait {
         $result = '';
         if (count( $attributes )) {
             foreach ($attributes as $name => $value ) {
-                $result .= $this->writer->attribute( $name, $value );
+                $result .= \arc\xml::attribute( $name, $value );
             }
         }
         return $result;
