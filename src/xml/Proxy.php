@@ -13,6 +13,7 @@ namespace arc\xml;
 /**
  * This class is a proxy for both the SimpleXMLElement and DOMElement 
  * properties and methods.
+ * @property \SimpleXMLElement nodeValue
  */
 class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
@@ -130,6 +131,11 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         return $temp;
     }
 
+    /**
+     * Ssearches through the subtree for an element with the given id and returns it
+     * @param string $id
+     * @return Proxy
+     */
     public function getElementById( $id ) {
         return current($this->find('#'.$id));
     }
