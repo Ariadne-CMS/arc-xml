@@ -11,7 +11,7 @@
 namespace arc\xml;
 
 /**
- * This class is a proxy for both the SimpleXMLElement and DOMElement 
+ * This class is a proxy for both the SimpleXMLElement and DOMElement
  * properties and methods.
  * @property \SimpleXMLElement nodeValue
  */
@@ -35,9 +35,9 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     private function _isDomProperty( $name ) {
         $domProperties = [
-            'tagName', 'nodeType', 'parentNode', 
+            'tagName', 'nodeType', 'parentNode',
             'firstChild', 'lastChild', 'previousSibling', 'nextSibling',
-            'ownerDocument', 'namespaceURI', 'prefix', 
+            'ownerDocument', 'namespaceURI', 'prefix',
             'localName', 'baseURI', 'textContent'
         ];
         return in_array( $name, $domProperties );
@@ -73,7 +73,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         }
         return $this->_proxyResult( $this->_getTargetProperty($name) );
     }
-    
+
     private function _domCall( $name, $args ) {
         $dom = dom_import_simplexml($this->target);
         foreach ( $args as $index => $arg ) {
@@ -124,7 +124,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
      */
     public function find( $query) {
         $xpath = \arc\xml::css2Xpath( $query );
-        $temp = $this->target->xpath( $xpath );
+        $temp  = $this->target->xpath( $xpath );
         foreach ($temp as $key => $value) {
             $temp[ $key ] = new static( $value, $this->parser );
         }
@@ -139,17 +139,17 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     public function getElementById( $id ) {
         return current($this->find('#'.$id));
     }
-    
+
     public function offsetGet( $offset )
     {
         return (string) $this->target[$offset];
     }
-    
+
     public function offsetSet( $offset, $value )
     {
         $this->target[$offset] = $value;
     }
-    
+
     public function offsetUnset( $offset )
     {
         unset( $this->target[$offset] );

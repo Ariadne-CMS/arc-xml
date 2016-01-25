@@ -15,7 +15,7 @@ namespace arc\xml;
  */
 trait NodeListTrait {
 
-    protected $writer = null;
+    protected $writer       = null;
     protected $invalidChars = [];
 
     /**
@@ -63,7 +63,7 @@ trait NodeListTrait {
     protected function parseArgs( $args )
     {
         $attributes = array();
-        $content = '';
+        $content    = '';
         foreach ($args as $arg ) {
             if (is_string( $arg ) ) {
                 $content .= $this->escape($arg);
@@ -87,8 +87,8 @@ trait NodeListTrait {
     protected function element( $tagName, $attributes, $content )
     {
         $tagName =  \arc\xml::name( $tagName );
-        $el = '<' . $tagName;
-        $el .= $this->getAttributes( $attributes );
+        $el      = '<' . $tagName;
+        $el      .= $this->getAttributes( $attributes );
         if ($this->hasContent( $content )) {
             $el .=  '>' . self::indent( $content, $this->writer->indent, $this->writer->newLine );
             $el .= '</' . $tagName . '>';
