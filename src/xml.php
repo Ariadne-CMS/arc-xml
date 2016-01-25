@@ -202,4 +202,8 @@ class xml
         return $preamble;
     }
 
+    public static function raw( $contents='' ) {
+        return new xml\RawXML($contents);
+    }
+
 }

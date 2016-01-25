@@ -16,6 +16,7 @@ namespace arc\xml;
 trait NodeListTrait {
 
     protected $writer = null;
+    protected $invalidChars = [];
 
     /**
      * @param array $list
@@ -54,19 +55,24 @@ trait NodeListTrait {
         }
     }
 
+    protected function escape( $contents ) {
+        $contents = preg_replace('/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u', '', $contents);
+        return htmlspecialchars( $contents, ENT_XML1, 'UTF-8');
+    }
+
     protected function parseArgs( $args ) 
     {
         $attributes = array();
         $content = '';
         foreach ($args as $arg ) {
-            if (is_string( $arg )) {
-                $content .= $arg;
+            if (is_string( $arg ) ) {
+                $content .= $this->escape($arg);
             } else if (is_array( $arg )) {
                 foreach( $arg as $key => $subArg ) {
                     if (is_numeric( $key )) {
                         list( $subattributes, $subcontent ) = $this->parseArgs( $subArg );
                         $attributes = array_merge( $attributes, $subattributes);
-                        $content .= $subcontent;
+                        $content = \arc\xml::raw( $content . $subcontent );
                     } else {
                         $attributes[ $key ] = $subArg;
                     }
