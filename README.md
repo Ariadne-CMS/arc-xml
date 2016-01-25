@@ -21,51 +21,53 @@ Finally the parser also adds the ability to use basic CSS selectors to find elem
 
 ```php5
 <?php
-	$xmlString = \arc\xml::preamble()
-	 .\arc\xml::rss(['version'=>'2.0'],
-	 	\arc\xml::channel(
-	 		\arc\xml::title('Wikipedia'),
-	 		\arc\xml::link('http://www.wikipedia.org'),
-	 		\arc\xml::description('This feed notifies you of new articles on Wikipedia.')
-	 	)
-	 );
+    use \arc\xml as x;
+    $xmlString = 
+        x::preamble()
+        .x::rss(['version'=>'2.0'],
+             x::channel(
+                 x::title('Wikipedia'),
+                 x::link('http://www.wikipedia.org'),
+                 x::description('This feed notifies you of new articles on Wikipedia.')
+             )
+        );
 ```
 
 ```php5
-	$xml = \arc\xml::parse($xmlString);
-	$title = $xml->channel->title->nodeValue; // SimpleXMLElement 'Wikipedia'
-	$titleTag = $xml->channel->title; // <title>Wikipedia</title>
+    $xml = \arc\xml::parse($xmlString);
+    $title = $xml->channel->title->nodeValue; // SimpleXMLElement 'Wikipedia'
+    $titleTag = $xml->channel->title; // <title>Wikipedia</title>
 ```
 
 CSS selectors
 -------------
 
 ```php5
-	$title = current($xml->find('title'));
+    $title = current($xml->find('title'));
 ```
 
 The find() method always returns an array, which may be empty. By using current() you get the first element found, or null if nothing was found.
 
 The following CSS selectors are supported:
 
-- 'tag1 tag2'<br>
-  This matches tag2 which is a descendant of tag1.
-- 'tag1 > tag2'<br>
-  This matches tag2 which is a direct child of tag1.
-- 'tag:first-child'<br>
-  This matches 'tag' only if its the first child.
-- 'tag1 + tag2'<br>
-  This matches tag2 only if its immediately preceded by tag1.
-- 'tag1 ~ tag2'<br>
-  This matches tag2 only if it has a previous sibling tag1.
-- 'tag[attr]'<br>
-  This matches 'tag' if it has the attribute 'attr'.
-- 'tag[attr="foo"]'<br>
-  This matches 'tag' if it has the attribute 'attr' with the value 'foo' in its value list.
-- 'tag#id'<br>
-  This matches any 'tag' with id 'id'.
-- '#id'<br>
-  This matches any element with id 'id'.
+- `tag1 tag2`<br>
+  This matches `tag2` which is a descendant of `tag1`.
+- `tag1 > tag2`<br>
+  This matches `tag2` which is a direct child of `tag1`.
+- `tag:first-child`<br>
+  This matches `tag` only if its the first child.
+- `tag1 + tag2`<br>
+  This matches `tag2` only if its immediately preceded by `tag1`.
+- `tag1 ~ tag2`<br>
+  This matches `tag2` only if it has a previous sibling `tag1`.
+- `tag[attr]`<br>
+  This matches `tag` if it has the attribute `attr`.
+- `tag[attr="foo"]`<br>
+  This matches `tag` if it has the attribute `attr` with the value `foo` in its value list.
+- `tag#id`<br>
+  This matches any `tag` with id `id`.
+- `#id`<br>
+  This matches any element with id `id`.
 
 SimpleXML
 ---------
@@ -73,14 +75,14 @@ SimpleXML
 The parsed XML behaves almost identical to a SimpleXMLElement, with the exceptions noted above. So you can access attributes just like SimpleXMLElement allows:
 
 ```php5
-	$version = $xml['version'];
-	$version = $xml->attributes('version');
+    $version = $xml['version'];
+    $version = $xml->attributes('version');
 ```
 
 You can walk through the node tree:
 
 ```php5
-	$title = $xml->channel->title;
+    $title = $xml->channel->title;
 ```
 
 Any method or property available in SimpleXMLElement is included in \arc\xml parsed data.
@@ -91,9 +93,9 @@ DOMElement
 In addition to SimpleXMLElement methods, you can also call any method that is available in DOMElement.
 
 ```php5
-	$version = $xml->getAttributes('version');
-	$title = $xml->getElementsByTagName('channel')[0]
-		->getElementsByTagName('title')[0];
+    $version = $xml->getAttributes('version');
+    $title = $xml->getElementsByTagName('channel')[0]
+        ->getElementsByTagName('title')[0];
 ```
 
 But right now you cannot access the properties of DOMElement. This will be fixed soonish.
@@ -106,14 +108,14 @@ The arc\xml parser also accepts partial XML content. It doesn't require a single
 ```php5
     $xmlString = <<< EOF
 <item>
-	<title>An item</title>
+    <title>An item</title>
 </item>
 <item>
-	<title>Another item</title>
+    <title>Another item</title>
 </item>
 EOF;
-	$xml = \arc\xml::parse($xmlString);
-	$titles = $xml->find('title');
+    $xml = \arc\xml::parse($xmlString);
+    $titles = $xml->find('title');
 ```
 
 And when you convert the xml back to a string, it will still be a partial XML fragment.
@@ -128,6 +130,12 @@ arc\xml::parse has the following differences:
   - You can use it with partial XML fragments.
   - No need to remember calling importNode() before appendChild() or insertBefore()
   - No need to switch between SimpleXML and DOMDocument, because you need that one method only available in the other API.
-  - When returning a list of elements, you always get a simple Array, not a magic NodeList.
+  - When returning a list of elements, you always get a standard array, not a magic NodeList.
 
-In addition arc\xml doubles as a simple way to generate valid and indented XML, with readable and self-validating code.
+In addition the arc\xml writer is a simple way to generate valid and indented XML, with readable and self-validating code.
+
+  - Filters all illegal characters from your XML
+  - Automatically translate &, < and > characters to &amp;, &lt; and &gt;
+  - Automatically translate " to &quot; in attributes
+
+You can include raw unfiltered XML with the \arc\xml::raw() method
