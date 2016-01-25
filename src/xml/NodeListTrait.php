@@ -88,7 +88,7 @@ trait NodeListTrait {
     {
         $tagName =  \arc\xml::name( $tagName );
         $el      = '<' . $tagName;
-        $el      .= $this->getAttributes( $attributes );
+        $el     .= $this->getAttributes( $attributes );
         if ($this->hasContent( $content )) {
             $el .=  '>' . self::indent( $content, $this->writer->indent, $this->writer->newLine );
             $el .= '</' . $tagName . '>';

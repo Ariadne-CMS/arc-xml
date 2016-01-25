@@ -73,7 +73,7 @@ class Parser
             }
             $root .= htmlspecialchars( $uri ) . '"';
         }
-        $root   .= '>';
+        $root  .= '>';
         $result = $this->parseFull( $root.$xml.'</arcxmlroot>', $encoding );
         $result = $result->firstChild->childNodes;
         return $result;
