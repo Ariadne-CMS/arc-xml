@@ -15,20 +15,20 @@ namespace arc\xml;
  */
 trait NodeListTrait {
 
-    protected $writer = null;
+    protected $writer       = null;
     protected $invalidChars = [];
 
     /**
      * @param array $list
      * @param Writer $writer
      */
-    public function __construct( $list = null, $writer = null ) 
+    public function __construct( $list = null, $writer = null )
     {
         parent::__construct( $list );
         $this->writer = $writer;
     }
 
-    public function __call( $name, $args ) 
+    public function __call( $name, $args )
     {
         $tagName = $name;
         list( $attributes, $content ) = $this->parseArgs( $args );
@@ -36,7 +36,7 @@ trait NodeListTrait {
         return $this;
     }
 
-    public function __toString() 
+    public function __toString()
     {
         $indent = '';
         if (!is_object( $this->writer ) || $this->writer->indent ) {
@@ -45,7 +45,7 @@ trait NodeListTrait {
         return join( $indent, (array) $this );
     }
 
-    protected static function indent( $content, $indent="\t", $newLine="\r\n" ) 
+    protected static function indent( $content, $indent="\t", $newLine="\r\n" )
     {
         if ($indent && ( strpos( $content, '<' ) !== false )) {
             $indent = ( is_string( $indent ) ? $indent : "\t" );
@@ -60,10 +60,10 @@ trait NodeListTrait {
         return htmlspecialchars( $contents, ENT_XML1, 'UTF-8');
     }
 
-    protected function parseArgs( $args ) 
+    protected function parseArgs( $args )
     {
         $attributes = array();
-        $content = '';
+        $content    = '';
         foreach ($args as $arg ) {
             if (is_string( $arg ) ) {
                 $content .= $this->escape($arg);
@@ -84,11 +84,11 @@ trait NodeListTrait {
         return [ $attributes, $content ];
     }
 
-    protected function element( $tagName, $attributes, $content ) 
+    protected function element( $tagName, $attributes, $content )
     {
         $tagName =  \arc\xml::name( $tagName );
-        $el = '<' . $tagName;
-        $el .= $this->getAttributes( $attributes );
+        $el      = '<' . $tagName;
+        $el     .= $this->getAttributes( $attributes );
         if ($this->hasContent( $content )) {
             $el .=  '>' . self::indent( $content, $this->writer->indent, $this->writer->newLine );
             $el .= '</' . $tagName . '>';
@@ -98,7 +98,7 @@ trait NodeListTrait {
         return $el;
     }
 
-    protected function getAttributes( $attributes ) 
+    protected function getAttributes( $attributes )
     {
         $result = '';
         if (count( $attributes )) {
@@ -109,7 +109,7 @@ trait NodeListTrait {
         return $result;
     }
 
-    protected function hasContent( $content ) 
+    protected function hasContent( $content )
     {
         return ( trim( $content ) != '' );
     }
