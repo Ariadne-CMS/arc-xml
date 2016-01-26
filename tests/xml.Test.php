@@ -44,6 +44,11 @@ class TestXML extends PHPUnit_Framework_TestCase
             )
         );
         $this->assertEquals( "<ul class=\"menu\">\r\n\t<li>menu 1</li>\r\n\t<li>\r\n\t\tmenu 2 <em>emphasized</em>\r\n\t</li>\r\n</ul>", (string) $xml );
+        $xml = \arc\xml::ul(
+            \arc\xml::comment('A comment'),
+            \arc\xml::cdata('Some < value >')
+        );
+        $this->assertEquals( "<ul>\r\n\t<!-- A comment --><![CDATA[Some < value >]]>\r\n</ul>", (string) $xml );
     }
 
     function testXMLWriterEscaping()

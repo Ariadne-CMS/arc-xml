@@ -162,7 +162,7 @@ class xml
      */
     public static function comment( $content)
     {
-        return '<!-- ' . static::value( $content ) . ' -->';
+        return static::raw('<!-- ' . static::value( $content ) . ' -->');
     }
 
     /**
@@ -172,7 +172,7 @@ class xml
      */
     public static function cdata( $content)
     {
-        return '<![CDATA[' . str_replace( ']]>', ']]&gt;', $content ) . ']]>';
+        return static::raw('<![CDATA[' . str_replace( ']]>', ']]&gt;', $content ) . ']]>');
     }
 
     /**
