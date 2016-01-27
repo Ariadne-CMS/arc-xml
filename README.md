@@ -2,6 +2,7 @@ ARC: Ariadne Component Library
 ==============================
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Ariadne-CMS/arc-xml/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Ariadne-CMS/arc-xml/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/Ariadne-CMS/arc-xml/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Ariadne-CMS/arc-xml/)
 [![Latest Stable Version](https://poser.pugx.org/arc/xml/v/stable.svg)](https://packagist.org/packages/arc/xml)
 [![Total Downloads](https://poser.pugx.org/arc/xml/downloads.svg)](https://packagist.org/packages/arc/xml)
 [![Latest Unstable Version](https://poser.pugx.org/arc/xml/v/unstable.svg)](https://packagist.org/packages/arc/xml)
