@@ -37,7 +37,7 @@ class xml
      * This parses an XML string and returns a Proxy
      * @param string|Proxy $xml
      * @return Proxy
-     * @throws \arc\Exception
+     * @throws \arc\UnknownError
      */
     public static function parse( $xml=null, $encoding = null )
     {

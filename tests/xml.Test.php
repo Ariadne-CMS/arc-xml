@@ -85,9 +85,9 @@ EOF;
 
         try {
                 $result = \arc\xml::parse( $this->incorrectXML );
-        } catch( \arc\Exception $error ) {
+        } catch( \arc\UnknownError $error ) {
         }
-        $this->assertTrue( $error instanceof \arc\Exception );
+        $this->assertTrue( $error instanceof \arc\UnknownError );
     }
 
     function testXMLFind() 
