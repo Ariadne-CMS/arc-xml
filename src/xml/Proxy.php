@@ -30,7 +30,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     }
 
     public function __toString() {
-        return $this->target->asXML();
+        return $this->target ? $this->target->asXML() : '';
     }
 
     private function _isDomProperty( $name ) {
@@ -139,6 +139,12 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     public function getElementById( $id ) {
         return current($this->find('#'.$id));
     }
+
+    public function registerNamespace( $prefix, $ns ) {
+        if ( $this->target ) {
+            $this->target->registerXPathNamespace( $prefix, $ns );
+        }
+    } 
     
     public function offsetGet( $offset )
     {
