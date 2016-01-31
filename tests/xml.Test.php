@@ -241,8 +241,8 @@ EOF;
 </rdf:RDF>
 EOF;
         $xml = \arc\xml::parse($xmlString);
-        $xml->registerNamespace('dc','http://purl.org/dc/elements/1.1/');
-        $xml->registerNamespace('foo','http://purl.org/dc/elements/1.1/');
+        $xml->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+        $xml->registerNamespace('foo', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
         $xml->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 
         $about = $xml->channel['rdf:about'];
@@ -253,9 +253,15 @@ EOF;
         $this->assertEquals('About tests', $about);
 
         unset($xml->channel['rdf:about']);
-        $about = $xml->channel['rdf:about'];
-        $this->assertEquals('', $about);
+        $this->assertEquals('', $xml->channel['rdf:about']);
 
+        $xml->channel['foo:about'] = 'About foo';
+        $this->assertEquals('About foo', $xml->channel['foo:about']);
+        $this->assertEquals('About foo', $xml->channel['rdf:about']);
+
+        $xml->registerNamespace('bar', 'http://arc.muze.nl/');
+        $xml->channel['bar:foo'] = 'Bar Foo';
+        $this->assertEquals('Bar Foo', $xml->channel['bar:foo']);
     }
 
 }

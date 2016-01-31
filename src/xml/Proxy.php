@@ -169,9 +169,9 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     public function offsetGet( $offset )
     {
-        list( $ns, $name, $prefix ) = $this->_parseName($offset);
-        if ( $ns ) {
-            return (string) $this->attributes($ns)[$name];
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri ) {
+            return (string) $this->attributes($uri)[$name];
         } else {
             return (string) $this->target[$offset];
         }
@@ -179,17 +179,8 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     public function offsetSet( $offset, $value )
     {
-        list( $ns, $name, $prefix ) = $this->_parseName($offset);
-        if ( $prefix ) {
-            $uri = $this->lookupNamespaceURI($prefix);
-            if ( !$uri ) {
-                // namespace needs to be added to the node
-                die('implement adding new namespaces');
-            }
-        } else {
-            $uri = $ns;
-        }
-        if ( $ns && !$this->isDefaultNamespace($uri) ) {
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri && !$this->isDefaultNamespace($uri) ) {
             $this->setAttributeNS($uri, $prefix.':'.$name, $value);
         } else {
             $this->target[$name] = $value;
@@ -198,9 +189,9 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     public function offsetUnset( $offset )
     {
-        list( $ns, $name, $prefix ) = $this->_parseName($offset);
-        if ( $ns ) {
-            unset( $this->target->attributes($ns)->{$name} );
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri ) {
+            unset( $this->target->attributes($uri)->{$name} );
         } else {
             unset( $this->target[$offset] );
         }
