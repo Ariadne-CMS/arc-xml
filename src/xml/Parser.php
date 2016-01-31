@@ -54,7 +54,7 @@ class Parser
         $xml = (string) $xml;
         try {
             return $this->parseFull( $xml, $encoding );
-        } catch( \arc\Exception $e) {
+        } catch( \arc\UnknownError $e) {
             return $this->parsePartial( $xml, $encoding );
         }
     }
@@ -107,6 +107,6 @@ class Parser
         foreach ($errors as $error) {
             $message .= '\nline: '.$error->line.'; column: '.$error->column.'; '.$error->message;
         }
-        throw new \arc\Exception( $message, \arc\exceptions::ILLEGAL_ARGUMENT );
+        throw new \arc\UnknownError( $message, \arc\exceptions::ILLEGAL_ARGUMENT );
     }
 }

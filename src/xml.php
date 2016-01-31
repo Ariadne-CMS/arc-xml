@@ -37,7 +37,7 @@ class xml
      * This parses an XML string and returns a Proxy
      * @param string|Proxy $xml
      * @return Proxy
-     * @throws \arc\Exception
+     * @throws \arc\UnknownError
      */
     public static function parse( $xml=null, $encoding = null )
     {
@@ -52,44 +52,48 @@ class xml
      */
     public static function css2XPath( $cssSelector )
     {
+        $tag = '(?:\w+\|)?\w+';
         /* based on work by Tijs Verkoyen - http://blog.verkoyen.eu/blog/p/detail/css-selector-to-xpath-query/ */
         $translateList = array(
             // E F: Matches any F element that is a descendant of an E element
-            '/(\w+)\s+(?=([^"]*"[^"]*")*[^"]*$)(\w+)/'
-            => '\1//\3',
+            '/('.$tag.')\s+(?=(?:[^"]*"[^"]*")*[^"]*$)('.$tag.')/'
+            => '\1//\2',
             // E > F: Matches any F element that is a child of an element E
-            '/(\w+)\s*>\s*(\w+)/'
+            '/('.$tag.')\s*>\s*('.$tag.')/'
             => '\1/\2',
             // E:first-child: Matches element E when E is the first child of its parent
-            '/(\w+|\*):first-child/'
+            '/('.$tag.'|(\w+\|)?\*):first-child/'
             => '*[1]/self::\1',
             // Matches E:checked, E:disabled or E:selected (and just for scrutinizer: this is not code!)
-            '/(\w+|\*):(checked|disabled|selected)/'
-            => '\1 [ @\2 ]',
+            '/('.$tag.'|(\w+\|)?\*):(checked|disabled|selected)/'
+            => '\1 [ @\3 ]',
             // E + F: Matches any F element immediately preceded by an element
-            '/(\w+)\s*\+\s*(\w+)/'
+            '/('.$tag.')\s*\+\s*('.$tag.')/'
             => '\1/following-sibling::*[1]/self::\2',
             // E ~ F: Matches any F element preceded by an element
-            '/(\w+)\s*\~\s*(\w+)/'
+            '/('.$tag.')\s*\~\s*('.$tag.')/'
             => '\1/following-sibling::*/self::\2',
             // E[foo]: Matches any E element with the "foo" attribute set (whatever the value)
-            '/(\w+)\[([\w\-]+)]/'
+            '/('.$tag.')\[([\w\-]+)]/'
             => '\1 [ @\2 ]',
             // E[foo="warning"]: Matches any E element whose "foo" attribute value is exactly equal to "warning"
-            '/(\w+)\[([\w\-]+)\=\"(.*)\"]/'
+            '/('.$tag.')\[([\w\-]+)\=\"(.*)\"]/'
             => '\1[ contains( concat( " ", normalize-space(@\2), " " ), concat( " ", "\3", " " ) ) ]',
             // .warning: HTML only. The same as *[class~="warning"]
             '/(^|\s)\.([\w\-]+)+/'
             => '*[ contains( concat( " ", normalize-space(@class), " " ), concat( " ", "\2", " " ) ) ]',
             // div.warning: HTML only. The same as DIV[class~="warning"]
-            '/(\w+|\*)\.([\w\-]+)+/'
-            => '\1[ contains( concat( " ", normalize-space(@class), " " ), concat( " ", "\2", " " ) ) ]',
+            '/('.$tag.'|(\w+\|)?\*)\.([\w\-]+)+/'
+            => '\1[ contains( concat( " ", normalize-space(@class), " " ), concat( " ", "\3", " " ) ) ]',
             // E#myid: Matches any E element with id-attribute equal to "myid"
-            '/(\w+)+\#([\w\-]+)/'
+            '/('.$tag.')\#([\w\-]+)/'
             => "\\1[@id='\\2']",
             // #myid: Matches any E element with id-attribute equal to "myid"
             '/\#([\w\-]+)/'
-            => "*[@id='\\1']"
+            => "*[@id='\\1']",
+            // namespace|
+            '/(\w+)\|/'
+            => "\\1:"
         );
 
         $cssSelectors = array_keys($translateList);
