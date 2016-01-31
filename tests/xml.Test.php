@@ -221,6 +221,9 @@ EOF;
         $date = $xml->channel->{'foo:date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
 
+        $xml->registerNamespace('bar', 'http://arc.muze.nl/');
+        $xml->channel->{'bar:foo'} = 'Bar Foo';
+        $this->assertEquals('Bar Foo', (string) $xml->channel->{'bar:foo'}->nodeValue);
     }
 
     function testNamespacedAttributes()

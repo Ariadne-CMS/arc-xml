@@ -30,7 +30,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     }
 
     public function __toString() {
-        return isset($this->target) ? $this->target->asXML() : '';
+        return isset($this->target) ? (string) $this->target->asXML() : '';
     }
 
     private function _isDomProperty( $name ) {
@@ -104,6 +104,20 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
             return $this->target;
         }
         return $this->_proxyResult( $this->_getTargetProperty($name) );
+    }
+
+    public function __set( $name, $value ) {
+        if ($name == 'nodeValue') {
+            $this->target = $value;
+        } else {
+            list($uri, $name, $prefix) = $this->_parseName($name);
+            if ( $uri && !$this->isDefaultNamespace($uri) ) {
+                $el = $this->ownerDocument->createElementNS($uri, $prefix.':'.$name, $value);
+                $this->appendChild($el);
+            } else {
+                $this->target->{$name} = $value;
+            }
+        }
     }
 
     private function _domCall( $name, $args ) {
