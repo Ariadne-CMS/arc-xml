@@ -19,6 +19,15 @@ can always access the 'nodeValue' property to get the original SimpleXMLElement.
 
 Finally the parser also adds the ability to use basic CSS selectors to find elements in the XML.
 
+Installation
+------------
+This library requires PHP 5.4 or higher. It is installable and autoloadable via Composer as arc/xml.
+
+Quality
+-------
+This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice compliance oversights, please send a patch via pull request.
+To run the unit tests at the command line, issue `composer install` and then `phpunit` at the package root. 
+
 The problem with XML
 ====================
 
