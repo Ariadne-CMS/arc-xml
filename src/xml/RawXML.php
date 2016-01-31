@@ -25,6 +25,6 @@ class RawXML {
 
     public function __toString()
     {
-        return $this->contents;
+        return (string) $this->contents;
     }
 }
