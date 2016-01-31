@@ -11,7 +11,7 @@
 namespace arc\xml;
 
 /**
- * This class is a proxy for both the SimpleXMLElement and DOMElement 
+ * This class is a proxy for both the SimpleXMLElement and DOMElement
  * properties and methods.
  * @property \SimpleXMLElement nodeValue
  */
@@ -30,14 +30,14 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     }
 
     public function __toString() {
-        return $this->target ? $this->target->asXML() : '';
+        return isset($this->target) ? $this->target->asXML() : '';
     }
 
     private function _isDomProperty( $name ) {
         $domProperties = [
-            'tagName', 'nodeType', 'parentNode', 
+            'tagName', 'nodeType', 'parentNode',
             'firstChild', 'lastChild', 'previousSibling', 'nextSibling',
-            'ownerDocument', 'namespaceURI', 'prefix', 
+            'ownerDocument', 'namespaceURI', 'prefix',
             'localName', 'baseURI', 'textContent'
         ];
         return in_array( $name, $domProperties );
@@ -59,12 +59,21 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     private function _proxyResult( $value ) {
         if ( $value instanceof \DOMElement ) {
             $value = simplexml_import_dom($value);
+        } else if ( $value instanceof \DOMNodeList ) {
+            $array = [];
+            for ( $i=0, $l=$value->length; $i<$l; $i ++ ) {
+                $array[$i] = $value[$i];
+            }
+            $value = $array;
         }
         if ( $value instanceof \SimpleXMLElement ) {
-            return new static( $value, $this->parser );
-        } else {
-            return $value;
+            $value = new static( $value, $this->parser );
+        } else if ( is_array($value) ) {
+            foreach ( $value as $key => $subvalue ) {
+                $value[$key] = $this->_proxyResult( $subvalue );
+            }
         }
+        return $value;
     }
 
     public function __get( $name) {
@@ -73,7 +82,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         }
         return $this->_proxyResult( $this->_getTargetProperty($name) );
     }
-    
+
     private function _domCall( $name, $args ) {
         $dom = dom_import_simplexml($this->target);
         foreach ( $args as $index => $arg ) {
@@ -93,27 +102,14 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
                 }
             }
         }
-        $result = call_user_func_array( [ $dom, $name], $args );
-        if ( isset($result) && is_object($result) ) {
-            if ( $result instanceof \DOMElement ) {
-                return new static( $result, $this->parser );
-            }
-            if ( $result instanceof \DOMNodeList ) {
-                $resultArray = [];
-                for ( $i=0, $l=$result->length; $i<$l; $i ++ ) {
-                    $resultArray[$i] = new static( simplexml_import_dom($result->item($i)), $this->parser );
-                }
-                return $resultArray;
-            }
-        }
-        return $result;
+        return call_user_func_array( [ $dom, $name], $args );
     }
 
     public function __call( $name, $args ) {
-        if ( !method_exists($this->target, $name) ) {
-            return $this->_domCall( $name, $args );
+        if ( !method_exists( $this->target, $name ) ) {
+            return $this->_proxyResult( $this->_domCall( $name, $args ) );
         } else {
-            return $this->ProxyCall($name, $args);
+            return $this->_proxyResult( $this->ProxyCall( $name, $args ) );
         }
     }
 
@@ -124,15 +120,11 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
      */
     public function find( $query) {
         $xpath = \arc\xml::css2Xpath( $query );
-        $temp = $this->target->xpath( $xpath );
-        foreach ($temp as $key => $value) {
-            $temp[ $key ] = new static( $value, $this->parser );
-        }
-        return $temp;
+        return $this->_proxyResult( $this->target->xpath( $xpath ) );
     }
 
     /**
-     * Ssearches through the subtree for an element with the given id and returns it
+     * Searches through the subtree for an element with the given id and returns it
      * @param string $id
      * @return Proxy
      */
@@ -140,22 +132,27 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         return current($this->find('#'.$id));
     }
 
+    /**
+     * Register a namespace alias and URI to use in xpath and find
+     * @param string $ns
+     * @param string $uri
+     */
     public function registerNamespace( $prefix, $ns ) {
-        if ( $this->target ) {
-            $this->target->registerXPathNamespace( $prefix, $ns );
+        if ( $this->target && $this->target instanceof \SimpleXMLElement ) {
+            $this->target->registerXPathNamespace($prefix, $ns);
         }
-    } 
-    
+    }
+
     public function offsetGet( $offset )
     {
         return (string) $this->target[$offset];
     }
-    
+
     public function offsetSet( $offset, $value )
     {
         $this->target[$offset] = $value;
     }
-    
+
     public function offsetUnset( $offset )
     {
         unset( $this->target[$offset] );
