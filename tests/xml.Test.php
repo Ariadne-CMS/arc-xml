@@ -156,10 +156,13 @@ EOF;
         $xml->channel->addChild('language','en-us');
         $language = $xml->channel->language->nodeValue;
         $this->assertEquals('en-us', (string) $language);
+
         $xml->channel->language = 'nl-NL';
         $this->assertEquals('nl-NL', (string) $xml->channel->language->nodeValue );
+
         $xml['version'] = '1.0';
         $this->assertEquals('1.0', $xml['version']);
+
         $category = \arc\xml::parse('<category>Encyclopedia</category>');
         $xml->channel->appendChild( $category );
         $cat = $xml->channel->category->nodeValue;
@@ -204,20 +207,25 @@ EOF;
         $xml->registerNamespace('dc','http://purl.org/dc/elements/1.1/');
         $xml->registerNamespace('foo','http://purl.org/dc/elements/1.1/');
         $xml->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+
         $date = current($xml->find("dc|date"));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
+
         $date = current($xml->find("channel > dc|date"));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue); 
+
         $date = current($xml->channel->find("dc|date"));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
 
         $date = $xml->channel->{'dc:date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue); 
+
         $date = $xml->channel->{'{http://purl.org/dc/elements/1.1/}date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
 
         $date = current($xml->find('foo|date'));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
+
         $date = $xml->channel->{'foo:date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
 
@@ -252,8 +260,7 @@ EOF;
         $this->assertEquals('http://slashdot.org/', $about);
 
         $xml->channel['rdf:about'] = 'About tests';
-        $about = $xml->channel['rdf:about'];
-        $this->assertEquals('About tests', $about);
+        $this->assertEquals('About tests', $xml->channel['rdf:about']);
 
         unset($xml->channel['rdf:about']);
         $this->assertEquals('', $xml->channel['rdf:about']);
