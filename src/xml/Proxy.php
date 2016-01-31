@@ -30,7 +30,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     }
 
     public function __toString() {
-        return isset($this->target) ? $this->target->asXML() : '';
+        return isset($this->target) ? (string) $this->target->asXML() : '';
     }
 
     private function _isDomProperty( $name ) {
@@ -43,21 +43,31 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         return in_array( $name, $domProperties );
     }
 
-    private function _getTargetProperty($name) {
-        $value = null;
+    private function _parseName( $name ) {
+        $ns     = '';
+        $name   = trim($name);
+        $prefix = false;
         if ( $name[0] == '{' ) {
             list($ns, $name) = explode('}', $name);
             $ns    = substr($ns, 1);
-            $value = $this->target->children($ns, false)->{$name};
         } else if ( strpos($name, ':') !== false ) {
             list ($ns, $name) = explode(':', $name);
             if ( isset($this->parser->namespaces[$ns]) ) {
+                $prefix = $ns;
                 $ns     = $this->parser->namespaces[$ns];
-                $prefix = false;
             } else {
-                $prefix = true;
+                $prefix = $this->lookupPrefix($ns);
             }
-            $value = $this->target->children($ns, $prefix)->{$name};
+        }
+        return [ $ns, $name, $prefix ];
+    }
+
+    private function _getTargetProperty($name) {
+        $value  = null;
+        list( $uri, $name, $prefix ) 
+                = $this->_parseName($name);
+        if ( $uri ) {
+            $value = $this->target->children($uri)->{$name};
         } else if ( !$this->_isDomProperty($name) ) {
             $value = $this->target->{$name};
         } else {
@@ -94,6 +104,20 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
             return $this->target;
         }
         return $this->_proxyResult( $this->_getTargetProperty($name) );
+    }
+
+    public function __set( $name, $value ) {
+        if ($name == 'nodeValue') {
+            $this->target = $value;
+        } else {
+            list($uri, $name, $prefix) = $this->_parseName($name);
+            if ( $uri && !$this->isDefaultNamespace($uri) ) {
+                $el = $this->ownerDocument->createElementNS($uri, $prefix.':'.$name, $value);
+                $this->appendChild($el);
+            } else {
+                $this->target->{$name} = $value;
+            }
+        }
     }
 
     private function _domCall( $name, $args ) {
@@ -159,16 +183,31 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     public function offsetGet( $offset )
     {
-        return (string) $this->target[$offset];
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri ) {
+            return (string) $this->attributes($uri)[$name];
+        } else {
+            return (string) $this->target[$offset];
+        }
     }
 
     public function offsetSet( $offset, $value )
     {
-        $this->target[$offset] = $value;
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri && !$this->isDefaultNamespace($uri) ) {
+            $this->setAttributeNS($uri, $prefix.':'.$name, $value);
+        } else {
+            $this->target[$name] = $value;
+        }
     }
 
     public function offsetUnset( $offset )
     {
-        unset( $this->target[$offset] );
+        list( $uri, $name, $prefix ) = $this->_parseName($offset);
+        if ( $uri ) {
+            unset( $this->target->attributes($uri)->{$name} );
+        } else {
+            unset( $this->target[$offset] );
+        }
     }
 }
