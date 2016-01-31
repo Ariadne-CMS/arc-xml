@@ -12,7 +12,6 @@
  
 class TestXML extends PHPUnit_Framework_TestCase 
 {
-
     var $RSSXML = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0">
         <channel>
@@ -184,7 +183,7 @@ EOF;
         $this->assertFalse( isset($baz->nodeValue) ); 
     }
 
-    function testNamespaces()
+    function testNamespacedElements()
     {
         $xmlString = <<<EOF
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -203,6 +202,7 @@ EOF;
 EOF;
         $xml = \arc\xml::parse($xmlString);
         $xml->registerNamespace('dc','http://purl.org/dc/elements/1.1/');
+        $xml->registerNamespace('foo','http://purl.org/dc/elements/1.1/');
         $xml->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
         $date = current($xml->find("dc|date"));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
@@ -216,9 +216,45 @@ EOF;
         $date = $xml->channel->{'{http://purl.org/dc/elements/1.1/}date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
 
-        $xml->registerNamespace('foo','http://purl.org/dc/elements/1.1/');
+        $date = current($xml->find('foo|date'));
+        $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
         $date = $xml->channel->{'foo:date'};
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);
+
+    }
+
+    function testNamespacedAttributes()
+    {
+        $xmlString = <<<EOF
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel rdf:about="http://slashdot.org/">
+        <title>Slashdot</title>
+        <link>http://slashdot.org/</link>
+        <description>News for nerds, stuff that matters</description>
+        <dc:language>en-us</dc:language>
+        <dc:rights>Copyright 1997-2016, SlashdotMedia. All Rights Reserved.</dc:rights>
+        <dc:date>2016-01-30T20:38:08+00:00</dc:date>
+        <dc:publisher>Dice</dc:publisher>
+        <dc:creator>help@slashdot.org</dc:creator>
+        <dc:subject>Technology</dc:subject>
+    </channel>
+</rdf:RDF>
+EOF;
+        $xml = \arc\xml::parse($xmlString);
+        $xml->registerNamespace('dc','http://purl.org/dc/elements/1.1/');
+        $xml->registerNamespace('foo','http://purl.org/dc/elements/1.1/');
+        $xml->registerNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+
+        $about = $xml->channel['rdf:about'];
+        $this->assertEquals('http://slashdot.org/', $about);
+
+        $xml->channel['rdf:about'] = 'About tests';
+        $about = $xml->channel['rdf:about'];
+        $this->assertEquals('About tests', $about);
+
+        unset($xml->channel['rdf:about']);
+        $about = $xml->channel['rdf:about'];
+        $this->assertEquals('', $about);
 
     }
 

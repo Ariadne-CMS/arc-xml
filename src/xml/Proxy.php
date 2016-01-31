@@ -43,21 +43,31 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         return in_array( $name, $domProperties );
     }
 
-    private function _getTargetProperty($name) {
-        $value = null;
+    private function _parseName( $name ) {
+        $ns     = '';
+        $name   = trim($name);
+        $prefix = false;
         if ( $name[0] == '{' ) {
             list($ns, $name) = explode('}', $name);
             $ns    = substr($ns, 1);
-            $value = $this->target->children($ns, false)->{$name};
         } else if ( strpos($name, ':') !== false ) {
             list ($ns, $name) = explode(':', $name);
             if ( isset($this->parser->namespaces[$ns]) ) {
+                $prefix = $ns;
                 $ns     = $this->parser->namespaces[$ns];
-                $prefix = false;
             } else {
-                $prefix = true;
+                $prefix = $this->lookupPrefix($ns);
             }
-            $value = $this->target->children($ns, $prefix)->{$name};
+        }
+        return [ $ns, $name, $prefix ];
+    }
+
+    private function _getTargetProperty($name) {
+        $value  = null;
+        list( $uri, $name, $prefix ) 
+                = $this->_parseName($name);
+        if ( $uri ) {
+            $value = $this->target->children($uri)->{$name};
         } else if ( !$this->_isDomProperty($name) ) {
             $value = $this->target->{$name};
         } else {
@@ -159,16 +169,40 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     public function offsetGet( $offset )
     {
-        return (string) $this->target[$offset];
+        list( $ns, $name, $prefix ) = $this->_parseName($offset);
+        if ( $ns ) {
+            return (string) $this->attributes($ns)[$name];
+        } else {
+            return (string) $this->target[$offset];
+        }
     }
 
     public function offsetSet( $offset, $value )
     {
-        $this->target[$offset] = $value;
+        list( $ns, $name, $prefix ) = $this->_parseName($offset);
+        if ( $prefix ) {
+            $uri = $this->lookupNamespaceURI($prefix);
+            if ( !$uri ) {
+                // namespace needs to be added to the node
+                die('implement adding new namespaces');
+            }
+        } else {
+            $uri = $ns;
+        }
+        if ( $ns && !$this->isDefaultNamespace($uri) ) {
+            $this->setAttributeNS($uri, $prefix.':'.$name, $value);
+        } else {
+            $this->target[$name] = $value;
+        }
     }
 
     public function offsetUnset( $offset )
     {
-        unset( $this->target[$offset] );
+        list( $ns, $name, $prefix ) = $this->_parseName($offset);
+        if ( $ns ) {
+            unset( $this->target->attributes($ns)->{$name} );
+        } else {
+            unset( $this->target[$offset] );
+        }
     }
 }
