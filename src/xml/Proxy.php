@@ -51,7 +51,13 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
             $value = $this->target->children($ns, false)->{$name};
         } else if ( strpos($name, ':')!== false ) {
             list ($ns, $name) = explode(":", $name);
-            $value = $this->target->children($ns, true)->{$name};
+            if ( isset($this->parser->namespaces[$ns]) ) {
+                $ns = $this->parser->namespaces[$ns];
+                $prefix = false;
+            } else {
+                $prefix = true;
+            }
+            $value = $this->target->children($ns, $prefix)->{$name};
         } else if ( !$this->_isDomProperty($name) ) {
             $value = $this->target->{$name};
         } else {
@@ -148,6 +154,7 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
         if ( $this->target && $this->target instanceof \SimpleXMLElement ) {
             $this->target->registerXPathNamespace($prefix, $ns);
         }
+        $this->parser->namespaces[$prefix] = $ns;
     }
 
     public function offsetGet( $offset )
