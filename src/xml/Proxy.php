@@ -46,13 +46,13 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
     private function _getTargetProperty($name) {
         $value = null;
         if ( $name[0] == '{' ) {
-            list($ns, $name) = explode("}", $name);
-            $ns = substr($ns, 1);
+            list($ns, $name) = explode('}', $name);
+            $ns    = substr($ns, 1);
             $value = $this->target->children($ns, false)->{$name};
-        } else if ( strpos($name, ':')!== false ) {
-            list ($ns, $name) = explode(":", $name);
+        } else if ( strpos($name, ':') !== false ) {
+            list ($ns, $name) = explode(':', $name);
             if ( isset($this->parser->namespaces[$ns]) ) {
-                $ns = $this->parser->namespaces[$ns];
+                $ns     = $this->parser->namespaces[$ns];
                 $prefix = false;
             } else {
                 $prefix = true;
@@ -147,8 +147,8 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     /**
      * Register a namespace alias and URI to use in xpath and find
-     * @param string $ns
-     * @param string $uri
+     * @param string $prefix the alias for this namespace
+     * @param string $ns the URI for this namespace
      */
     public function registerNamespace( $prefix, $ns ) {
         if ( $this->target && $this->target instanceof \SimpleXMLElement ) {
