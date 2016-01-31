@@ -45,7 +45,14 @@ class Proxy extends \ArrayObject implements DOMElement, SimpleXMLElement {
 
     private function _getTargetProperty($name) {
         $value = null;
-        if ( !$this->_isDomProperty($name) ) {
+        if ( $name[0] == '{' ) {
+            list($ns, $name) = explode("}", $name);
+            $ns = substr($ns, 1);
+            $value = $this->target->children($ns, false)->{$name};
+        } else if ( strpos($name, ':')!== false ) {
+            list ($ns, $name) = explode(":", $name);
+            $value = $this->target->children($ns, true)->{$name};
+        } else if ( !$this->_isDomProperty($name) ) {
             $value = $this->target->{$name};
         } else {
             $dom = dom_import_simplexml($this->target);

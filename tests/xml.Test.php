@@ -210,6 +210,11 @@ EOF;
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue); 
         $date = current($xml->channel->find("dc|date"));
         $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue); 
+        
+        $date = $xml->channel->{'dc:date'};
+        $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue); 
+        $date = $xml->channel->{'{http://purl.org/dc/elements/1.1/}date'};
+        $this->assertEquals('2016-01-30T20:38:08+00:00', (string) $date->nodeValue);         
     }
 
 }
