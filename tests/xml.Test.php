@@ -10,7 +10,7 @@
  */
 
  
-class TestXML extends PHPUnit_Framework_TestCase 
+class TestXML extends PHPUnit\Framework\TestCase 
 {
     var $RSSXML = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0">

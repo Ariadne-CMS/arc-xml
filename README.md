@@ -8,6 +8,14 @@ ARC: Ariadne Component Library
 [![Latest Unstable Version](https://poser.pugx.org/arc/xml/v/unstable.svg)](https://packagist.org/packages/arc/xml)
 [![License](https://poser.pugx.org/arc/xml/license.svg)](https://packagist.org/packages/arc/xml)
 
+
+A flexible component library for PHP
+------------------------------------ 
+
+The Ariadne Component Library is a spinoff from the Ariadne Web 
+Application Framework and Content Management System 
+[ http://www.ariadne-cms.org/ ]
+
 arc/xml
 =======
 
@@ -20,8 +28,7 @@ can always access the 'nodeValue' property to get the original SimpleXMLElement.
 
 Finally the parser also adds the ability to use basic CSS selectors to find elements in the XML.
 
-```php5
-<?php
+```php
     use \arc\xml as x;
     $xmlString = 
         x::preamble()
@@ -34,7 +41,7 @@ Finally the parser also adds the ability to use basic CSS selectors to find elem
         );
 ```
 
-```php5
+```php
     $xml = \arc\xml::parse($xmlString);
     $title = $xml->channel->title->nodeValue; // SimpleXMLElement 'Wikipedia'
     $titleTag = $xml->channel->title; // <title>Wikipedia</title>
@@ -43,7 +50,7 @@ Finally the parser also adds the ability to use basic CSS selectors to find elem
 CSS selectors
 -------------
 
-```php5
+```php
     $title = current($xml->find('title'));
 ```
 
@@ -75,14 +82,14 @@ SimpleXML
 
 The parsed XML behaves almost identical to a SimpleXMLElement, with the exceptions noted above. So you can access attributes just like SimpleXMLElement allows:
 
-```php5
+```php
     $version = $xml['version'];
     $version = $xml->attributes('version');
 ```
 
 You can walk through the node tree:
 
-```php5
+```php
     $title = $xml->channel->title;
 ```
 
@@ -93,7 +100,7 @@ DOMElement
 
 In addition to SimpleXMLElement methods, you can also call any method that is available in DOMElement.
 
-```php5
+```php
     $version = $xml->getAttributes('version');
     $title = $xml->getElementsByTagName('channel')[0]
         ->getElementsByTagName('title')[0];
@@ -106,7 +113,7 @@ Parsing fragments
 
 The arc\xml parser also accepts partial XML content. It doesn't require a single root element. 
 
-```php5
+```php
     $xmlString = <<< EOF
 <item>
     <title>An item</title>
